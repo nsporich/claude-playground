@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "bash ../scripts/build-catalog.sh",
+    "prebuild": "bash ../scripts/build-catalog.sh && cp ../install.sh public/install.sh",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

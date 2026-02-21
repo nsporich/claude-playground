@@ -5,7 +5,7 @@ A curated collection of reusable Claude Code skills, templates, and prompts.
 ## Quick Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/nsporich/claude-playground/main/install.sh | bash
+curl -fsSL claude.sporich.dev/install.sh | bash
 ```
 
 The installer fetches the catalog, presents an interactive picker, and copies selected assets into your project.

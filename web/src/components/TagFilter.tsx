@@ -17,10 +17,10 @@ export default function TagFilter({
           <button
             key={tag}
             onClick={() => onToggle(tag)}
-            className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${
+            className={`rounded-full px-3.5 py-1.5 text-xs font-mono font-medium transition-all duration-200 ${
               isSelected
-                ? "bg-blue-600 text-white"
-                : "border border-gray-300 text-gray-600 hover:border-gray-400 hover:text-gray-900"
+                ? "bg-[var(--accent)] text-black shadow-[0_0_12px_rgba(245,158,11,0.25)]"
+                : "border border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--accent)]/40 hover:text-[var(--accent-text)]"
             }`}
           >
             {tag}

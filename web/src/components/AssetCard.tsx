@@ -1,6 +1,12 @@
 import Link from "next/link";
 import type { CatalogAsset } from "@/lib/types";
 
+const categoryStyles: Record<string, { bg: string; text: string }> = {
+  skills: { bg: "bg-amber-500/10", text: "text-amber-400" },
+  templates: { bg: "bg-emerald-500/10", text: "text-emerald-400" },
+  prompts: { bg: "bg-violet-500/10", text: "text-violet-400" },
+};
+
 const categoryLabels: Record<string, string> = {
   skills: "Skill",
   templates: "Template",
@@ -8,38 +14,52 @@ const categoryLabels: Record<string, string> = {
 };
 
 export default function AssetCard({ asset }: { asset: CatalogAsset }) {
+  const style = categoryStyles[asset.category] ?? {
+    bg: "bg-white/5",
+    text: "text-white/60",
+  };
+
   return (
-    <div className="group rounded-lg border border-gray-200 bg-white p-5 transition-shadow hover:shadow-md">
-      <div className="mb-2 flex items-center gap-2">
-        <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
-          {categoryLabels[asset.category] ?? asset.category}
-        </span>
-        <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
-          {asset.group}
-        </span>
-      </div>
+    <Link
+      href={`/${asset.category}/${asset.slug}`}
+      className="group relative block rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 transition-all duration-300 hover:border-[var(--border-accent)] hover:bg-[var(--bg-elevated)]"
+    >
+      {/* Hover glow */}
+      <div className="pointer-events-none absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-[radial-gradient(ellipse_at_top,var(--accent-glow),transparent_70%)]" />
 
-      <Link
-        href={`/${asset.category}/${asset.slug}`}
-        className="mb-1 block text-lg font-semibold text-gray-900 group-hover:text-blue-600"
-      >
-        {asset.name}
-      </Link>
-
-      <p className="mb-3 text-sm text-gray-600">{asset.description}</p>
-
-      {asset.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {asset.tags.map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full border border-gray-200 px-2 py-0.5 text-xs text-gray-500"
-            >
-              {tag}
-            </span>
-          ))}
+      <div className="relative">
+        <div className="mb-3 flex items-center gap-2">
+          <span
+            className={`rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${style.bg} ${style.text}`}
+          >
+            {categoryLabels[asset.category] ?? asset.category}
+          </span>
+          <span className="rounded-md bg-white/5 px-2 py-0.5 text-[10px] font-medium text-[var(--text-muted)]">
+            {asset.group}
+          </span>
         </div>
-      )}
-    </div>
+
+        <h3 className="mb-1.5 text-base font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-text)] transition-colors">
+          {asset.name}
+        </h3>
+
+        <p className="mb-4 text-sm leading-relaxed text-[var(--text-muted)]">
+          {asset.description}
+        </p>
+
+        {asset.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {asset.tags.map((tag) => (
+              <span
+                key={tag}
+                className="rounded-full border border-[var(--border-subtle)] px-2 py-0.5 text-[11px] text-[var(--text-muted)] font-mono"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    </Link>
   );
 }

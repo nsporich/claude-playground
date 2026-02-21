@@ -2,30 +2,36 @@ import Link from "next/link";
 
 export default function Header() {
   return (
-    <header className="border-b border-gray-200 bg-white">
+    <header className="border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]/80 backdrop-blur-xl sticky top-0 z-50">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <Link href="/" className="text-xl font-bold text-gray-900">
-          Claude Playground
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--accent)] text-sm font-bold text-black">
+            CP
+          </span>
+          <span className="font-display text-lg text-[var(--text-primary)] tracking-wide">
+            Claude Playground
+          </span>
         </Link>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-1">
           <Link
             href="/browse"
-            className="text-sm font-medium text-gray-600 hover:text-gray-900"
+            className="rounded-lg px-3.5 py-2 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]"
           >
             Browse
           </Link>
           <Link
             href="/getting-started"
-            className="text-sm font-medium text-gray-600 hover:text-gray-900"
+            className="rounded-lg px-3.5 py-2 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]"
           >
             Getting Started
           </Link>
+          <div className="ml-2 h-4 w-px bg-[var(--border-default)]" />
           <a
-            href="https://github.com"
+            href="https://github.com/nsporich/claude-playground"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-gray-500 hover:text-gray-900"
+            className="ml-2 rounded-lg p-2 text-[var(--text-muted)] transition-colors hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]"
             aria-label="GitHub"
           >
             <svg

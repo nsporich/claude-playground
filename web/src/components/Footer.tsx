@@ -1,17 +1,21 @@
 export default function Footer() {
   return (
-    <footer className="border-t border-gray-200 bg-white">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6 text-sm text-gray-500">
-        <p>Built for the Claude Code community</p>
+    <footer className="border-t border-[var(--border-subtle)]">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-8 text-sm">
+        <p className="text-[var(--text-muted)]">
+          Built for the{" "}
+          <span className="text-[var(--text-secondary)]">Claude Code</span>{" "}
+          community
+        </p>
         <a
-          href="https://github.com"
+          href="https://github.com/nsporich/claude-playground"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-gray-500 hover:text-gray-900"
+          className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-[var(--text-muted)] transition-colors hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]"
           aria-label="GitHub"
         >
           <svg
-            className="h-5 w-5"
+            className="h-4 w-4"
             fill="currentColor"
             viewBox="0 0 24 24"
             aria-hidden="true"
@@ -22,6 +26,7 @@ export default function Footer() {
               clipRule="evenodd"
             />
           </svg>
+          <span className="text-xs">Source</span>
         </a>
       </div>
     </footer>
