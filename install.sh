@@ -19,22 +19,29 @@ SKILLS_DIR="$CLAUDE_DIR/skills"
 # Save the original working directory so templates install to the right place
 ORIG_CWD="$(pwd)"
 
-# ── TTY handling ─────────────────────────────────────────────────────────────
-# When piped (curl ... | bash), stdin is not a terminal but /dev/tty still is.
-# We read interactive input from /dev/tty so pipe installs work seamlessly.
+# ── Colors & gum detection ───────────────────────────────────────────────────
+# Amber-warm palette matching the site theme
 if [ -t 1 ]; then
   BOLD='\033[1m'
   DIM='\033[2m'
-  CYAN='\033[36m'
-  GREEN='\033[32m'
-  YELLOW='\033[33m'
-  RED='\033[31m'
   RESET='\033[0m'
+  AMBER='\033[38;5;214m'
+  WHITE='\033[97m'
+  GRAY='\033[38;5;245m'
+  GREEN='\033[32m'
+  RED='\033[31m'
+  YELLOW='\033[33m'
 else
-  BOLD='' DIM='' CYAN='' GREEN='' YELLOW='' RED='' RESET=''
+  BOLD='' DIM='' RESET='' AMBER='' WHITE='' GRAY='' GREEN='' RED='' YELLOW=''
 fi
 
-# Verify we can get interactive input (either stdin or /dev/tty)
+# Detect gum for rich interactive experience
+HAS_GUM=0
+if command -v gum >/dev/null 2>&1; then
+  HAS_GUM=1
+fi
+
+# TTY input handling for piped installs (curl ... | bash)
 if [ -t 0 ]; then
   TTY_INPUT="/dev/stdin"
 elif [ -e /dev/tty ]; then
@@ -45,22 +52,72 @@ else
 fi
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
-info()  { printf "${GREEN}>>>${RESET} %s\n" "$*"; }
-warn()  { printf "${YELLOW}>>>${RESET} %s\n" "$*"; }
-err()   { printf "${RED}>>>${RESET} %s\n" "$*" >&2; }
+info()  { printf "${AMBER}  ▸${RESET} %s\n" "$*"; }
+ok()    { printf "${GREEN}  ✓${RESET} %s\n" "$*"; }
+warn()  { printf "${YELLOW}  !${RESET} %s\n" "$*"; }
+err()   { printf "${RED}  ✗${RESET} %s\n" "$*" >&2; }
 die()   { err "$@"; exit 1; }
+
+# ── Banner ───────────────────────────────────────────────────────────────────
+show_banner() {
+  echo ""
+  if [ "$HAS_GUM" -eq 1 ]; then
+    gum style \
+      --border rounded \
+      --border-foreground 214 \
+      --foreground 214 \
+      --align center \
+      --width 42 \
+      --padding "1 2" \
+      "Claude Playground" \
+      "" \
+      "Skills · Templates · Prompts"
+  else
+    printf "${AMBER}  ╭──────────────────────────────────────╮${RESET}\n"
+    printf "${AMBER}  │${RESET}                                      ${AMBER}│${RESET}\n"
+    printf "${AMBER}  │${RESET}    ${BOLD}${WHITE}Claude Playground${RESET}                ${AMBER}│${RESET}\n"
+    printf "${AMBER}  │${RESET}    ${GRAY}─────────────────${RESET}                ${AMBER}│${RESET}\n"
+    printf "${AMBER}  │${RESET}    ${GRAY}Skills · Templates · Prompts${RESET}     ${AMBER}│${RESET}\n"
+    printf "${AMBER}  │${RESET}                                      ${AMBER}│${RESET}\n"
+    printf "${AMBER}  ╰──────────────────────────────────────╯${RESET}\n"
+  fi
+  echo ""
+}
+
+# ── Spinner ──────────────────────────────────────────────────────────────────
+run_with_spinner() {
+  local msg="$1"
+  shift
+  if [ "$HAS_GUM" -eq 1 ]; then
+    gum spin --spinner dot --title "$msg" -- "$@"
+    ok "$msg"
+  else
+    local frames=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
+    local i=0
+    printf "  ${AMBER}%s${RESET} %s" "${frames[0]}" "$msg"
+    "$@" &
+    local pid=$!
+    while kill -0 "$pid" 2>/dev/null; do
+      printf "\r  ${AMBER}%s${RESET} %s" "${frames[$i]}" "$msg"
+      i=$(( (i + 1) % ${#frames[@]} ))
+      sleep 0.08
+    done
+    wait "$pid"
+    local exit_code=$?
+    printf "\r  ${GREEN}✓${RESET} %s\n" "$msg"
+    return $exit_code
+  fi
+}
 
 # ── Step 1: Check for git ────────────────────────────────────────────────────
 command -v git >/dev/null 2>&1 || die "git is required but not found. Please install git first."
 
 # ── Step 2: Clone or pull the repo ───────────────────────────────────────────
 if [ -d "$CACHE_DIR/.git" ]; then
-  info "Updating cached repo in $CACHE_DIR ..."
-  git -C "$CACHE_DIR" pull --ff-only --quiet 2>/dev/null || warn "Could not pull latest changes; using cached version."
+  run_with_spinner "Updating assets..." git -C "$CACHE_DIR" pull --ff-only --quiet 2>/dev/null || warn "Could not pull latest; using cached version."
 else
-  info "Cloning repo to $CACHE_DIR ..."
   rm -rf "$CACHE_DIR"
-  git clone --quiet "$REPO_URL" "$CACHE_DIR" || die "Failed to clone $REPO_URL"
+  run_with_spinner "Fetching assets..." git clone --quiet "$REPO_URL" "$CACHE_DIR" || die "Failed to clone $REPO_URL"
 fi
 
 # ── Step 3: Build catalog if needed ──────────────────────────────────────────
@@ -82,8 +139,7 @@ fi
 
 if [ "$needs_rebuild" -eq 1 ]; then
   if [ -x "$BUILD_SCRIPT" ] || [ -f "$BUILD_SCRIPT" ]; then
-    info "Building catalog ..."
-    bash "$BUILD_SCRIPT" >/dev/null
+    run_with_spinner "Building catalog..." bash "$BUILD_SCRIPT"
   else
     die "catalog.json is missing and build-catalog.sh not found."
   fi
@@ -143,9 +199,7 @@ if [ "$total" -eq 0 ]; then
 fi
 
 # ── Step 5: Display grouped interactive menu ─────────────────────────────────
-echo ""
-printf "${BOLD}${CYAN}Claude Playground Installer${RESET}\n"
-echo ""
+show_banner
 
 prev_header=""
 for i in $(seq 0 $((total - 1))); do
