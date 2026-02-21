@@ -229,8 +229,7 @@ if [ "$HAS_GUM" -eq 1 ]; then
     --selected-prefix "✓ " \
     --selected-indicator.foreground 214 \
     --unselected-prefix "  " \
-    --match.foreground 214 \
-    < "$TTY_INPUT")" || selected=""
+    --match.foreground 214)" || selected=""
 
   if [ -z "$selected" ]; then
     echo "  Nothing selected. Bye!"
