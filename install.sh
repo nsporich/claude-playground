@@ -198,68 +198,112 @@ if [ "$total" -eq 0 ]; then
   die "No items found in catalog.json."
 fi
 
-# ── Step 5: Display grouped interactive menu ─────────────────────────────────
+# ── Step 5: Select assets ────────────────────────────────────────────────────
 show_banner
 
-prev_header=""
-for i in $(seq 0 $((total - 1))); do
-  cat="${ITEM_CATEGORY[$i]}"
-  grp="${ITEM_GROUP[$i]}"
-  # Capitalize first letter of category and group
-  cat_label="$(echo "$cat" | sed 's/^./\U&/' | sed 's/s$/s/')"
-  # Title-case: capitalize first letter
-  grp_label="$(echo "$grp" | sed 's/^./\U&/')"
-  header="${cat_label} > ${grp_label}"
-
-  if [ "$header" != "$prev_header" ]; then
-    printf "${BOLD}${CYAN}[%s]${RESET}\n" "$header"
-    prev_header="$header"
-  fi
-
-  num=$((i + 1))
-  printf "  %2d) ${BOLD}%-30s${RESET} ${DIM}- %s${RESET}\n" "$num" "${ITEM_SLUG[$i]}" "${ITEM_DESC[$i]}"
-done
-
-echo ""
-
-# ── Step 6: Get user selection ───────────────────────────────────────────────
-printf "Enter numbers to install (space-separated, ${BOLD}'all'${RESET} for everything, ${BOLD}'q'${RESET} to quit): "
-read -r selection < "$TTY_INPUT"
-
-if [ -z "$selection" ] || [ "$selection" = "q" ] || [ "$selection" = "Q" ]; then
-  echo "Nothing to install. Bye!"
-  exit 0
-fi
-
-# Build list of indices to install
 declare -a install_indices=()
 
-if [ "$selection" = "all" ] || [ "$selection" = "ALL" ]; then
+if [ "$HAS_GUM" -eq 1 ]; then
+  # ── Gum: fuzzy multi-select ──
+  gum_lines=()
   for i in $(seq 0 $((total - 1))); do
-    install_indices+=("$i")
+    local cat_label
+    case "${ITEM_CATEGORY[$i]}" in
+      skills)    cat_label="skill   " ;;
+      templates) cat_label="template" ;;
+      prompts)   cat_label="prompt  " ;;
+      *)         cat_label="${ITEM_CATEGORY[$i]}" ;;
+    esac
+    gum_lines+=("$(printf "[%s]  %-28s  %s" "$cat_label" "${ITEM_SLUG[$i]}" "${ITEM_DESC[$i]}")")
   done
+
+  printf "  ${GRAY}Arrow keys to navigate · Space to select · Enter to confirm${RESET}\n\n"
+
+  selected="$(printf '%s\n' "${gum_lines[@]}" | gum filter \
+    --no-limit \
+    --height 15 \
+    --header "Select assets to install" \
+    --header.foreground 214 \
+    --indicator "▸" \
+    --indicator.foreground 214 \
+    --selected-prefix "✓ " \
+    --selected-prefix.foreground 214 \
+    --unselected-prefix "  " \
+    --match.foreground 214 \
+    < "$TTY_INPUT")" || true
+
+  if [ -z "$selected" ]; then
+    echo "  Nothing selected. Bye!"
+    exit 0
+  fi
+
+  # Map selected lines back to indices
+  while IFS= read -r sel_line; do
+    for i in $(seq 0 $((total - 1))); do
+      if echo "$sel_line" | grep -qF "${ITEM_SLUG[$i]}"; then
+        install_indices+=("$i")
+        break
+      fi
+    done
+  done <<< "$selected"
+
 else
-  for token in $selection; do
-    # Validate it's a number in range
-    if ! echo "$token" | grep -qE '^[0-9]+$'; then
-      warn "Skipping invalid input: $token"
-      continue
+  # ── Bash: improved numbered menu ──
+  prev_cat=""
+  for i in $(seq 0 $((total - 1))); do
+    cat_raw="${ITEM_CATEGORY[$i]}"
+    grp="${ITEM_GROUP[$i]}"
+    cat_label="$(echo "$cat_raw" | sed 's/^./\U&/')"
+    grp_label="$(echo "$grp" | sed 's/^./\U&/')"
+    header="${cat_label} › ${grp_label}"
+
+    if [ "$header" != "$prev_cat" ]; then
+      [ -n "$prev_cat" ] && echo ""
+      printf "  ${AMBER}${BOLD}%s${RESET}\n" "$header"
+      printf "  ${GRAY}────────────────────────────────────────${RESET}\n"
+      prev_cat="$header"
     fi
-    idx=$((token - 1))
-    if [ "$idx" -lt 0 ] || [ "$idx" -ge "$total" ]; then
-      warn "Skipping out-of-range number: $token"
-      continue
-    fi
-    install_indices+=("$idx")
+
+    num=$((i + 1))
+    printf "  ${WHITE}%2d)${RESET}  ${BOLD}%-28s${RESET}  ${GRAY}%s${RESET}\n" "$num" "${ITEM_SLUG[$i]}" "${ITEM_DESC[$i]}"
   done
+
+  echo ""
+  printf "  ${AMBER}▸${RESET} Enter numbers (space-separated), ${BOLD}'all'${RESET}, or ${BOLD}'q'${RESET} to quit: "
+  read -r selection < "$TTY_INPUT"
+
+  if [ -z "$selection" ] || [ "$selection" = "q" ] || [ "$selection" = "Q" ]; then
+    echo "  Nothing to install. Bye!"
+    exit 0
+  fi
+
+  if [ "$selection" = "all" ] || [ "$selection" = "ALL" ]; then
+    for i in $(seq 0 $((total - 1))); do
+      install_indices+=("$i")
+    done
+  else
+    for token in $selection; do
+      if ! echo "$token" | grep -qE '^[0-9]+$'; then
+        warn "Skipping invalid input: $token"
+        continue
+      fi
+      idx=$((token - 1))
+      if [ "$idx" -lt 0 ] || [ "$idx" -ge "$total" ]; then
+        warn "Skipping out-of-range: $token"
+        continue
+      fi
+      install_indices+=("$idx")
+    done
+  fi
 fi
 
 if [ ${#install_indices[@]} -eq 0 ]; then
-  echo "Nothing selected. Bye!"
+  echo "  Nothing selected. Bye!"
   exit 0
 fi
 
-# ── Step 7: Install selected items ───────────────────────────────────────────
+# ── Step 6: Install selected items ───────────────────────────────────────────
+echo ""
 declare -a summary=()
 
 for idx in "${install_indices[@]}"; do
@@ -271,87 +315,112 @@ for idx in "${install_indices[@]}"; do
   src="$CACHE_DIR/$item_path"
 
   if [ ! -f "$src" ]; then
-    warn "Source file not found: $src -- skipping $slug"
+    warn "Source not found: $src -- skipping $slug"
     continue
   fi
 
   case "$cat" in
     skills)
-      # Symlink: ~/.claude-playground/skills/<group>/<name> -> ~/.claude/skills/<name>
       skill_src_dir="$(dirname "$src")"
       target_link="$SKILLS_DIR/$slug"
-
       mkdir -p "$SKILLS_DIR"
 
-      # Remove existing symlink or directory if present
       if [ -L "$target_link" ]; then
         rm "$target_link"
       elif [ -d "$target_link" ]; then
-        warn "$target_link already exists as a directory; skipping $slug"
+        summary+=("$(printf "${YELLOW}–${RESET}  %-12s  %-28s  skipped (dir exists)" "[skill]" "$slug")")
         continue
       fi
 
       ln -s "$skill_src_dir" "$target_link"
-      summary+=("$(printf "${GREEN}[skill]${RESET}    %-30s -> %s" "$slug" "$target_link")")
+      summary+=("$(printf "${GREEN}✓${RESET}  %-12s  %-28s  → %s" "[skill]" "$slug" "$target_link")")
       ;;
 
     templates)
       dest="$ORIG_CWD/CLAUDE.md"
 
       if [ -f "$dest" ]; then
-        printf "${YELLOW}>>>${RESET} CLAUDE.md already exists in %s. Overwrite? [y/N] " "$ORIG_CWD"
-        read -r answer < "$TTY_INPUT"
-        case "$answer" in
+        do_overwrite="n"
+        if [ "$HAS_GUM" -eq 1 ]; then
+          gum confirm "CLAUDE.md already exists in $ORIG_CWD. Overwrite?" < "$TTY_INPUT" && do_overwrite="y" || true
+        else
+          printf "  ${YELLOW}!${RESET} CLAUDE.md exists in %s. Overwrite? [y/N] " "$ORIG_CWD"
+          read -r do_overwrite < "$TTY_INPUT"
+        fi
+        case "$do_overwrite" in
           y|Y|yes|YES)
             cp "$src" "$dest"
-            summary+=("$(printf "${GREEN}[template]${RESET} %-30s -> %s" "$slug" "$dest")")
+            summary+=("$(printf "${GREEN}✓${RESET}  %-12s  %-28s  → %s" "[template]" "$slug" "$dest")")
             ;;
           *)
-            warn "Skipped template '$slug' (CLAUDE.md not overwritten)."
+            summary+=("$(printf "${YELLOW}–${RESET}  %-12s  %-28s  skipped" "[template]" "$slug")")
             ;;
         esac
       else
         cp "$src" "$dest"
-        summary+=("$(printf "${GREEN}[template]${RESET} %-30s -> %s" "$slug" "$dest")")
+        summary+=("$(printf "${GREEN}✓${RESET}  %-12s  %-28s  → %s" "[template]" "$slug" "$dest")")
       fi
       ;;
 
     prompts)
-      printf "${CYAN}>>>${RESET} Prompt '${BOLD}%s${RESET}': save to file or print to stdout?\n" "$slug"
-      printf "  Enter a file path (or press Enter to print to stdout): "
-      read -r prompt_dest < "$TTY_INPUT"
+      prompt_dest=""
+      if [ "$HAS_GUM" -eq 1 ]; then
+        printf "\n"
+        prompt_dest="$(gum input \
+          --header "Prompt: $slug" \
+          --header.foreground 214 \
+          --placeholder "File path (or Enter to print to stdout)" \
+          --width 60 \
+          < "$TTY_INPUT")" || true
+      else
+        printf "  ${AMBER}▸${RESET} Prompt '${BOLD}%s${RESET}': save to file or print?\n" "$slug"
+        printf "    File path (or Enter for stdout): "
+        read -r prompt_dest < "$TTY_INPUT"
+      fi
 
       if [ -z "$prompt_dest" ]; then
         echo ""
-        printf "${DIM}────────────────────────────────────────${RESET}\n"
-        cat "$src"
-        printf "${DIM}────────────────────────────────────────${RESET}\n"
+        printf "  ${GRAY}┌─────────────────────────────────────────┐${RESET}\n"
+        while IFS= read -r pline; do
+          printf "  ${GRAY}│${RESET} %s\n" "$pline"
+        done < "$src"
+        printf "  ${GRAY}└─────────────────────────────────────────┘${RESET}\n"
         echo ""
-        summary+=("$(printf "${GREEN}[prompt]${RESET}   %-30s    (printed to stdout)" "$slug")")
+        summary+=("$(printf "${GREEN}✓${RESET}  %-12s  %-28s  printed" "[prompt]" "$slug")")
       else
-        # Resolve relative paths against original CWD
         case "$prompt_dest" in
-          /*) ;; # absolute -- keep as-is
+          /*) ;;
           *)  prompt_dest="$ORIG_CWD/$prompt_dest" ;;
         esac
         mkdir -p "$(dirname "$prompt_dest")"
         cp "$src" "$prompt_dest"
-        summary+=("$(printf "${GREEN}[prompt]${RESET}   %-30s -> %s" "$slug" "$prompt_dest")")
+        summary+=("$(printf "${GREEN}✓${RESET}  %-12s  %-28s  → %s" "[prompt]" "$slug" "$prompt_dest")")
       fi
       ;;
   esac
 done
 
-# ── Step 8: Print summary ───────────────────────────────────────────────────
+# ── Step 7: Print summary ────────────────────────────────────────────────────
 echo ""
-printf "${BOLD}${CYAN}Installation Summary${RESET}\n"
-printf "${DIM}────────────────────────────────────────${RESET}\n"
 if [ ${#summary[@]} -eq 0 ]; then
-  echo "  Nothing was installed."
+  printf "  Nothing was installed.\n"
 else
-  for line in "${summary[@]}"; do
-    printf "  %b\n" "$line"
-  done
+  if [ "$HAS_GUM" -eq 1 ]; then
+    summary_text=""
+    for line in "${summary[@]}"; do
+      summary_text+="$(printf '%b' "$line")"$'\n'
+    done
+    printf '%s' "$summary_text" | gum style \
+      --border rounded \
+      --border-foreground 214 \
+      --padding "1 2"
+  else
+    printf "  ${AMBER}${BOLD}Installation Summary${RESET}\n"
+    printf "  ${GRAY}────────────────────────────────────────────────────────────${RESET}\n"
+    for line in "${summary[@]}"; do
+      printf "  %b\n" "$line"
+    done
+    printf "  ${GRAY}────────────────────────────────────────────────────────────${RESET}\n"
+  fi
 fi
-printf "${DIM}────────────────────────────────────────${RESET}\n"
 echo ""
