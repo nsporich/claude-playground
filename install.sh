@@ -19,8 +19,10 @@ SKILLS_DIR="$CLAUDE_DIR/skills"
 # Save the original working directory so templates install to the right place
 ORIG_CWD="$(pwd)"
 
-# ── Colors (disabled if not a terminal) ──────────────────────────────────────
-if [ -t 1 ] && [ -t 0 ]; then
+# ── TTY handling ─────────────────────────────────────────────────────────────
+# When piped (curl ... | bash), stdin is not a terminal but /dev/tty still is.
+# We read interactive input from /dev/tty so pipe installs work seamlessly.
+if [ -t 1 ]; then
   BOLD='\033[1m'
   DIM='\033[2m'
   CYAN='\033[36m'
@@ -28,10 +30,18 @@ if [ -t 1 ] && [ -t 0 ]; then
   YELLOW='\033[33m'
   RED='\033[31m'
   RESET='\033[0m'
-  IS_TTY=1
 else
   BOLD='' DIM='' CYAN='' GREEN='' YELLOW='' RED='' RESET=''
-  IS_TTY=0
+fi
+
+# Verify we can get interactive input (either stdin or /dev/tty)
+if [ -t 0 ]; then
+  TTY_INPUT="/dev/stdin"
+elif [ -e /dev/tty ]; then
+  TTY_INPUT="/dev/tty"
+else
+  echo "Error: No terminal available for interactive input." >&2
+  exit 1
 fi
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
@@ -159,12 +169,8 @@ done
 echo ""
 
 # ── Step 6: Get user selection ───────────────────────────────────────────────
-if [ "$IS_TTY" -eq 0 ]; then
-  die "Interactive selection requires a terminal. Run the script directly instead of piping."
-fi
-
 printf "Enter numbers to install (space-separated, ${BOLD}'all'${RESET} for everything, ${BOLD}'q'${RESET} to quit): "
-read -r selection
+read -r selection < "$TTY_INPUT"
 
 if [ -z "$selection" ] || [ "$selection" = "q" ] || [ "$selection" = "Q" ]; then
   echo "Nothing to install. Bye!"
@@ -240,7 +246,7 @@ for idx in "${install_indices[@]}"; do
 
       if [ -f "$dest" ]; then
         printf "${YELLOW}>>>${RESET} CLAUDE.md already exists in %s. Overwrite? [y/N] " "$ORIG_CWD"
-        read -r answer
+        read -r answer < "$TTY_INPUT"
         case "$answer" in
           y|Y|yes|YES)
             cp "$src" "$dest"
@@ -259,7 +265,7 @@ for idx in "${install_indices[@]}"; do
     prompts)
       printf "${CYAN}>>>${RESET} Prompt '${BOLD}%s${RESET}': save to file or print to stdout?\n" "$slug"
       printf "  Enter a file path (or press Enter to print to stdout): "
-      read -r prompt_dest
+      read -r prompt_dest < "$TTY_INPUT"
 
       if [ -z "$prompt_dest" ]; then
         echo ""
