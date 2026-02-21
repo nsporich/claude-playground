@@ -207,14 +207,14 @@ if [ "$HAS_GUM" -eq 1 ]; then
   # ── Gum: fuzzy multi-select ──
   gum_lines=()
   for i in $(seq 0 $((total - 1))); do
-    local cat_label
+    cat_label=""
     case "${ITEM_CATEGORY[$i]}" in
       skills)    cat_label="skill   " ;;
       templates) cat_label="template" ;;
       prompts)   cat_label="prompt  " ;;
       *)         cat_label="${ITEM_CATEGORY[$i]}" ;;
     esac
-    gum_lines+=("$(printf "[%s]  %-28s  %s" "$cat_label" "${ITEM_SLUG[$i]}" "${ITEM_DESC[$i]}")")
+    gum_lines+=("$(printf "%d|[%s]  %-28s  %s" "$i" "$cat_label" "${ITEM_SLUG[$i]}" "${ITEM_DESC[$i]}")")
   done
 
   printf "  ${GRAY}Arrow keys to navigate · Space to select · Enter to confirm${RESET}\n\n"
@@ -237,14 +237,10 @@ if [ "$HAS_GUM" -eq 1 ]; then
     exit 0
   fi
 
-  # Map selected lines back to indices
+  # Map selected lines back to indices (extract the index prefix)
   while IFS= read -r sel_line; do
-    for i in $(seq 0 $((total - 1))); do
-      if echo "$sel_line" | grep -qF "${ITEM_SLUG[$i]}"; then
-        install_indices+=("$i")
-        break
-      fi
-    done
+    idx="${sel_line%%|*}"
+    install_indices+=("$idx")
   done <<< "$selected"
 
 else
@@ -253,8 +249,8 @@ else
   for i in $(seq 0 $((total - 1))); do
     cat_raw="${ITEM_CATEGORY[$i]}"
     grp="${ITEM_GROUP[$i]}"
-    cat_label="$(echo "$cat_raw" | sed 's/^./\U&/')"
-    grp_label="$(echo "$grp" | sed 's/^./\U&/')"
+    cat_label="$(echo "$cat_raw" | awk '{print toupper(substr($0,1,1)) substr($0,2)}')"
+    grp_label="$(echo "$grp" | awk '{print toupper(substr($0,1,1)) substr($0,2)}')"
     header="${cat_label} › ${grp_label}"
 
     if [ "$header" != "$prev_cat" ]; then
