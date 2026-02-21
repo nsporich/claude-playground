@@ -22,9 +22,16 @@ process_file() {
   local category
   category="$(echo "$relpath" | cut -d/ -f1)"
 
-  # Determine group (second-level dir)
+  # Determine group (second-level dir, or category name for flat layouts)
   local group
-  group="$(echo "$relpath" | cut -d/ -f2)"
+  local parts
+  parts="$(echo "$relpath" | awk -F/ '{print NF}')"
+  if [ "$parts" -le 2 ]; then
+    # Flat layout: templates/angular.md → group is category
+    group="$category"
+  else
+    group="$(echo "$relpath" | cut -d/ -f2)"
+  fi
 
   # Determine slug
   local slug

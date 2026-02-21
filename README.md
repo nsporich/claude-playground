@@ -41,13 +41,13 @@ The installer fetches the catalog, presents an interactive picker, and copies se
 
 1. Each asset is a Markdown file with **YAML frontmatter** (`name`, `description`, `tags`).
 2. `build-catalog.sh` scans all asset directories and generates `catalog.json`.
-3. `install.sh` fetches the catalog from GitHub, presents an interactive picker using `fzf` (or a numbered menu fallback), and copies selected files into your project's `.claude/` directory.
+3. `install.sh` fetches the catalog from GitHub, presents an interactive picker using `gum` (or a numbered menu fallback), and copies selected files into your project's `.claude/` directory.
 
 ## Adding New Assets
 
 1. Create a `.md` file in the appropriate directory:
    - **Skills** -- `skills/<category>/<skill-name>/SKILL.md`
-   - **Templates** -- `templates/<category>/<name>.md`
+   - **Templates** -- `templates/<name>.md`
    - **Prompts** -- `prompts/<category>/<name>.md`
 2. Add YAML frontmatter with `name`, `description`, and `tags`.
 3. Run `./build-catalog.sh` to regenerate `catalog.json`.

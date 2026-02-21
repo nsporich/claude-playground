@@ -5,7 +5,7 @@ A collection of reusable Claude Code skills, CLAUDE.md templates, and prompts.
 ## Structure
 
 - `skills/<group>/<name>/SKILL.md` — Claude Code skills
-- `templates/<group>/<name>.md` — CLAUDE.md project templates
+- `templates/<name>.md` — CLAUDE.md project templates
 - `prompts/<group>/<name>.md` — Standalone reusable prompts
 - `scripts/build-catalog.sh` — Generates catalog.json from frontmatter
 - `install.sh` — Interactive installer

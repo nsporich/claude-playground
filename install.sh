@@ -423,8 +423,12 @@ else
       cat_raw="${ITEM_CATEGORY[$i]}"
       grp="${ITEM_GROUP[$i]}"
       cat_label="$(echo "$cat_raw" | awk '{print toupper(substr($0,1,1)) substr($0,2)}')"
-      grp_label="$(echo "$grp" | awk '{print toupper(substr($0,1,1)) substr($0,2)}')"
-      header="${cat_label} › ${grp_label}"
+      if [ "$cat_raw" = "templates" ]; then
+        header="Project Templates"
+      else
+        grp_label="$(echo "$grp" | awk '{print toupper(substr($0,1,1)) substr($0,2)}')"
+        header="${cat_label} › ${grp_label}"
+      fi
 
       if [ "$header" != "$prev_cat" ]; then
         [ -n "$prev_cat" ] && echo ""

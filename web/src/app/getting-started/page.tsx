@@ -453,7 +453,7 @@ export default function GettingStartedPage() {
             <>
               Create a <CodeTag>.md</CodeTag> file in the right directory (
               <CodeTag>skills/&lt;category&gt;/&lt;name&gt;/SKILL.md</CodeTag>,{" "}
-              <CodeTag>templates/&lt;category&gt;/&lt;name&gt;.md</CodeTag>, or{" "}
+              <CodeTag>templates/&lt;name&gt;.md</CodeTag>, or{" "}
               <CodeTag>prompts/&lt;category&gt;/&lt;name&gt;.md</CodeTag>).
             </>,
             <>
