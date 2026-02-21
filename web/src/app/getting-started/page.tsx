@@ -71,7 +71,7 @@ export default function GettingStartedPage() {
         <p className="text-gray-700 leading-relaxed">
           Run the following command to get started:
         </p>
-        <InstallCommand command="curl -fsSL https://raw.githubusercontent.com/USER/claude-playground/main/install.sh | bash" />
+        <InstallCommand command="curl -fsSL https://raw.githubusercontent.com/nsporich/claude-playground/main/install.sh | bash" />
         <p className="text-gray-700 leading-relaxed">
           The installer clones the repo, presents a menu, and installs selected
           assets to the right locations on your machine.

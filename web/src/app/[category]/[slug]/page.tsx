@@ -43,7 +43,7 @@ export default async function AssetDetailPage({ params }: PageProps) {
 
   const content = getAssetContent(asset);
   const label = CATEGORY_LABELS[asset.category] ?? asset.category;
-  const installCommand = `curl -fsSL https://raw.githubusercontent.com/USER/claude-playground/main/install.sh | bash`;
+  const installCommand = `curl -fsSL https://raw.githubusercontent.com/nsporich/claude-playground/main/install.sh | bash`;
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-12">

@@ -3,7 +3,7 @@
 # install.sh -- Interactive installer for claude-playground assets
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/USER/claude-playground/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/nsporich/claude-playground/main/install.sh | bash
 #
 # Or clone the repo and run directly:
 #   ./install.sh
@@ -11,7 +11,7 @@
 set -euo pipefail
 
 # ── Configuration ────────────────────────────────────────────────────────────
-REPO_URL="https://github.com/USER/claude-playground"
+REPO_URL="https://github.com/nsporich/claude-playground"
 CACHE_DIR="$HOME/.claude-playground"
 CLAUDE_DIR="$HOME/.claude"
 SKILLS_DIR="$CLAUDE_DIR/skills"

@@ -29,7 +29,7 @@ export default function Home() {
           prompts.
         </p>
         <div className="mx-auto mt-8 max-w-2xl">
-          <InstallCommand command="curl -fsSL https://raw.githubusercontent.com/USER/claude-playground/main/install.sh | bash" />
+          <InstallCommand command="curl -fsSL https://raw.githubusercontent.com/nsporich/claude-playground/main/install.sh | bash" />
         </div>
       </section>
 
