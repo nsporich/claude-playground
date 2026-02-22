@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getCatalog } from "@/lib/catalog";
+import { getHeroColor } from "@/lib/hero-colors";
 import HeroRoster from "@/components/HeroRoster";
 import InstallCommand from "@/components/InstallCommand";
 
@@ -185,14 +186,21 @@ export default function Home() {
                     Used by
                   </span>
                   <div className="flex gap-1">
-                    {skill.used_by.map((agent) => (
-                      <span
-                        key={agent}
-                        className="border border-[var(--ink)] bg-[var(--comic-red-light)] px-1.5 py-0.5 text-[10px] font-bold text-[var(--comic-red)]"
-                      >
-                        {agent}
-                      </span>
-                    ))}
+                    {skill.used_by.map((agent) => {
+                      const heroColor = getHeroColor(agent);
+                      return (
+                        <span
+                          key={agent}
+                          className="border border-[var(--ink)] px-1.5 py-0.5 text-[10px] font-bold"
+                          style={{
+                            background: heroColor?.light ?? "var(--comic-red-light)",
+                            color: heroColor?.color ?? "var(--comic-red)",
+                          }}
+                        >
+                          {agent}
+                        </span>
+                      );
+                    })}
                   </div>
                 </div>
               )}
