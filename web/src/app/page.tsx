@@ -94,7 +94,7 @@ export default function Home() {
         </p>
 
         <div className="max-w-2xl mx-auto">
-          <InstallCommand command="curl -fsSL claude.sporich.dev/install.sh | bash" />
+          <InstallCommand command="curl -fsSL assemble.sporich.dev/install.sh | bash" />
         </div>
       </section>
 

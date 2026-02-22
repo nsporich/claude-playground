@@ -308,7 +308,7 @@ export default function GettingStartedPage() {
           resolution.
         </p>
 
-        <InstallCommand command="curl -fsSL claude.sporich.dev/install.sh | bash" />
+        <InstallCommand command="curl -fsSL assemble.sporich.dev/install.sh | bash" />
 
         <div
           className="bg-[var(--panel-bg)] p-6 space-y-5"
@@ -407,7 +407,7 @@ export default function GettingStartedPage() {
                 style={{ border: "2px solid var(--ink)" }}
               >
                 <span className="text-[var(--comic-red)] font-bold">$</span>{" "}
-                curl -fsSL claude.sporich.dev/install.sh | bash
+                curl -fsSL assemble.sporich.dev/install.sh | bash
               </div>
             </div>
           </div>

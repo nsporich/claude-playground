@@ -5,7 +5,7 @@ Assemble your team. Opinionated agent personas for Claude Code that orchestrate 
 ## Quick Install
 
 ```bash
-curl -fsSL claude.sporich.dev/install.sh | bash
+curl -fsSL assemble.sporich.dev/install.sh | bash
 ```
 
 The installer resolves dependencies automatically — installing an agent pulls in all required skills.

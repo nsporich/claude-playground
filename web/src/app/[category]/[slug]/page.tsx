@@ -75,7 +75,7 @@ export default async function AssetDetailPage({ params }: PageProps) {
   const colorLight = heroColor?.light ?? defaults.colorLight;
   const label = defaults.label;
 
-  const installCommand = `curl -fsSL claude.sporich.dev/install.sh | bash`;
+  const installCommand = `curl -fsSL assemble.sporich.dev/install.sh | bash`;
 
   return (
     <main className="mx-auto max-w-3xl py-12">

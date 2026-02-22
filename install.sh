@@ -3,7 +3,7 @@
 # install.sh -- Agents Assemble: pick your team, deploy your agents
 #
 # Usage:
-#   curl -fsSL claude.sporich.dev/install.sh | bash
+#   curl -fsSL assemble.sporich.dev/install.sh | bash
 #
 set -euo pipefail
 
