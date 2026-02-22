@@ -8,8 +8,8 @@
 set -euo pipefail
 
 # ── Configuration ────────────────────────────────────────────────────────────
-REPO_URL="https://github.com/nsporich/claude-playground"
-CACHE_DIR="$HOME/.claude-playground"
+REPO_URL="https://github.com/nsporich/agents-assemble"
+CACHE_DIR="$HOME/.agents-assemble"
 SKILLS_DIR="$HOME/.claude/skills"
 
 # ── Colors ───────────────────────────────────────────────────────────────────

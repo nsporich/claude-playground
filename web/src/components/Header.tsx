@@ -52,7 +52,7 @@ export default function Header() {
           </Link>
           <div className="ml-2 h-5 w-[2px] bg-[var(--ink)] opacity-20" />
           <a
-            href="https://github.com/nsporich/claude-playground"
+            href="https://github.com/nsporich/agents-assemble"
             target="_blank"
             rel="noopener noreferrer"
             className="ml-2 p-2 text-[var(--ink-medium)] transition-colors hover:text-[var(--ink)]"
