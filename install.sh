@@ -71,13 +71,16 @@ show_banner() {
       --padding "1 2" \
       "Claude Playground" \
       "" \
-      "Skills · Templates · Prompts"
+      "Assemble Your Team" \
+      "" \
+      "Agents · Skills"
   else
     printf "${AMBER}  ╭──────────────────────────────────────╮${RESET}\n"
     printf "${AMBER}  │${RESET}                                      ${AMBER}│${RESET}\n"
     printf "${AMBER}  │${RESET}    ${BOLD}${WHITE}Claude Playground${RESET}                ${AMBER}│${RESET}\n"
     printf "${AMBER}  │${RESET}    ${GRAY}─────────────────${RESET}                ${AMBER}│${RESET}\n"
-    printf "${AMBER}  │${RESET}    ${GRAY}Skills · Templates · Prompts${RESET}     ${AMBER}│${RESET}\n"
+    printf "${AMBER}  │${RESET}    ${GRAY}Assemble Your Team${RESET}               ${AMBER}│${RESET}\n"
+    printf "${AMBER}  │${RESET}    ${GRAY}Agents · Skills${RESET}                  ${AMBER}│${RESET}\n"
     printf "${AMBER}  │${RESET}                                      ${AMBER}│${RESET}\n"
     printf "${AMBER}  ╰──────────────────────────────────────╯${RESET}\n"
   fi
@@ -134,7 +137,7 @@ else
       needs_rebuild=1
       break
     fi
-  done < <(find "$CACHE_DIR/skills" "$CACHE_DIR/templates" "$CACHE_DIR/prompts" -name '*.md' -print0 2>/dev/null)
+  done < <(find "$CACHE_DIR/skills" "$CACHE_DIR/agents" -name '*.md' -print0 2>/dev/null)
 fi
 
 if [ "$needs_rebuild" -eq 1 ]; then
@@ -153,12 +156,14 @@ fi
 #   {"name": "...", "slug": "...", "description": "...", ... "group": "...", "path": "..."}
 
 # Arrays to hold parsed data (parallel arrays indexed by menu number)
-declare -a ITEM_CATEGORY=()   # skills | templates | prompts
+declare -a ITEM_CATEGORY=()   # skills | agents
 declare -a ITEM_NAME=()
 declare -a ITEM_SLUG=()
 declare -a ITEM_DESC=()
 declare -a ITEM_GROUP=()
 declare -a ITEM_PATH=()
+declare -a ITEM_REQ_SKILLS=()  # comma-separated list of required skill slugs (agents only)
+declare -a ITEM_REQ_AGENTS=()  # comma-separated list of required agent slugs (agents only)
 
 current_category=""
 
@@ -167,11 +172,8 @@ while IFS= read -r line; do
   if echo "$line" | grep -q '"skills"'; then
     current_category="skills"
     continue
-  elif echo "$line" | grep -q '"templates"'; then
-    current_category="templates"
-    continue
-  elif echo "$line" | grep -q '"prompts"'; then
-    current_category="prompts"
+  elif echo "$line" | grep -q '"agents"'; then
+    current_category="agents"
     continue
   fi
 
@@ -185,12 +187,24 @@ while IFS= read -r line; do
   local_group="$(echo "$line" | sed 's/.*"group":[[:space:]]*"\([^"]*\)".*/\1/')"
   local_path="$(echo "$line" | sed 's/.*"path":[[:space:]]*"\([^"]*\)".*/\1/')"
 
+  # Parse requires for agents
+  local_req_skills=""
+  local_req_agents=""
+  if [ "$current_category" = "agents" ]; then
+    # Extract skills array from requires
+    local_req_skills="$(echo "$line" | sed -n 's/.*"skills":[[:space:]]*\[\([^]]*\)\].*/\1/p' | sed 's/"//g' | sed 's/[[:space:]]//g')"
+    # Extract agents array from requires
+    local_req_agents="$(echo "$line" | sed -n 's/.*"agents":[[:space:]]*\[\([^]]*\)\].*/\1/p' | sed 's/"//g' | sed 's/[[:space:]]//g')"
+  fi
+
   ITEM_CATEGORY+=("$current_category")
   ITEM_NAME+=("$local_name")
   ITEM_SLUG+=("$local_slug")
   ITEM_DESC+=("$local_desc")
   ITEM_GROUP+=("$local_group")
   ITEM_PATH+=("$local_path")
+  ITEM_REQ_SKILLS+=("$local_req_skills")
+  ITEM_REQ_AGENTS+=("$local_req_agents")
 done < "$CATALOG"
 
 total=${#ITEM_SLUG[@]}
@@ -207,20 +221,12 @@ for i in $(seq 0 $((total - 1))); do
   slug="${ITEM_SLUG[$i]}"
 
   case "$cat" in
-    skills)
+    skills|agents)
       if [ -L "$SKILLS_DIR/$slug" ] || [ -d "$SKILLS_DIR/$slug" ]; then
         ITEM_STATUS+=("installed")
       else
         ITEM_STATUS+=("not_installed")
       fi
-      ;;
-    templates)
-      # Templates install to CWD as CLAUDE.md -- can't reliably detect which template
-      ITEM_STATUS+=("not_installed")
-      ;;
-    prompts)
-      # Prompts are printed or saved to user-chosen path -- can't detect
-      ITEM_STATUS+=("not_installed")
       ;;
     *)
       ITEM_STATUS+=("not_installed")
@@ -233,6 +239,63 @@ installed_count=0
 for s in "${ITEM_STATUS[@]}"; do
   [ "$s" = "installed" ] && installed_count=$((installed_count + 1))
 done
+
+# ── Dependency Resolution ──────────────────────────────────────────────────
+# Given an agent index, resolve all required skills and agents recursively
+# Populates dep_indices array with indices of all dependencies
+declare -a dep_indices=()
+declare -a visited_deps=()
+
+resolve_deps() {
+  local idx="$1"
+  local slug="${ITEM_SLUG[$idx]}"
+
+  # Circular dependency guard
+  local v
+  for v in "${visited_deps[@]}"; do
+    [ "$v" = "$slug" ] && return
+  done
+  visited_deps+=("$slug")
+
+  # Resolve required skills
+  if [ -n "${ITEM_REQ_SKILLS[$idx]}" ]; then
+    local req_skills_arr
+    IFS=',' read -ra req_skills_arr <<< "${ITEM_REQ_SKILLS[$idx]}"
+    local req
+    for req in "${req_skills_arr[@]}"; do
+      req="$(echo "$req" | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//')"
+      [ -z "$req" ] && continue
+      # Find the skill index
+      local j
+      for j in $(seq 0 $((total - 1))); do
+        if [ "${ITEM_SLUG[$j]}" = "$req" ] && [ "${ITEM_CATEGORY[$j]}" = "skills" ]; then
+          dep_indices+=("$j")
+          break
+        fi
+      done
+    done
+  fi
+
+  # Resolve required agents (recursive)
+  if [ -n "${ITEM_REQ_AGENTS[$idx]}" ]; then
+    local req_agents_arr
+    IFS=',' read -ra req_agents_arr <<< "${ITEM_REQ_AGENTS[$idx]}"
+    local req
+    for req in "${req_agents_arr[@]}"; do
+      req="$(echo "$req" | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//')"
+      [ -z "$req" ] && continue
+      # Find the agent index and recurse
+      local j
+      for j in $(seq 0 $((total - 1))); do
+        if [ "${ITEM_SLUG[$j]}" = "$req" ] && [ "${ITEM_CATEGORY[$j]}" = "agents" ]; then
+          dep_indices+=("$j")
+          resolve_deps "$j"
+          break
+        fi
+      done
+    done
+  fi
+}
 
 # ── Step 6: Select assets ────────────────────────────────────────────────────
 show_banner
@@ -375,9 +438,8 @@ else
     for i in $(seq 0 $((total - 1))); do
       cat_label=""
       case "${ITEM_CATEGORY[$i]}" in
-        skills)    cat_label="skill   " ;;
-        templates) cat_label="template" ;;
-        prompts)   cat_label="prompt  " ;;
+        skills)    cat_label="skill " ;;
+        agents)    cat_label="agent " ;;
         *)         cat_label="${ITEM_CATEGORY[$i]}" ;;
       esac
       status_mark=""
@@ -422,12 +484,11 @@ else
     for i in $(seq 0 $((total - 1))); do
       cat_raw="${ITEM_CATEGORY[$i]}"
       grp="${ITEM_GROUP[$i]}"
-      cat_label="$(echo "$cat_raw" | awk '{print toupper(substr($0,1,1)) substr($0,2)}')"
-      if [ "$cat_raw" = "templates" ]; then
-        header="Project Templates"
+      if [ "$cat_raw" = "agents" ]; then
+        header="Agents"
       else
         grp_label="$(echo "$grp" | awk '{print toupper(substr($0,1,1)) substr($0,2)}')"
-        header="${cat_label} › ${grp_label}"
+        header="Skills › ${grp_label}"
       fi
 
       if [ "$header" != "$prev_cat" ]; then
@@ -483,6 +544,46 @@ if [ ${#install_indices[@]} -eq 0 ] && [ ${#remove_indices[@]} -eq 0 ]; then
   exit 0
 fi
 
+# ── Resolve dependencies for selected agents ────────────────────────────────
+final_indices=()
+for idx in "${install_indices[@]}"; do
+  final_indices+=("$idx")
+  if [ "${ITEM_CATEGORY[$idx]}" = "agents" ]; then
+    dep_indices=()
+    visited_deps=()
+    resolve_deps "$idx"
+    for dep_idx in "${dep_indices[@]}"; do
+      # Add if not already selected and not already installed
+      already=0
+      for existing in "${final_indices[@]}"; do
+        [ "$existing" = "$dep_idx" ] && already=1 && break
+      done
+      if [ "$already" -eq 0 ] && [ "${ITEM_STATUS[$dep_idx]}" != "installed" ]; then
+        final_indices+=("$dep_idx")
+      fi
+    done
+  fi
+done
+
+# Show dependency summary if any deps were added
+dep_count=$(( ${#final_indices[@]} - ${#install_indices[@]} ))
+if [ "$dep_count" -gt 0 ]; then
+  echo ""
+  info "Resolving dependencies: $dep_count additional item(s) will be installed"
+  for idx in "${final_indices[@]}"; do
+    # Check if this was an auto-resolved dependency
+    is_dep=1
+    for orig in "${install_indices[@]}"; do
+      [ "$orig" = "$idx" ] && is_dep=0 && break
+    done
+    if [ "$is_dep" -eq 1 ]; then
+      printf "    ${GRAY}+ [%s] %s${RESET}\n" "${ITEM_CATEGORY[$idx]}" "${ITEM_SLUG[$idx]}"
+    fi
+  done
+  echo ""
+fi
+install_indices=("${final_indices[@]}")
+
 # ── Step 7: Remove selected items ────────────────────────────────────────────
 echo ""
 declare -a summary=()
@@ -492,20 +593,20 @@ for idx in "${remove_indices[@]}"; do
   slug="${ITEM_SLUG[$idx]}"
 
   case "$cat" in
-    skills)
+    skills|agents)
       target_link="$SKILLS_DIR/$slug"
       if [ -L "$target_link" ]; then
         rm "$target_link"
-        summary+=("$(printf "${RED}✗${RESET}  %-12s  %-28s  removed" "[skill]" "$slug")")
+        summary+=("$(printf "${RED}✗${RESET}  %-12s  %-28s  removed" "[$cat]" "$slug")")
       elif [ -d "$target_link" ]; then
         warn "$slug is a directory (not a symlink) -- skipping removal"
-        summary+=("$(printf "${YELLOW}–${RESET}  %-12s  %-28s  skipped (not a symlink)" "[skill]" "$slug")")
+        summary+=("$(printf "${YELLOW}–${RESET}  %-12s  %-28s  skipped (not a symlink)" "[$cat]" "$slug")")
       else
-        summary+=("$(printf "${YELLOW}–${RESET}  %-12s  %-28s  not found" "[skill]" "$slug")")
+        summary+=("$(printf "${YELLOW}–${RESET}  %-12s  %-28s  not found" "[$cat]" "$slug")")
       fi
       ;;
     *)
-      warn "Removal is only supported for skills"
+      warn "Removal is only supported for skills and agents"
       ;;
   esac
 done
@@ -528,7 +629,7 @@ for idx in "${install_indices[@]}"; do
   [ "${ITEM_STATUS[$idx]}" = "installed" ] && is_update="yes"
 
   case "$cat" in
-    skills)
+    skills|agents)
       skill_src_dir="$(dirname "$src")"
       target_link="$SKILLS_DIR/$slug"
       mkdir -p "$SKILLS_DIR"
@@ -536,77 +637,15 @@ for idx in "${install_indices[@]}"; do
       if [ -L "$target_link" ]; then
         rm "$target_link"
       elif [ -d "$target_link" ]; then
-        summary+=("$(printf "${YELLOW}–${RESET}  %-12s  %-28s  skipped (dir exists)" "[skill]" "$slug")")
+        summary+=("$(printf "${YELLOW}–${RESET}  %-12s  %-28s  skipped (dir exists)" "[$cat]" "$slug")")
         continue
       fi
 
       ln -s "$skill_src_dir" "$target_link"
       if [ "$is_update" = "yes" ]; then
-        summary+=("$(printf "${GREEN}↻${RESET}  %-12s  %-28s  updated → %s" "[skill]" "$slug" "$target_link")")
+        summary+=("$(printf "${GREEN}↻${RESET}  %-12s  %-28s  updated → %s" "[$cat]" "$slug" "$target_link")")
       else
-        summary+=("$(printf "${GREEN}✓${RESET}  %-12s  %-28s  → %s" "[skill]" "$slug" "$target_link")")
-      fi
-      ;;
-
-    templates)
-      dest="$ORIG_CWD/CLAUDE.md"
-
-      if [ -f "$dest" ]; then
-        do_overwrite="n"
-        if [ "$HAS_GUM" -eq 1 ]; then
-          gum confirm "CLAUDE.md already exists in $ORIG_CWD. Overwrite?" < "$TTY_INPUT" && do_overwrite="y" || true
-        else
-          printf "  ${YELLOW}!${RESET} CLAUDE.md exists in %s. Overwrite? [y/N] " "$ORIG_CWD"
-          read -r do_overwrite < "$TTY_INPUT"
-        fi
-        case "$do_overwrite" in
-          y|Y|yes|YES)
-            cp "$src" "$dest"
-            summary+=("$(printf "${GREEN}✓${RESET}  %-12s  %-28s  → %s" "[template]" "$slug" "$dest")")
-            ;;
-          *)
-            summary+=("$(printf "${YELLOW}–${RESET}  %-12s  %-28s  skipped" "[template]" "$slug")")
-            ;;
-        esac
-      else
-        cp "$src" "$dest"
-        summary+=("$(printf "${GREEN}✓${RESET}  %-12s  %-28s  → %s" "[template]" "$slug" "$dest")")
-      fi
-      ;;
-
-    prompts)
-      prompt_dest=""
-      if [ "$HAS_GUM" -eq 1 ]; then
-        printf "\n"
-        prompt_dest="$(gum input \
-          --header "Prompt: $slug" \
-          --header.foreground 214 \
-          --placeholder "File path (or Enter to print to stdout)" \
-          --width 60 \
-          < "$TTY_INPUT")" || true
-      else
-        printf "  ${AMBER}▸${RESET} Prompt '${BOLD}%s${RESET}': save to file or print?\n" "$slug"
-        printf "    File path (or Enter for stdout): "
-        read -r prompt_dest < "$TTY_INPUT"
-      fi
-
-      if [ -z "$prompt_dest" ]; then
-        echo ""
-        printf "  ${GRAY}┌─────────────────────────────────────────┐${RESET}\n"
-        while IFS= read -r pline; do
-          printf "  ${GRAY}│${RESET} %s\n" "$pline"
-        done < "$src"
-        printf "  ${GRAY}└─────────────────────────────────────────┘${RESET}\n"
-        echo ""
-        summary+=("$(printf "${GREEN}✓${RESET}  %-12s  %-28s  printed" "[prompt]" "$slug")")
-      else
-        case "$prompt_dest" in
-          /*) ;;
-          *)  prompt_dest="$ORIG_CWD/$prompt_dest" ;;
-        esac
-        mkdir -p "$(dirname "$prompt_dest")"
-        cp "$src" "$prompt_dest"
-        summary+=("$(printf "${GREEN}✓${RESET}  %-12s  %-28s  → %s" "[prompt]" "$slug" "$prompt_dest")")
+        summary+=("$(printf "${GREEN}✓${RESET}  %-12s  %-28s  → %s" "[$cat]" "$slug" "$target_link")")
       fi
       ;;
   esac
