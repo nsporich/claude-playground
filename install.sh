@@ -16,9 +16,6 @@ CACHE_DIR="$HOME/.claude-playground"
 CLAUDE_DIR="$HOME/.claude"
 SKILLS_DIR="$CLAUDE_DIR/skills"
 
-# Save the original working directory so templates install to the right place
-ORIG_CWD="$(pwd)"
-
 # ── Colors & gum detection ───────────────────────────────────────────────────
 # Amber-warm palette matching the site theme
 if [ -t 1 ]; then
