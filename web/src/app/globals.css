@@ -208,6 +208,102 @@ body {
   pointer-events: none;
 }
 
+/* ── Zigzag Divider — Jagged comic panel separator ────────────────── */
+.zigzag-divider {
+  height: 8px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 8'%3E%3Cpolygon points='0,8 10,0 20,8' fill='%231a1a2e'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 20px 8px;
+}
+.zigzag-divider-red {
+  height: 8px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 8'%3E%3Cpolygon points='0,8 10,0 20,8' fill='%23E23636'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 20px 8px;
+}
+.zigzag-divider-blue {
+  height: 8px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 8'%3E%3Cpolygon points='0,8 10,0 20,8' fill='%232563EB'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 20px 8px;
+}
+
+/* ── Speed Lines on Hover — Motion effect for interactive elements ── */
+.speed-hover {
+  position: relative;
+  overflow: hidden;
+}
+.speed-hover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-conic-gradient(
+    transparent 0deg 5deg,
+    rgba(26, 26, 46, 0.025) 5deg 10deg
+  );
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+.speed-hover:hover::after {
+  opacity: 1;
+}
+
+/* ── Panel Number — Circled section index ─────────────────────────── */
+.panel-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--ink);
+  background: var(--comic-yellow);
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  color: var(--ink);
+  box-shadow: 2px 2px 0 var(--ink);
+  flex-shrink: 0;
+}
+
+/* ── Kirby Krackle — Cosmic energy dot cluster ────────────────────── */
+.kirby-krackle {
+  position: relative;
+}
+.kirby-krackle::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 8% 15%, var(--ink) 2.5px, transparent 2.5px),
+    radial-gradient(circle at 12% 22%, var(--ink) 1.5px, transparent 1.5px),
+    radial-gradient(circle at 5% 28%, var(--ink) 2px, transparent 2px),
+    radial-gradient(circle at 15% 12%, var(--ink) 1px, transparent 1px),
+    radial-gradient(circle at 88% 75%, var(--ink) 2.5px, transparent 2.5px),
+    radial-gradient(circle at 92% 68%, var(--ink) 1.5px, transparent 1.5px),
+    radial-gradient(circle at 95% 82%, var(--ink) 2px, transparent 2px),
+    radial-gradient(circle at 85% 85%, var(--ink) 1px, transparent 1px),
+    radial-gradient(circle at 90% 60%, var(--ink) 1.5px, transparent 1.5px),
+    radial-gradient(circle at 3% 35%, var(--ink) 1px, transparent 1px);
+  opacity: 0.07;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Burst Shape — Explosion/starburst for onomatopoeia ───────────── */
+.burst-shape {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  clip-path: polygon(
+    50% 0%, 61% 20%, 78% 5%, 72% 28%, 98% 28%,
+    80% 42%, 95% 60%, 72% 55%, 78% 78%, 58% 62%,
+    50% 85%, 42% 62%, 22% 78%, 28% 55%, 5% 60%,
+    20% 42%, 2% 28%, 28% 28%, 22% 5%, 39% 20%
+  );
+}
+
 /* ── Dossier Panel Transition ─────────────────────────────────────── */
 .dossier-enter {
   animation: slam 0.35s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;

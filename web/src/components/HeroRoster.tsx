@@ -231,7 +231,7 @@ export default function HeroRoster({ agents }: { agents: CatalogAsset[] }) {
             <button
               key={agent.slug}
               onClick={() => handleSelect(agent.slug)}
-              className="animate-fade-up group relative p-4 sm:p-5 text-center transition-all duration-200 cursor-pointer bg-[var(--panel-bg)]"
+              className="animate-fade-up group relative p-4 sm:p-5 text-center transition-all duration-200 cursor-pointer bg-[var(--panel-bg)] speed-hover"
               style={{
                 border: `3px solid var(--ink)`,
                 boxShadow: isSelected

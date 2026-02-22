@@ -31,7 +31,7 @@ export default function AssetCard({ asset }: { asset: CatalogAsset }) {
   return (
     <Link
       href={`/${asset.category}/${asset.slug}`}
-      className="group relative block border-3 border-[var(--ink)] bg-[var(--panel-bg)] p-5 transition-all duration-200 hover:-translate-y-1"
+      className="group relative block border-3 border-[var(--ink)] bg-[var(--panel-bg)] p-5 transition-all duration-200 hover:-translate-y-1 speed-hover"
       style={{
         border: "3px solid var(--ink)",
         boxShadow: "4px 4px 0 var(--ink)",

@@ -11,7 +11,7 @@ export default function Home() {
     <div className="space-y-10">
       {/* ── SPLASH PANEL — Hero Section ─────────────────────────────── */}
       <section
-        className="relative pt-16 pb-12 text-center overflow-hidden bg-[var(--panel-bg)]"
+        className="relative pt-16 pb-12 text-center overflow-hidden bg-[var(--panel-bg)] kirby-krackle"
         style={{
           border: "3px solid var(--ink)",
           boxShadow: "6px 6px 0 var(--ink)",
@@ -22,7 +22,7 @@ export default function Home() {
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              "repeating-conic-gradient(transparent 0deg 4deg, rgba(226,54,54,0.02) 4deg 8deg)",
+              "repeating-conic-gradient(transparent 0deg 3deg, rgba(226,54,54,0.015) 3deg 6deg)",
           }}
         />
 
@@ -62,53 +62,39 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Decorative action words */}
+        {/* Decorative action word bursts */}
         <div className="absolute top-6 left-6 action-word text-3xl sm:text-4xl opacity-20 rotate-[-12deg]">
           POW!
         </div>
         <div className="absolute bottom-8 right-8 action-word text-2xl sm:text-3xl opacity-15 rotate-[8deg]">
           ZAP!
         </div>
+        <div className="absolute top-10 right-12 action-word text-xl sm:text-2xl opacity-10 rotate-[15deg]">
+          WHAM!
+        </div>
+        <div className="absolute bottom-14 left-10 action-word text-xl opacity-10 rotate-[-5deg]">
+          BOOM!
+        </div>
       </section>
 
       {/* ── MISSION CALL — Install Command ──────────────────────────── */}
       <section className="animate-fade-up animate-delay-3">
-        <div
-          className="relative bg-[var(--panel-bg)] p-6 sm:p-8 overflow-hidden"
-          style={{
-            border: "3px solid var(--ink)",
-            boxShadow: "4px 4px 0 var(--ink)",
-          }}
-        >
-          {/* Halftone dots */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              backgroundImage:
-                "radial-gradient(circle, var(--ink) 0.5px, transparent 0.5px)",
-              backgroundSize: "5px 5px",
-              opacity: 0.03,
-            }}
-          />
+        <div className="flex items-center gap-3 mb-8">
+          <div className="h-[3px] flex-1 bg-[var(--ink)] opacity-10" />
+          <span className="panel-number">01</span>
+          <h2 className="font-[family-name:var(--font-display)] text-3xl tracking-widest text-[var(--comic-red)]">
+            MISSION CALL
+          </h2>
+          <div className="h-[3px] flex-1 bg-[var(--ink)] opacity-10" />
+        </div>
 
-          <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-5">
-              <div className="h-[3px] flex-1 bg-[var(--ink)] opacity-10" />
-              <h2 className="font-[family-name:var(--font-display)] text-2xl tracking-widest text-[var(--comic-red)]">
-                MISSION CALL
-              </h2>
-              <div className="h-[3px] flex-1 bg-[var(--ink)] opacity-10" />
-            </div>
+        <p className="text-center text-sm text-[var(--ink-light)] mb-5 font-bold">
+          One command to deploy the full roster. Pick your agents, the
+          installer handles the rest.
+        </p>
 
-            <p className="text-center text-sm text-[var(--ink-light)] mb-5 font-bold">
-              One command to deploy the full roster. Pick your agents, the
-              installer handles the rest.
-            </p>
-
-            <div className="max-w-2xl mx-auto">
-              <InstallCommand command="curl -fsSL claude.sporich.dev/install.sh | bash" />
-            </div>
-          </div>
+        <div className="max-w-2xl mx-auto">
+          <InstallCommand command="curl -fsSL claude.sporich.dev/install.sh | bash" />
         </div>
       </section>
 
@@ -116,6 +102,7 @@ export default function Home() {
       <section className="animate-fade-up animate-delay-4">
         <div className="flex items-center gap-3 mb-8">
           <div className="h-[3px] flex-1 bg-[var(--ink)] opacity-10" />
+          <span className="panel-number">02</span>
           <h2 className="font-[family-name:var(--font-display)] text-3xl tracking-widest text-[var(--ink)]">
             THE ROSTER
           </h2>
@@ -134,6 +121,7 @@ export default function Home() {
       <section>
         <div className="flex items-center gap-3 mb-8">
           <div className="h-[3px] flex-1 bg-[var(--ink)] opacity-10" />
+          <span className="panel-number">03</span>
           <h2 className="font-[family-name:var(--font-display)] text-3xl tracking-widest text-[var(--comic-blue)]">
             SKILL ARMORY
           </h2>
@@ -150,7 +138,7 @@ export default function Home() {
             <Link
               key={skill.slug}
               href={`/skills/${skill.slug}`}
-              className="group relative bg-[var(--panel-bg)] p-4 transition-all duration-200 hover:-translate-y-1"
+              className="group relative bg-[var(--panel-bg)] p-4 transition-all duration-200 hover:-translate-y-1 speed-hover"
               style={{
                 border: "2px solid var(--ink)",
                 boxShadow: "3px 3px 0 var(--ink)",
@@ -193,7 +181,8 @@ export default function Home() {
                           key={agent}
                           className="border border-[var(--ink)] px-1.5 py-0.5 text-[10px] font-bold"
                           style={{
-                            background: heroColor?.light ?? "var(--comic-red-light)",
+                            background:
+                              heroColor?.light ?? "var(--comic-red-light)",
                             color: heroColor?.color ?? "var(--comic-red)",
                           }}
                         >
@@ -209,7 +198,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── CTA ─────────────────────────────────────────────────────── */}
+      {/* ── CTA ───────────────────────────────────────────────────────── */}
       <div className="text-center pb-8">
         <Link
           href="/browse"
