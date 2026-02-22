@@ -33,7 +33,7 @@ parse_array() {
   local json="["
   local first=1
   IFS=',' read -ra arr <<< "$raw"
-  for item in "${arr[@]}"; do
+  for item in "${arr[@]+"${arr[@]}"}"; do
     item="$(echo "$item" | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//' | sed 's/^["'"'"']//' | sed 's/["'"'"']$//')"
     if [ -n "$item" ]; then
       if [ "$first" -eq 1 ]; then
@@ -117,7 +117,7 @@ process_agent() {
   local clean_skills
   clean_skills="$(echo "$req_skills_raw" | sed 's/^\[//' | sed 's/\]$//')"
   IFS=',' read -ra skill_arr <<< "$clean_skills"
-  for skill in "${skill_arr[@]}"; do
+  for skill in "${skill_arr[@]+"${skill_arr[@]}"}"; do
     skill="$(echo "$skill" | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//' | sed 's/^["'"'"']//' | sed 's/["'"'"']$//')"
     if [ -n "$skill" ]; then
       agent_skill_deps+=("${slug}:${skill}")
@@ -144,23 +144,41 @@ fi
 AGENT_ORDER=(ironclad deadeye aegis titan lorekeeper oracle)
 
 if [ -d "$REPO_ROOT/agents" ]; then
-  declare -A agent_files=()
+  # Parallel arrays instead of associative array (Bash 3.2 compat)
+  declare -a agent_file_slugs=()
+  declare -a agent_file_paths=()
   while IFS= read -r -d '' mdfile; do
     aslug="$(basename "$(dirname "$mdfile")")"
-    agent_files["$aslug"]="$mdfile"
+    agent_file_slugs+=("$aslug")
+    agent_file_paths+=("$mdfile")
   done < <(find "$REPO_ROOT/agents" -name 'AGENT.md' -print0)
+
+  declare -a processed_agents=()
 
   # Process in explicit order first
   for aslug in "${AGENT_ORDER[@]}"; do
-    if [ -n "${agent_files[$aslug]+x}" ]; then
-      process_agent "${agent_files[$aslug]}"
-      unset "agent_files[$aslug]"
-    fi
+    for i in $(seq 0 $((${#agent_file_slugs[@]} - 1))); do
+      if [ "${agent_file_slugs[$i]}" = "$aslug" ]; then
+        process_agent "${agent_file_paths[$i]}"
+        processed_agents+=("$aslug")
+        break
+      fi
+    done
   done
 
   # Then any remaining agents alphabetically
-  for aslug in $(echo "${!agent_files[@]}" | tr ' ' '\n' | sort); do
-    process_agent "${agent_files[$aslug]}"
+  for aslug in $(printf '%s\n' "${agent_file_slugs[@]}" | sort -u); do
+    already_done=0
+    for p in "${processed_agents[@]+"${processed_agents[@]}"}"; do
+      [ "$p" = "$aslug" ] && already_done=1 && break
+    done
+    [ "$already_done" -eq 1 ] && continue
+    for i in $(seq 0 $((${#agent_file_slugs[@]} - 1))); do
+      if [ "${agent_file_slugs[$i]}" = "$aslug" ]; then
+        process_agent "${agent_file_paths[$i]}"
+        break
+      fi
+    done
   done
 fi
 

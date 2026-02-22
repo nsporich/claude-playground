@@ -129,15 +129,14 @@ declare -a SKILL_PATH=()
 current_category=""
 
 while IFS= read -r line; do
-  if echo "$line" | grep -q '"skills"'; then
-    current_category="skills"
-    continue
-  elif echo "$line" | grep -q '"agents"'; then
-    current_category="agents"
+  # Category headers (e.g. "skills": [...) don't contain "slug"
+  # Data lines do — check slug first to avoid false category matches
+  # (agent entries contain "skills" in their requires field)
+  if ! echo "$line" | grep -q '"slug"'; then
+    echo "$line" | grep -q '"skills"' && current_category="skills"
+    echo "$line" | grep -q '"agents"' && current_category="agents"
     continue
   fi
-
-  echo "$line" | grep -q '"slug"' || continue
 
   local_name="$(echo "$line" | sed 's/.*"name":[[:space:]]*"\([^"]*\)".*/\1/')"
   local_slug="$(echo "$line" | sed 's/.*"slug":[[:space:]]*"\([^"]*\)".*/\1/')"
@@ -227,21 +226,33 @@ fi
 
 # ── Step 7: Resolve dependencies ─────────────────────────────────────────────
 # Collect all required skill slugs and agent slugs
-declare -A needed_skills=()
-declare -A needed_agents=()
+# (Using indexed arrays for Bash 3.2 compatibility — no declare -A)
+declare -a needed_skill_list=()
+declare -a needed_agent_slugs=()
+declare -a needed_agent_idxs=()
 declare -a visited=()
+
+list_contains() {
+  local needle="$1"
+  shift
+  for item in "$@"; do
+    [ "$item" = "$needle" ] && return 0
+  done
+  return 1
+}
 
 resolve_agent() {
   local idx="$1"
   local slug="${AGENT_SLUG[$idx]}"
 
   # Guard against circular deps
-  for v in "${visited[@]+"${visited[@]}"}"; do
-    [ "$v" = "$slug" ] && return
-  done
+  list_contains "$slug" "${visited[@]+"${visited[@]}"}" && return
   visited+=("$slug")
 
-  needed_agents["$slug"]="$idx"
+  if ! list_contains "$slug" "${needed_agent_slugs[@]+"${needed_agent_slugs[@]}"}"; then
+    needed_agent_slugs+=("$slug")
+    needed_agent_idxs+=("$idx")
+  fi
 
   # Required skills
   if [ -n "${AGENT_REQ_SKILLS[$idx]}" ]; then
@@ -249,7 +260,9 @@ resolve_agent() {
     for s in "${skills[@]}"; do
       s="$(echo "$s" | tr -d ' ')"
       [ -z "$s" ] && continue
-      needed_skills["$s"]=1
+      if ! list_contains "$s" "${needed_skill_list[@]+"${needed_skill_list[@]}"}"; then
+        needed_skill_list+=("$s")
+      fi
     done
   fi
 
@@ -280,12 +293,12 @@ printf "  ${BOLD}${WHITE}DEPLOYMENT PLAN${RESET}\n"
 printf "  ${GRAY}──────────────────────────────────────────────${RESET}\n"
 
 # Agents
-for slug in "${!needed_agents[@]}"; do
+for slug in "${needed_agent_slugs[@]+"${needed_agent_slugs[@]}"}"; do
   printf "  ${RED}●${RESET}  ${BOLD}%-14s${RESET}  ${GRAY}agent${RESET}\n" "$slug"
 done
 
 # Skills
-for slug in "${!needed_skills[@]}"; do
+for slug in "${needed_skill_list[@]+"${needed_skill_list[@]}"}"; do
   already_installed=0
   if [ -L "$SKILLS_DIR/$slug" ] || [ -d "$SKILLS_DIR/$slug" ]; then
     already_installed=1
@@ -305,7 +318,7 @@ mkdir -p "$SKILLS_DIR"
 declare -a summary=()
 
 # Install skills first
-for slug in "${!needed_skills[@]}"; do
+for slug in "${needed_skill_list[@]+"${needed_skill_list[@]}"}"; do
   # Find skill path
   skill_path=""
   for j in $(seq 0 $((${#SKILL_SLUG[@]} - 1))); do
@@ -344,8 +357,9 @@ for slug in "${!needed_skills[@]}"; do
 done
 
 # Install agents
-for slug in "${!needed_agents[@]}"; do
-  idx="${needed_agents[$slug]}"
+for i in $(seq 0 $((${#needed_agent_slugs[@]} - 1))); do
+  slug="${needed_agent_slugs[$i]}"
+  idx="${needed_agent_idxs[$i]}"
   src="$CACHE_DIR/${AGENT_PATH[$idx]}"
   src_dir="$(dirname "$src")"
   target="$SKILLS_DIR/$slug"
