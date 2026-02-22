@@ -140,11 +140,28 @@ if [ -d "$REPO_ROOT/skills" ]; then
   done < <(find "$REPO_ROOT/skills" -name 'SKILL.md' -print0 | sort -z)
 fi
 
-# Process agents
+# Process agents in display order (new agents not in this list are appended alphabetically)
+AGENT_ORDER=(ironclad deadeye aegis titan lorekeeper oracle)
+
 if [ -d "$REPO_ROOT/agents" ]; then
+  declare -A agent_files=()
   while IFS= read -r -d '' mdfile; do
-    process_agent "$mdfile"
-  done < <(find "$REPO_ROOT/agents" -name 'AGENT.md' -print0 | sort -z)
+    aslug="$(basename "$(dirname "$mdfile")")"
+    agent_files["$aslug"]="$mdfile"
+  done < <(find "$REPO_ROOT/agents" -name 'AGENT.md' -print0)
+
+  # Process in explicit order first
+  for aslug in "${AGENT_ORDER[@]}"; do
+    if [ -n "${agent_files[$aslug]+x}" ]; then
+      process_agent "${agent_files[$aslug]}"
+      unset "agent_files[$aslug]"
+    fi
+  done
+
+  # Then any remaining agents alphabetically
+  for aslug in $(echo "${!agent_files[@]}" | tr ' ' '\n' | sort); do
+    process_agent "${agent_files[$aslug]}"
+  done
 fi
 
 # Compute used_by for each skill by scanning agent_skill_deps

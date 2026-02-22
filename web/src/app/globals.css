@@ -39,12 +39,12 @@
   --gold-text: #fde68a;
 
   /* Hero Colors */
-  --hero-ironclad: #f59e0b;
-  --hero-deadeye: #ef4444;
+  --hero-ironclad: #ef4444;
+  --hero-deadeye: #a855f7;
   --hero-aegis: #3b82f6;
-  --hero-oracle: #a855f7;
-  --hero-lorekeeper: #10b981;
-  --hero-titan: #06b6d4;
+  --hero-titan: #10b981;
+  --hero-lorekeeper: #f59e0b;
+  --hero-oracle: #06b6d4;
 
   /* Fonts */
   --font-display: "Bebas Neue", Impact, sans-serif;

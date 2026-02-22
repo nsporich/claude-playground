@@ -24,9 +24,9 @@ const HERO_META: Record<string, HeroMeta> = {
     synergy: "Automatically calls in Aegis for final code verification.",
     flavorText:
       "If you can dream the blueprint, Ironclad can forge the fortress. He doesn\u2019t just write code; he constructs reality.",
-    color: "#f59e0b",
-    colorDim: "#92400e",
-    colorGlow: "rgba(245, 158, 11, 0.2)",
+    color: "#ef4444",
+    colorDim: "#991b1b",
+    colorGlow: "rgba(239, 68, 68, 0.2)",
   },
   deadeye: {
     title: "The Marksman",
@@ -34,9 +34,9 @@ const HERO_META: Record<string, HeroMeta> = {
     skillSet: "Precision Bug-Diagnosis, TDD, and Code-Review.",
     flavorText:
       "Deadeye never misses. While others guess at the cause, he\u2019s already neutralized the target from ten thousand lines away.",
-    color: "#ef4444",
-    colorDim: "#991b1b",
-    colorGlow: "rgba(239, 68, 68, 0.2)",
+    color: "#a855f7",
+    colorDim: "#581c87",
+    colorGlow: "rgba(168, 85, 247, 0.2)",
   },
   aegis: {
     title: "The Sentinel",
@@ -48,15 +48,15 @@ const HERO_META: Record<string, HeroMeta> = {
     colorDim: "#1e3a5f",
     colorGlow: "rgba(59, 130, 246, 0.2)",
   },
-  oracle: {
-    title: "The All-Seeing",
-    role: "Codebase Onboarding",
-    skillSet: "Operates via specialized Built-in Subagents.",
+  titan: {
+    title: "The Colossus",
+    role: "Optimization Specialist",
+    skillSet: "Performance Optimization and Code-Review.",
     flavorText:
-      "Oracle doesn\u2019t read your code; she understands it. She maps the dark corners of legacy repos so the rest of the team can strike with certainty.",
-    color: "#a855f7",
-    colorDim: "#581c87",
-    colorGlow: "rgba(168, 85, 247, 0.2)",
+      "Built for the heavy lifting. When the system groans under the weight of technical debt, Titan pulls the load until it\u2019s lean and lethal.",
+    color: "#10b981",
+    colorDim: "#064e3b",
+    colorGlow: "rgba(16, 185, 129, 0.2)",
   },
   lorekeeper: {
     title: "The Archivist",
@@ -64,16 +64,16 @@ const HERO_META: Record<string, HeroMeta> = {
     skillSet: "Comprehensive Documentation orchestration.",
     flavorText:
       "The guardian of the sacred texts. Lorekeeper ensures that the \u2018how\u2019 and \u2018why\u2019 of your mission are never lost to time.",
-    color: "#10b981",
-    colorDim: "#064e3b",
-    colorGlow: "rgba(16, 185, 129, 0.2)",
+    color: "#f59e0b",
+    colorDim: "#92400e",
+    colorGlow: "rgba(245, 158, 11, 0.2)",
   },
-  titan: {
-    title: "The Colossus",
-    role: "Optimization Specialist",
-    skillSet: "Performance Optimization and Code-Review.",
+  oracle: {
+    title: "The All-Seeing",
+    role: "Codebase Onboarding",
+    skillSet: "Operates via specialized Built-in Subagents.",
     flavorText:
-      "Built for the heavy lifting. When the system groans under the weight of technical debt, Titan pulls the load until it\u2019s lean and lethal.",
+      "Oracle doesn\u2019t read your code; she understands it. She maps the dark corners of legacy repos so the rest of the team can strike with certainty.",
     color: "#06b6d4",
     colorDim: "#164e63",
     colorGlow: "rgba(6, 182, 212, 0.2)",
