@@ -1,0 +1,19 @@
+{
+  "skills": [
+    {"name": "bug-diagnosis", "slug": "bug-diagnosis", "description": "Scientific bug diagnosis and fix with root-cause investigation", "tags": ["debugging", "tdd", "general"], "group": "general", "path": "skills/general/bug-diagnosis/SKILL.md", "used_by": ["deadeye"]},
+    {"name": "code-review", "slug": "code-review", "description": "Structured code review with severity ratings", "tags": ["review", "general"], "group": "general", "path": "skills/general/code-review/SKILL.md", "used_by": ["aegis", "deadeye", "ironclad", "titan"]},
+    {"name": "documentation", "slug": "documentation", "description": "Structured documentation generation for codebases and APIs", "tags": ["documentation", "docs", "general"], "group": "general", "path": "skills/general/documentation/SKILL.md", "used_by": ["lorekeeper"]},
+    {"name": "feature-implementation", "slug": "feature-implementation", "description": "Stepped feature development with scaled planning and TDD", "tags": ["feature", "tdd", "planning", "general"], "group": "general", "path": "skills/general/feature-implementation/SKILL.md", "used_by": ["ironclad"]},
+    {"name": "optimization", "slug": "optimization", "description": "Performance profiling, benchmarking, and bottleneck elimination", "tags": ["performance", "optimization", "general"], "group": "general", "path": "skills/general/optimization/SKILL.md", "used_by": ["titan"]},
+    {"name": "planning", "slug": "planning", "description": "Requirements gathering and design through structured exploration", "tags": ["planning", "design", "general"], "group": "general", "path": "skills/general/planning/SKILL.md", "used_by": ["ironclad"]},
+    {"name": "tdd", "slug": "tdd", "description": "Test-driven development with red-green-refactor discipline", "tags": ["tdd", "testing", "general"], "group": "general", "path": "skills/general/tdd/SKILL.md", "used_by": ["deadeye", "ironclad"]}
+  ],
+  "agents": [
+    {"name": "Aegis", "slug": "aegis", "description": "The shield — multi-layered code review protecting quality on all fronts", "tags": ["review", "security", "orchestration"], "path": "agents/aegis/AGENT.md", "requires": {"skills": ["code-review"], "agents": []}, "features": ["subagents"]},
+    {"name": "Deadeye", "slug": "deadeye", "description": "The sharpshooter — hunts bugs with hypothesis-driven precision", "tags": ["debugging", "tdd", "orchestration"], "path": "agents/deadeye/AGENT.md", "requires": {"skills": ["bug-diagnosis", "tdd", "code-review"], "agents": []}, "features": ["worktrees", "subagents"]},
+    {"name": "Ironclad", "slug": "ironclad", "description": "The engineer — builds features from blueprint to production", "tags": ["feature", "tdd", "orchestration"], "path": "agents/ironclad/AGENT.md", "requires": {"skills": ["planning", "tdd", "feature-implementation", "code-review"], "agents": ["aegis"]}, "features": ["worktrees", "subagents"]},
+    {"name": "Lorekeeper", "slug": "lorekeeper", "description": "The chronicler — documents APIs, architecture, and tribal knowledge", "tags": ["documentation", "orchestration"], "path": "agents/lorekeeper/AGENT.md", "requires": {"skills": ["documentation"], "agents": []}, "features": ["subagents"]},
+    {"name": "Oracle", "slug": "oracle", "description": "The all-seeing — maps codebases and reveals architecture instantly", "tags": ["exploration", "onboarding", "orchestration"], "path": "agents/oracle/AGENT.md", "requires": {"skills": [], "agents": []}, "features": ["subagents"]},
+    {"name": "Titan", "slug": "titan", "description": "The powerhouse — optimizes performance and eliminates bottlenecks", "tags": ["performance", "optimization", "orchestration"], "path": "agents/titan/AGENT.md", "requires": {"skills": ["optimization", "code-review"], "agents": []}, "features": ["worktrees", "subagents"]}
+  ]
+}

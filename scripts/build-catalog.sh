@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# build-catalog.sh -- Walk skills/, templates/, prompts/ and produce catalog.json
+# build-catalog.sh -- Walk skills/ and agents/ and produce catalog.json
 # Uses only standard unix tools (awk/sed/grep).
 #
 set -euo pipefail
@@ -10,104 +10,162 @@ OUTPUT="$REPO_ROOT/catalog.json"
 
 # Collect entries per category into shell variables
 skills_json=""
-templates_json=""
-prompts_json=""
+agents_json=""
 
-process_file() {
+# Track agent requirements for computing used_by
+# Format: "agent_slug:skill_slug" pairs
+declare -a agent_skill_deps=()
+
+parse_frontmatter() {
   local filepath="$1"
-  # Make path relative to repo root
-  local relpath="${filepath#$REPO_ROOT/}"
+  awk 'BEGIN{found=0} /^---$/{found++; next} found==1{print} found>=2{exit}' "$filepath"
+}
 
-  # Determine category (top-level dir)
-  local category
-  category="$(echo "$relpath" | cut -d/ -f1)"
+parse_field() {
+  local frontmatter="$1"
+  local field="$2"
+  echo "$frontmatter" | grep "^${field}:" | sed "s/^${field}:[[:space:]]*//" | sed 's/^["'"'"']//' | sed 's/["'"'"']$//'
+}
 
-  # Determine group (second-level dir, or category name for flat layouts)
-  local group
-  local parts
-  parts="$(echo "$relpath" | awk -F/ '{print NF}')"
-  if [ "$parts" -le 2 ]; then
-    # Flat layout: templates/angular.md → group is category
-    group="$category"
-  else
-    group="$(echo "$relpath" | cut -d/ -f2)"
-  fi
-
-  # Determine slug
-  local slug
-  if [ "$category" = "skills" ]; then
-    # For skills, slug is the parent directory name (e.g. code-review from skills/general/code-review/SKILL.md)
-    slug="$(basename "$(dirname "$filepath")")"
-  else
-    # For templates/prompts, slug is filename without .md
-    slug="$(basename "$filepath" .md)"
-  fi
-
-  # Extract YAML frontmatter (lines between first and second ---)
-  local frontmatter
-  frontmatter="$(awk 'BEGIN{found=0} /^---$/{found++; next} found==1{print} found>=2{exit}' "$filepath")"
-
-  # Parse name (strip surrounding quotes if present)
-  local name
-  name="$(echo "$frontmatter" | grep '^name:' | sed 's/^name:[[:space:]]*//' | sed 's/^["'"'"']//' | sed 's/["'"'"']$//')"
-
-  # Parse description (strip surrounding quotes if present)
-  local description
-  description="$(echo "$frontmatter" | grep '^description:' | sed 's/^description:[[:space:]]*//' | sed 's/^["'"'"']//' | sed 's/["'"'"']$//')"
-
-  # Parse tags -- extract content inside brackets, split by comma, build JSON array
-  local tags_raw
-  tags_raw="$(echo "$frontmatter" | grep '^tags:' | sed 's/^tags:[[:space:]]*//' | sed 's/^\[//' | sed 's/\]$//')"
-  local tags_json="["
+parse_array() {
+  local raw="$1"
+  raw="$(echo "$raw" | sed 's/^\[//' | sed 's/\]$//')"
+  local json="["
   local first=1
-  IFS=',' read -ra tag_arr <<< "$tags_raw"
-  for tag in "${tag_arr[@]}"; do
-    tag="$(echo "$tag" | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//' | sed 's/^["'"'"']//' | sed 's/["'"'"']$//')"
-    if [ -n "$tag" ]; then
+  IFS=',' read -ra arr <<< "$raw"
+  for item in "${arr[@]}"; do
+    item="$(echo "$item" | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//' | sed 's/^["'"'"']//' | sed 's/["'"'"']$//')"
+    if [ -n "$item" ]; then
       if [ "$first" -eq 1 ]; then
         first=0
       else
-        tags_json+=", "
+        json+=", "
       fi
-      tags_json+="\"$tag\""
+      json+="\"$item\""
     fi
   done
-  tags_json+="]"
-
-  # Build JSON object for this entry
-  local entry
-  entry="    {\"name\": \"$name\", \"slug\": \"$slug\", \"description\": \"$description\", \"tags\": $tags_json, \"group\": \"$group\", \"path\": \"$relpath\"}"
-
-  # Append to the right category
-  case "$category" in
-    skills)
-      if [ -n "$skills_json" ]; then
-        skills_json+=$',\n'
-      fi
-      skills_json+="$entry"
-      ;;
-    templates)
-      if [ -n "$templates_json" ]; then
-        templates_json+=$',\n'
-      fi
-      templates_json+="$entry"
-      ;;
-    prompts)
-      if [ -n "$prompts_json" ]; then
-        prompts_json+=$',\n'
-      fi
-      prompts_json+="$entry"
-      ;;
-  esac
+  json+="]"
+  echo "$json"
 }
 
-# Walk all three directories for .md files (excluding .gitkeep)
-for dir in skills templates prompts; do
-  target="$REPO_ROOT/$dir"
-  if [ -d "$target" ]; then
-    while IFS= read -r -d '' mdfile; do
-      process_file "$mdfile"
-    done < <(find "$target" -name '*.md' ! -name '.gitkeep' -print0 | sort -z)
+process_skill() {
+  local filepath="$1"
+  local relpath="${filepath#$REPO_ROOT/}"
+  local slug
+  slug="$(basename "$(dirname "$filepath")")"
+  local group
+  group="$(echo "$relpath" | cut -d/ -f2)"
+
+  local frontmatter
+  frontmatter="$(parse_frontmatter "$filepath")"
+
+  local name
+  name="$(parse_field "$frontmatter" "name")"
+  local description
+  description="$(parse_field "$frontmatter" "description")"
+  local tags_raw
+  tags_raw="$(parse_field "$frontmatter" "tags")"
+  local tags_json
+  tags_json="$(parse_array "$tags_raw")"
+
+  # used_by will be filled in after all agents are processed
+  local entry
+  entry="    {\"name\": \"$name\", \"slug\": \"$slug\", \"description\": \"$description\", \"tags\": $tags_json, \"group\": \"$group\", \"path\": \"$relpath\", \"used_by\": []}"
+
+  if [ -n "$skills_json" ]; then
+    skills_json+=$',\n'
+  fi
+  skills_json+="$entry"
+}
+
+process_agent() {
+  local filepath="$1"
+  local relpath="${filepath#$REPO_ROOT/}"
+  local slug
+  slug="$(basename "$(dirname "$filepath")")"
+
+  local frontmatter
+  frontmatter="$(parse_frontmatter "$filepath")"
+
+  local name
+  name="$(parse_field "$frontmatter" "name")"
+  local description
+  description="$(parse_field "$frontmatter" "description")"
+  local tags_raw
+  tags_raw="$(parse_field "$frontmatter" "tags")"
+  local tags_json
+  tags_json="$(parse_array "$tags_raw")"
+
+  # Parse requires.skills and requires.agents from indented YAML
+  local req_skills_raw
+  req_skills_raw="$(echo "$frontmatter" | awk '/^requires:/{found=1; next} found && /^  skills:/{print; next} found && /^  agents:/{next} found && /^[^ ]/{exit}' | sed 's/^  skills:[[:space:]]*//')"
+  local req_agents_raw
+  req_agents_raw="$(echo "$frontmatter" | awk '/^requires:/{found=1; next} found && /^  agents:/{print; next} found && /^  skills:/{next} found && /^[^ ]/{exit}' | sed 's/^  agents:[[:space:]]*//')"
+
+  local req_skills_json
+  req_skills_json="$(parse_array "$req_skills_raw")"
+  local req_agents_json
+  req_agents_json="$(parse_array "$req_agents_raw")"
+
+  # Parse features
+  local features_raw
+  features_raw="$(parse_field "$frontmatter" "features")"
+  local features_json
+  features_json="$(parse_array "$features_raw")"
+
+  # Track skill dependencies for used_by computation
+  local clean_skills
+  clean_skills="$(echo "$req_skills_raw" | sed 's/^\[//' | sed 's/\]$//')"
+  IFS=',' read -ra skill_arr <<< "$clean_skills"
+  for skill in "${skill_arr[@]}"; do
+    skill="$(echo "$skill" | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//' | sed 's/^["'"'"']//' | sed 's/["'"'"']$//')"
+    if [ -n "$skill" ]; then
+      agent_skill_deps+=("${slug}:${skill}")
+    fi
+  done
+
+  local entry
+  entry="    {\"name\": \"$name\", \"slug\": \"$slug\", \"description\": \"$description\", \"tags\": $tags_json, \"path\": \"$relpath\", \"requires\": {\"skills\": $req_skills_json, \"agents\": $req_agents_json}, \"features\": $features_json}"
+
+  if [ -n "$agents_json" ]; then
+    agents_json+=$',\n'
+  fi
+  agents_json+="$entry"
+}
+
+# Process skills
+if [ -d "$REPO_ROOT/skills" ]; then
+  while IFS= read -r -d '' mdfile; do
+    process_skill "$mdfile"
+  done < <(find "$REPO_ROOT/skills" -name 'SKILL.md' -print0 | sort -z)
+fi
+
+# Process agents
+if [ -d "$REPO_ROOT/agents" ]; then
+  while IFS= read -r -d '' mdfile; do
+    process_agent "$mdfile"
+  done < <(find "$REPO_ROOT/agents" -name 'AGENT.md' -print0 | sort -z)
+fi
+
+# Compute used_by for each skill by scanning agent_skill_deps
+for dep in "${agent_skill_deps[@]}"; do
+  agent_slug="${dep%%:*}"
+  skill_slug="${dep#*:}"
+  if echo "$skills_json" | grep -q "\"slug\": \"$skill_slug\""; then
+    skills_json="$(echo "$skills_json" | awk -v slug="$skill_slug" -v agent="$agent_slug" '
+    {
+      if (index($0, "\"slug\": \"" slug "\"") > 0) {
+        if (index($0, "\"used_by\": []") > 0) {
+          gsub("\"used_by\": \\[\\]", "\"used_by\": [\"" agent "\"]")
+        } else {
+          match($0, /"used_by": \[[^\]]*/)
+          before = substr($0, 1, RSTART + RLENGTH - 1)
+          after = substr($0, RSTART + RLENGTH)
+          $0 = before ", \"" agent "\"" after
+        }
+      }
+      print
+    }')"
   fi
 done
 
@@ -117,11 +175,8 @@ cat > "$OUTPUT" <<EOF
   "skills": [
 ${skills_json}
   ],
-  "templates": [
-${templates_json}
-  ],
-  "prompts": [
-${prompts_json}
+  "agents": [
+${agents_json}
   ]
 }
 EOF
