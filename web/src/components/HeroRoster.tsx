@@ -3,8 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { CatalogAsset } from "@/lib/types";
-import InstallCommand from "./InstallCommand";
-
 interface HeroMeta {
   title: string;
   role: string;
@@ -406,14 +404,6 @@ export default function HeroRoster({ agents }: { agents: CatalogAsset[] }) {
 
                 {/* Spacer for speech bubble tail */}
                 <div className="h-2" />
-
-                {/* Install */}
-                <div>
-                  <p className="font-[family-name:var(--font-display)] tracking-widest uppercase text-[var(--ink-light)] mb-2 text-sm">
-                    Deploy {selectedAgent.name.toUpperCase()}
-                  </p>
-                  <InstallCommand command="curl -fsSL claude.sporich.dev/install.sh | bash" />
-                </div>
 
                 {/* View Full Dossier */}
                 <Link
