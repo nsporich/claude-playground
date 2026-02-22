@@ -2,24 +2,37 @@ import Link from "next/link";
 
 export default function Header() {
   return (
-    <header className="border-b-2 border-[var(--accent-dim)]/30 bg-[var(--bg-surface)]/90 backdrop-blur-xl sticky top-0 z-50">
-      {/* Thin accent line at very top */}
-      <div className="h-[2px] bg-gradient-to-r from-transparent via-[var(--accent)] to-transparent" />
+    <header className="relative bg-[var(--comic-yellow)] border-b-[3px] border-[var(--ink)] sticky top-0 z-50">
+      {/* Red top stripe */}
+      <div className="h-[4px] bg-[var(--comic-red)]" />
 
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5">
+      <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-2.5">
         <Link href="/" className="flex items-center gap-3 group">
-          {/* Logo mark */}
-          <span className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--accent)] text-black overflow-hidden">
-            <svg className="h-5 w-5 relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+          {/* Shield logo */}
+          <span
+            className="relative flex h-10 w-10 items-center justify-center bg-[var(--comic-red)] border-2 border-[var(--ink)] text-white transition-transform group-hover:rotate-[-4deg]"
+            style={{ boxShadow: "2px 2px 0 var(--ink)" }}
+          >
+            <svg
+              className="h-5 w-5 relative z-10"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
+              />
             </svg>
           </span>
           <div className="flex flex-col">
-            <span className="font-[family-name:var(--font-display)] text-xl tracking-[0.12em] text-[var(--text-primary)] leading-none">
+            <span className="font-[family-name:var(--font-display)] text-[1.6rem] tracking-wider text-[var(--ink)] leading-none comic-text-3d">
               AGENTS ASSEMBLE
             </span>
-            <span className="text-[9px] tracking-[0.25em] uppercase text-[var(--text-muted)] leading-none mt-0.5">
-              Command Center
+            <span className="text-[10px] tracking-[0.2em] uppercase text-[var(--ink-medium)] font-bold leading-none mt-0.5">
+              Command Center &bull; Issue #1
             </span>
           </div>
         </Link>
@@ -27,22 +40,22 @@ export default function Header() {
         <div className="flex items-center gap-1">
           <Link
             href="/browse"
-            className="rounded-lg px-3.5 py-2 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]"
+            className="px-3.5 py-2 font-[family-name:var(--font-display)] text-lg tracking-wider text-[var(--ink)] hover:text-[var(--comic-red)] transition-colors"
           >
             Roster
           </Link>
           <Link
             href="/getting-started"
-            className="rounded-lg px-3.5 py-2 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]"
+            className="px-3.5 py-2 font-[family-name:var(--font-display)] text-lg tracking-wider text-[var(--ink)] hover:text-[var(--comic-red)] transition-colors"
           >
             Briefing
           </Link>
-          <div className="ml-2 h-4 w-px bg-[var(--border-default)]" />
+          <div className="ml-2 h-5 w-[2px] bg-[var(--ink)] opacity-20" />
           <a
             href="https://github.com/nsporich/claude-playground"
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-2 rounded-lg p-2 text-[var(--text-muted)] transition-colors hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]"
+            className="ml-2 p-2 text-[var(--ink-medium)] transition-colors hover:text-[var(--ink)]"
             aria-label="GitHub"
           >
             <svg

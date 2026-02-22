@@ -1,240 +1,356 @@
 @import "tailwindcss";
 
-/* ── Design Tokens ─────────────────────────────────────────────────── */
+/* ── Comic Book Design Tokens ─────────────────────────────────────── */
 :root {
-  /* Backgrounds */
-  --bg-base: #050508;
-  --bg-surface: #0b0c14;
-  --bg-elevated: #12131e;
-  --bg-hover: #1a1b28;
+  /* Paper & Backgrounds */
+  --paper: #FFF9ED;
+  --paper-alt: #FFF3D6;
+  --panel-bg: #FFFFFF;
 
-  /* Borders */
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-default: rgba(255, 255, 255, 0.12);
-  --border-accent: rgba(220, 38, 38, 0.4);
-  --border-hard: rgba(255, 255, 255, 0.2);
+  /* Ink & Text */
+  --ink: #1a1a2e;
+  --ink-medium: #3d3d5c;
+  --ink-light: #6b6b8a;
+  --ink-faded: #a3a3bc;
 
-  /* Text */
-  --text-primary: #e8eaf6;
-  --text-secondary: #8890a8;
-  --text-muted: #525970;
-
-  /* Primary Accent — Crimson */
-  --accent: #dc2626;
-  --accent-bright: #ef4444;
-  --accent-dim: #991b1b;
-  --accent-glow: rgba(220, 38, 38, 0.2);
-  --accent-text: #fca5a5;
-
-  /* Secondary — Cyan */
-  --cyan: #22d3ee;
-  --cyan-dim: #0e7490;
-  --cyan-glow: rgba(34, 211, 238, 0.12);
-  --cyan-text: #a5f3fc;
-
-  /* Tertiary — Gold */
-  --gold: #fbbf24;
-  --gold-dim: #b45309;
-  --gold-glow: rgba(251, 191, 36, 0.12);
-  --gold-text: #fde68a;
+  /* Comic Colors — Bold Primaries */
+  --comic-red: #E23636;
+  --comic-red-light: #FEE2E2;
+  --comic-blue: #2563EB;
+  --comic-blue-light: #DBEAFE;
+  --comic-yellow: #FACC15;
+  --comic-yellow-light: #FEF9C3;
+  --comic-green: #16A34A;
+  --comic-green-light: #DCFCE7;
+  --comic-purple: #7C3AED;
+  --comic-purple-light: #EDE9FE;
+  --comic-cyan: #0891B2;
+  --comic-cyan-light: #CFFAFE;
+  --comic-orange: #EA580C;
+  --comic-orange-light: #FFEDD5;
 
   /* Hero Colors */
-  --hero-ironclad: #ef4444;
-  --hero-deadeye: #a855f7;
-  --hero-aegis: #3b82f6;
-  --hero-titan: #10b981;
-  --hero-lorekeeper: #f59e0b;
-  --hero-oracle: #06b6d4;
+  --hero-ironclad: #E23636;
+  --hero-deadeye: #7C3AED;
+  --hero-aegis: #2563EB;
+  --hero-titan: #16A34A;
+  --hero-lorekeeper: #D97706;
+  --hero-oracle: #0891B2;
+
+  /* Functional Aliases */
+  --accent: var(--comic-red);
+  --accent-light: var(--comic-red-light);
+
+  /* Shadows — Hard offset, no blur, classic comic print */
+  --shadow-comic: 4px 4px 0 var(--ink);
+  --shadow-comic-sm: 2px 2px 0 var(--ink);
+  --shadow-comic-lg: 6px 6px 0 var(--ink);
 
   /* Fonts */
-  --font-display: "Bebas Neue", Impact, sans-serif;
-  --font-body: "Barlow", sans-serif;
+  --font-display: "Bangers", cursive;
+  --font-body: "Comic Neue", cursive;
   --font-mono: "JetBrains Mono", monospace;
 }
 
 /* ── Base ──────────────────────────────────────────────────────────── */
 ::selection {
-  background: rgba(220, 38, 38, 0.35);
-  color: #fff;
+  background: rgba(226, 54, 54, 0.3);
+  color: var(--ink);
 }
 
 body {
-  background-color: var(--bg-base);
-  background-image:
-    radial-gradient(circle, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-  background-size: 24px 24px;
-}
-
-/* ── Noise Overlay ─────────────────────────────────────────────────── */
-.noise-overlay {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0.025;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-}
-
-/* ── Scan Lines ────────────────────────────────────────────────────── */
-.scan-lines::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.06) 2px,
-    rgba(0, 0, 0, 0.06) 4px
+  background-color: var(--paper);
+  color: var(--ink);
+  /* Ben-Day dots — the classic comic book halftone print texture */
+  background-image: radial-gradient(
+    circle,
+    rgba(26, 26, 46, 0.035) 1px,
+    transparent 1px
   );
-}
-
-/* ── Halftone Pattern ──────────────────────────────────────────────── */
-.halftone {
-  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
   background-size: 6px 6px;
 }
 
-/* ── Hazard Stripes ────────────────────────────────────────────────── */
-.hazard-stripes {
-  background: repeating-linear-gradient(
-    -45deg,
-    transparent,
-    transparent 4px,
-    rgba(220, 38, 38, 0.05) 4px,
-    rgba(220, 38, 38, 0.05) 8px
-  );
-}
-
-/* ── Glow Border ───────────────────────────────────────────────────── */
-.glow-border {
+/* ── Comic Panels ─────────────────────────────────────────────────── */
+.comic-panel {
+  background: var(--panel-bg);
+  border: 3px solid var(--ink);
+  box-shadow: var(--shadow-comic);
   position: relative;
   overflow: hidden;
 }
-.glow-border::before {
+
+.comic-panel-sm {
+  background: var(--panel-bg);
+  border: 2px solid var(--ink);
+  box-shadow: var(--shadow-comic-sm);
+  position: relative;
+}
+
+/* ── Halftone Patterns ────────────────────────────────────────────── */
+.halftone::before {
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(220, 38, 38, 0.5), transparent 40%, transparent 60%, rgba(34, 211, 238, 0.3));
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-  opacity: 0;
-  transition: opacity 0.4s ease;
+  background-image: radial-gradient(
+    circle,
+    currentColor 0.8px,
+    transparent 0.8px
+  );
+  background-size: 5px 5px;
+  opacity: 0.06;
   pointer-events: none;
-}
-.glow-border:hover::before {
-  opacity: 1;
+  z-index: 0;
 }
 
-/* ── Classified Stamp ──────────────────────────────────────────────── */
+/* ── Speech Bubble ────────────────────────────────────────────────── */
+.speech-bubble {
+  position: relative;
+  background: var(--panel-bg);
+  border: 3px solid var(--ink);
+  border-radius: 24px;
+  padding: 1rem 1.5rem;
+}
+.speech-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -16px;
+  left: 32px;
+  border-width: 16px 12px 0;
+  border-style: solid;
+  border-color: var(--ink) transparent;
+}
+.speech-bubble::before {
+  content: "";
+  position: absolute;
+  bottom: -11px;
+  left: 35px;
+  border-width: 12px 9px 0;
+  border-style: solid;
+  border-color: var(--panel-bg) transparent;
+  z-index: 1;
+}
+
+/* ── Caption Box — Yellow narration rectangle ─────────────────────── */
+.caption-box {
+  background: var(--comic-yellow);
+  border: 2px solid var(--ink);
+  padding: 0.5rem 1rem;
+  font-style: italic;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* ── Speed Lines — Radiating from center ──────────────────────────── */
+.speed-lines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-conic-gradient(
+    transparent 0deg 4deg,
+    rgba(26, 26, 46, 0.018) 4deg 8deg
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Starburst — Explosion background ─────────────────────────────── */
+.starburst {
+  clip-path: polygon(
+    50% 0%,
+    63% 28%,
+    98% 35%,
+    72% 57%,
+    82% 91%,
+    50% 72%,
+    18% 91%,
+    28% 57%,
+    2% 35%,
+    37% 28%
+  );
+}
+
+/* ── Action Word Text ─────────────────────────────────────────────── */
+.action-word {
+  font-family: var(--font-display);
+  display: inline-block;
+  color: var(--comic-yellow);
+  text-shadow:
+    2px 2px 0 var(--ink),
+    -1px -1px 0 var(--ink),
+    1px -1px 0 var(--ink),
+    -1px 1px 0 var(--ink);
+  letter-spacing: 0.06em;
+}
+
+/* ── Comic Text Effects ───────────────────────────────────────────── */
+.comic-text-3d {
+  text-shadow:
+    3px 3px 0 rgba(26, 26, 46, 0.12);
+}
+
+/* ── Classified Stamp ─────────────────────────────────────────────── */
 .classified-stamp {
   position: relative;
 }
-.classified-stamp::before {
-  content: "CLASSIFIED";
+.classified-stamp::after {
+  content: "TOP SECRET";
   position: absolute;
-  top: 16px;
-  right: -16px;
+  top: 24px;
+  right: 20px;
   font-family: var(--font-display);
-  font-size: 10px;
-  letter-spacing: 0.3em;
-  color: rgba(220, 38, 38, 0.12);
+  font-size: 1.1rem;
+  letter-spacing: 0.12em;
+  color: var(--comic-red);
+  border: 3px solid var(--comic-red);
+  padding: 2px 10px;
   transform: rotate(12deg);
+  opacity: 0.3;
   pointer-events: none;
 }
 
-/* ── Dossier Transition ────────────────────────────────────────────── */
+/* ── Dossier Panel Transition ─────────────────────────────────────── */
 .dossier-enter {
-  animation: dossier-slide 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: slam 0.35s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
-@keyframes dossier-slide {
+/* ── Animations ───────────────────────────────────────────────────── */
+@keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(-12px);
-    clip-path: inset(0 0 100% 0);
+    transform: translateY(24px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
-    clip-path: inset(0 0 0 0);
   }
 }
 
-/* ── Animations ────────────────────────────────────────────────────── */
-@keyframes fade-up {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
-@keyframes shimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
+@keyframes slam {
+  0% {
+    opacity: 0;
+    transform: scale(1.15) rotate(-2deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.98) rotate(0.5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
 }
 
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 var(--pulse-color, rgba(220, 38, 38, 0.4)); }
-  50% { box-shadow: 0 0 24px 4px var(--pulse-color, rgba(220, 38, 38, 0.15)); }
+@keyframes pop {
+  0% {
+    transform: scale(0);
+  }
+  70% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
-@keyframes flicker {
-  0%, 100% { opacity: 1; }
-  92% { opacity: 1; }
-  93% { opacity: 0.7; }
-  94% { opacity: 1; }
-  96% { opacity: 0.85; }
-  97% { opacity: 1; }
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  15% {
+    transform: translateX(-3px) rotate(-1deg);
+  }
+  45% {
+    transform: translateX(3px) rotate(0.5deg);
+  }
+  75% {
+    transform: translateX(-2px) rotate(-0.3deg);
+  }
 }
 
-.animate-fade-up { animation: fade-up 0.6s ease-out both; }
-.animate-fade-in { animation: fade-in 0.5s ease-out both; }
-.animate-pulse-glow { animation: pulse-glow 2.5s ease-in-out infinite; }
+@keyframes pulse-dot {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 0.7;
+  }
+}
 
-.animate-delay-1 { animation-delay: 0.1s; }
-.animate-delay-2 { animation-delay: 0.2s; }
-.animate-delay-3 { animation-delay: 0.3s; }
-.animate-delay-4 { animation-delay: 0.4s; }
-.animate-delay-5 { animation-delay: 0.5s; }
-.animate-delay-6 { animation-delay: 0.6s; }
-.animate-delay-7 { animation-delay: 0.7s; }
+.animate-fade-up {
+  animation: fade-up 0.5s ease-out both;
+}
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out both;
+}
+.animate-slam {
+  animation: slam 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+.animate-pop {
+  animation: pop 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
 
-/* ── Markdown Content ──────────────────────────────────────────────── */
+.animate-delay-1 {
+  animation-delay: 0.06s;
+}
+.animate-delay-2 {
+  animation-delay: 0.12s;
+}
+.animate-delay-3 {
+  animation-delay: 0.18s;
+}
+.animate-delay-4 {
+  animation-delay: 0.24s;
+}
+.animate-delay-5 {
+  animation-delay: 0.3s;
+}
+.animate-delay-6 {
+  animation-delay: 0.36s;
+}
+.animate-delay-7 {
+  animation-delay: 0.42s;
+}
+
+/* ── Markdown Content ─────────────────────────────────────────────── */
 .markdown-content h1 {
   font-family: var(--font-display);
-  font-size: 2rem;
-  font-weight: 400;
-  letter-spacing: 0.06em;
-  color: var(--text-primary);
+  font-size: 2.25rem;
+  letter-spacing: 0.04em;
+  color: var(--ink);
   margin-top: 2.5rem;
   margin-bottom: 1rem;
+  text-shadow: 2px 2px 0 rgba(26, 26, 46, 0.06);
 }
 
 .markdown-content h2 {
   font-family: var(--font-display);
-  font-size: 1.5rem;
-  font-weight: 400;
-  letter-spacing: 0.04em;
-  color: var(--text-primary);
+  font-size: 1.75rem;
+  letter-spacing: 0.03em;
+  color: var(--ink);
   margin-top: 2rem;
   margin-bottom: 0.75rem;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid var(--accent-dim);
+  border-bottom: 3px solid var(--comic-red);
 }
 
 .markdown-content h3 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  letter-spacing: 0.02em;
+  color: var(--ink);
   margin-top: 1.5rem;
   margin-bottom: 0.5rem;
 }
@@ -242,53 +358,51 @@ body {
 .markdown-content h4,
 .markdown-content h5,
 .markdown-content h6 {
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-medium);
   margin-top: 1.25rem;
   margin-bottom: 0.5rem;
 }
 
 .markdown-content p {
-  line-height: 1.75;
-  color: var(--text-secondary);
+  line-height: 1.8;
+  color: var(--ink-medium);
   margin-bottom: 1rem;
 }
 
 .markdown-content a {
-  color: var(--cyan-text);
+  color: var(--comic-blue);
   text-decoration: none;
-  border-bottom: 1px solid rgba(34, 211, 238, 0.3);
-  transition: border-color 0.2s ease, color 0.2s ease;
+  border-bottom: 2px solid var(--comic-blue);
+  font-weight: 700;
+  transition: color 0.2s, border-color 0.2s;
 }
 .markdown-content a:hover {
-  color: var(--cyan);
-  border-bottom-color: var(--cyan);
+  color: var(--comic-red);
+  border-bottom-color: var(--comic-red);
 }
 
 .markdown-content ul {
   list-style: none;
-  padding-left: 1.25rem;
+  padding-left: 1.5rem;
   margin-bottom: 1rem;
 }
 .markdown-content ul li {
   position: relative;
   padding-left: 0.5rem;
-  margin-bottom: 0.375rem;
-  color: var(--text-secondary);
-  line-height: 1.7;
+  margin-bottom: 0.5rem;
+  color: var(--ink-medium);
+  line-height: 1.75;
 }
 .markdown-content ul li::before {
-  content: "";
+  content: "\2605";
   position: absolute;
-  left: -0.75rem;
-  top: 0.65em;
-  height: 4px;
-  width: 4px;
-  border-radius: 50%;
-  background: var(--accent);
+  left: -1rem;
+  top: 0.1em;
+  font-size: 0.65em;
+  color: var(--comic-red);
 }
 
 .markdown-content ol {
@@ -297,31 +411,32 @@ body {
   margin-bottom: 1rem;
 }
 .markdown-content ol li {
-  color: var(--text-secondary);
-  line-height: 1.7;
-  margin-bottom: 0.375rem;
+  color: var(--ink-medium);
+  line-height: 1.75;
+  margin-bottom: 0.5rem;
 }
 .markdown-content ol li::marker {
-  color: var(--accent);
-  font-weight: 600;
+  color: var(--comic-red);
+  font-family: var(--font-display);
 }
 
 .markdown-content code {
   font-family: var(--font-mono);
   font-size: 0.85em;
-  padding: 0.15rem 0.4rem;
-  border-radius: 0.25rem;
-  background: var(--bg-elevated);
-  color: var(--cyan-text);
-  border: 1px solid var(--border-subtle);
+  padding: 0.15rem 0.45rem;
+  border-radius: 3px;
+  background: var(--comic-yellow-light);
+  color: var(--ink);
+  border: 1.5px solid var(--ink);
 }
 
 .markdown-content pre {
-  border: 1px solid var(--border-default);
-  border-radius: 0.5rem;
+  border: 3px solid var(--ink);
+  border-radius: 4px;
   overflow-x: auto;
   margin-bottom: 1.25rem;
-  background: var(--bg-surface) !important;
+  background: #1e1e2e !important;
+  box-shadow: var(--shadow-comic);
 }
 .markdown-content pre code {
   display: block;
@@ -330,54 +445,57 @@ body {
   line-height: 1.7;
   background: transparent;
   border: none;
-  color: var(--text-secondary);
+  color: #e2e8f0;
 }
 
 .markdown-content blockquote {
-  border-left: 3px solid var(--accent);
+  border: 2px solid var(--ink);
+  border-left: 5px solid var(--comic-yellow);
   padding: 0.75rem 1.25rem;
   margin: 1rem 0;
   font-style: italic;
-  color: var(--text-muted);
-  background: rgba(220, 38, 38, 0.03);
-  border-radius: 0 0.5rem 0.5rem 0;
+  color: var(--ink-medium);
+  background: var(--comic-yellow-light);
+  border-radius: 0 4px 4px 0;
 }
 
 .markdown-content table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 1.25rem;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
+  border: 2px solid var(--ink);
+  box-shadow: var(--shadow-comic-sm);
 }
 .markdown-content th {
   text-align: left;
   padding: 0.6rem 0.75rem;
-  border-bottom: 2px solid var(--border-default);
-  font-weight: 600;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--text-muted);
-  background: var(--bg-elevated);
+  border-bottom: 3px solid var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  color: var(--ink);
+  background: var(--comic-yellow-light);
 }
 .markdown-content td {
   padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid var(--border-subtle);
-  color: var(--text-secondary);
+  border-bottom: 1.5px solid rgba(26, 26, 46, 0.15);
+  color: var(--ink-medium);
 }
 
 .markdown-content img {
   max-width: 100%;
-  border-radius: 0.5rem;
+  border: 3px solid var(--ink);
+  box-shadow: var(--shadow-comic);
 }
 
 .markdown-content hr {
   border: none;
-  border-top: 2px solid var(--border-default);
+  border-top: 3px solid var(--ink);
   margin: 2rem 0;
 }
 
 .markdown-content strong {
-  color: var(--text-primary);
-  font-weight: 600;
+  color: var(--ink);
+  font-weight: 700;
 }

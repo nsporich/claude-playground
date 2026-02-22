@@ -2,38 +2,45 @@ export interface HeroColor {
   color: string;
   text: string;
   bg: string;
+  light: string;
 }
 
 const HERO_COLORS: Record<string, HeroColor> = {
   ironclad: {
-    color: "#ef4444",
-    text: "#fca5a5",
-    bg: "rgba(239, 68, 68, 0.15)",
+    color: "#E23636",
+    text: "#B91C1C",
+    bg: "rgba(226, 54, 54, 0.12)",
+    light: "#FEE2E2",
   },
   deadeye: {
-    color: "#a855f7",
-    text: "#d8b4fe",
-    bg: "rgba(168, 85, 247, 0.15)",
+    color: "#7C3AED",
+    text: "#5B21B6",
+    bg: "rgba(124, 58, 237, 0.12)",
+    light: "#EDE9FE",
   },
   aegis: {
-    color: "#3b82f6",
-    text: "#93c5fd",
-    bg: "rgba(59, 130, 246, 0.15)",
+    color: "#2563EB",
+    text: "#1D4ED8",
+    bg: "rgba(37, 99, 235, 0.12)",
+    light: "#DBEAFE",
   },
   titan: {
-    color: "#10b981",
-    text: "#6ee7b7",
-    bg: "rgba(16, 185, 129, 0.15)",
+    color: "#16A34A",
+    text: "#15803D",
+    bg: "rgba(22, 163, 74, 0.12)",
+    light: "#DCFCE7",
   },
   lorekeeper: {
-    color: "#f59e0b",
-    text: "#fcd34d",
-    bg: "rgba(245, 158, 11, 0.15)",
+    color: "#D97706",
+    text: "#B45309",
+    bg: "rgba(217, 119, 6, 0.12)",
+    light: "#FEF3C7",
   },
   oracle: {
-    color: "#06b6d4",
-    text: "#67e8f9",
-    bg: "rgba(6, 182, 212, 0.15)",
+    color: "#0891B2",
+    text: "#0E7490",
+    bg: "rgba(8, 145, 178, 0.12)",
+    light: "#CFFAFE",
   },
 };
 

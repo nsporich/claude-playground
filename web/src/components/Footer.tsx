@@ -6,43 +6,48 @@ export default function Footer() {
   const skillCount = catalog.skills.length;
 
   return (
-    <footer className="border-t-2 border-[var(--accent-dim)]/20 bg-[var(--bg-surface)]/60">
-      <div className="h-px bg-gradient-to-r from-transparent via-[var(--accent)]/20 to-transparent" />
-
-      <div className="mx-auto flex max-w-6xl flex-col sm:flex-row items-center justify-between gap-4 px-6 py-6">
+    <footer className="border-t-[3px] border-[var(--ink)] bg-[var(--panel-bg)]">
+      <div className="mx-auto flex max-w-6xl flex-col sm:flex-row items-center justify-between gap-4 px-6 py-5">
         {/* Stats */}
-        <div className="flex items-center gap-5 text-sm">
+        <div className="flex items-center gap-4 font-[family-name:var(--font-display)] text-base tracking-wider">
           <div className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)] animate-pulse" />
-            <span className="font-[family-name:var(--font-display)] text-sm tracking-[0.12em] text-[var(--accent-text)]">
+            <span
+              className="inline-block h-3 w-3 bg-[var(--comic-red)] border border-[var(--ink)]"
+              style={{ clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)" }}
+            />
+            <span className="text-[var(--comic-red)]">
               {agentCount} AGENTS
             </span>
           </div>
-          <div className="h-3.5 w-px bg-[var(--border-default)]" />
+          <div className="h-4 w-[2px] bg-[var(--ink)] opacity-20" />
           <div className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--cyan)] animate-pulse" />
-            <span className="font-[family-name:var(--font-display)] text-sm tracking-[0.12em] text-[var(--cyan-text)]">
+            <span
+              className="inline-block h-3 w-3 bg-[var(--comic-blue)] border border-[var(--ink)]"
+              style={{ clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)" }}
+            />
+            <span className="text-[var(--comic-blue)]">
               {skillCount} SKILLS
             </span>
           </div>
-          <div className="h-3.5 w-px bg-[var(--border-default)]" />
-          <span className="text-[10px] tracking-[0.15em] uppercase text-[var(--text-muted)]">
-            Ready for deployment
+          <div className="h-4 w-[2px] bg-[var(--ink)] opacity-20" />
+          <span className="text-sm text-[var(--ink-faded)] tracking-widest">
+            READY FOR ACTION
           </span>
         </div>
 
         {/* Links */}
         <div className="flex items-center gap-3">
-          <span className="text-xs text-[var(--text-muted)]">
+          <span className="text-sm text-[var(--ink-light)] font-bold">
             Built for the{" "}
-            <span className="text-[var(--text-secondary)]">Claude Code</span>{" "}
+            <span className="text-[var(--ink)]">Claude Code</span>{" "}
             community
           </span>
           <a
             href="https://github.com/nsporich/claude-playground"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[var(--text-muted)] transition-colors hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]"
+            className="flex items-center gap-1.5 border-2 border-[var(--ink)] px-3 py-1.5 text-[var(--ink)] font-bold text-sm transition-all hover:bg-[var(--ink)] hover:text-white"
+            style={{ boxShadow: "2px 2px 0 var(--ink)" }}
           >
             <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
               <path
@@ -51,7 +56,7 @@ export default function Footer() {
                 clipRule="evenodd"
               />
             </svg>
-            <span className="text-xs">Source</span>
+            Source
           </a>
         </div>
       </div>

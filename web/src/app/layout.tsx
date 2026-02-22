@@ -1,19 +1,19 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, Barlow, JetBrains_Mono } from "next/font/google";
+import { Bangers, Comic_Neue, JetBrains_Mono } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import "./globals.css";
 
-const bebasNeue = Bebas_Neue({
+const bangers = Bangers({
   variable: "--font-display",
   subsets: ["latin"],
   weight: "400",
 });
 
-const barlow = Barlow({
+const comicNeue = Comic_Neue({
   variable: "--font-body",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["300", "400", "700"],
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -36,9 +36,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${bebasNeue.variable} ${barlow.variable} ${jetbrainsMono.variable} antialiased flex min-h-screen flex-col bg-[var(--bg-base)] text-[var(--text-primary)] font-[family-name:var(--font-body)]`}
+        className={`${bangers.variable} ${comicNeue.variable} ${jetbrainsMono.variable} antialiased flex min-h-screen flex-col bg-[var(--paper)] text-[var(--ink)] font-[family-name:var(--font-body)]`}
       >
-        <div className="noise-overlay" />
         <Header />
         <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-10">
           {children}
