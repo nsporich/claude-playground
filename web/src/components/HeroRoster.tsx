@@ -3,6 +3,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { CatalogAsset } from "@/lib/types";
+interface HeroStats {
+  power: number;
+  precision: number;
+  speed: number;
+  range: number;
+  teamwork: number;
+}
+
 interface HeroMeta {
   title: string;
   role: string;
@@ -11,6 +19,7 @@ interface HeroMeta {
   flavorText: string;
   color: string;
   colorLight: string;
+  stats: HeroStats;
 }
 
 const HERO_META: Record<string, HeroMeta> = {
@@ -23,6 +32,7 @@ const HERO_META: Record<string, HeroMeta> = {
       "If you can dream the blueprint, Ironclad can forge the fortress. He doesn\u2019t just write code; he constructs reality.",
     color: "#E23636",
     colorLight: "#FEE2E2",
+    stats: { power: 5, precision: 3, speed: 3, range: 4, teamwork: 4 },
   },
   deadeye: {
     title: "The Marksman",
@@ -32,6 +42,7 @@ const HERO_META: Record<string, HeroMeta> = {
       "Deadeye never misses. While others guess at the cause, he\u2019s already neutralized the target from ten thousand lines away.",
     color: "#7C3AED",
     colorLight: "#EDE9FE",
+    stats: { power: 3, precision: 5, speed: 4, range: 3, teamwork: 3 },
   },
   aegis: {
     title: "The Sentinel",
@@ -41,6 +52,7 @@ const HERO_META: Record<string, HeroMeta> = {
       "The final line of defense. If a single semicolon is out of place, the shield stays up. Nothing enters the master branch without Aegis\u2019s seal.",
     color: "#2563EB",
     colorLight: "#DBEAFE",
+    stats: { power: 3, precision: 5, speed: 2, range: 2, teamwork: 4 },
   },
   titan: {
     title: "The Colossus",
@@ -50,6 +62,7 @@ const HERO_META: Record<string, HeroMeta> = {
       "Built for the heavy lifting. When the system groans under the weight of technical debt, Titan pulls the load until it\u2019s lean and lethal.",
     color: "#16A34A",
     colorLight: "#DCFCE7",
+    stats: { power: 5, precision: 4, speed: 4, range: 3, teamwork: 3 },
   },
   lorekeeper: {
     title: "The Archivist",
@@ -59,6 +72,7 @@ const HERO_META: Record<string, HeroMeta> = {
       "The guardian of the sacred texts. Lorekeeper ensures that the \u2018how\u2019 and \u2018why\u2019 of your mission are never lost to time.",
     color: "#D97706",
     colorLight: "#FEF3C7",
+    stats: { power: 2, precision: 4, speed: 3, range: 5, teamwork: 5 },
   },
   oracle: {
     title: "The All-Seeing",
@@ -68,8 +82,48 @@ const HERO_META: Record<string, HeroMeta> = {
       "Oracle doesn\u2019t read your code; she understands it. She maps the dark corners of legacy repos so the rest of the team can strike with certainty.",
     color: "#0891B2",
     colorLight: "#CFFAFE",
+    stats: { power: 3, precision: 4, speed: 5, range: 5, teamwork: 4 },
   },
 };
+
+/* ── Power Rating Stat Bars ──────────────────────────────────── */
+const STAT_LABELS: { key: keyof HeroStats; label: string }[] = [
+  { key: "power", label: "Power" },
+  { key: "precision", label: "Precision" },
+  { key: "speed", label: "Speed" },
+  { key: "range", label: "Range" },
+  { key: "teamwork", label: "Teamwork" },
+];
+
+function StatBar({ stats, color, colorLight }: { stats: HeroStats; color: string; colorLight: string }) {
+  return (
+    <div className="space-y-1.5">
+      {STAT_LABELS.map(({ key, label }) => {
+        const value = stats[key];
+        return (
+          <div key={key} className="flex items-center gap-2">
+            <span className="w-16 text-[11px] font-bold text-[var(--ink-light)]">
+              {label}
+            </span>
+            <div className="flex gap-[2px] flex-1">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-2 flex-1"
+                  style={{
+                    border: "1px solid var(--ink)",
+                    background: i < value ? color : colorLight,
+                    opacity: i < value ? 1 : 0.4,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 /* Simple SVG icons for each hero */
 function HeroIcon({ slug, color }: { slug: string; color: string }) {
@@ -404,6 +458,13 @@ export default function HeroRoster({ agents }: { agents: CatalogAsset[] }) {
 
                 {/* Spacer for speech bubble tail */}
                 <div className="h-2" />
+
+                {/* Power Rating Stats */}
+                <StatBar
+                  stats={selectedMeta.stats}
+                  color={selectedMeta.color}
+                  colorLight={selectedMeta.colorLight}
+                />
 
                 {/* View Full Dossier */}
                 <Link
