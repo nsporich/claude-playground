@@ -1,31 +1,42 @@
 # Claude Playground
 
-A collection of reusable Claude Code skills, CLAUDE.md templates, and prompts.
+Opinionated agent personas and skills for Claude Code. Agents orchestrate skills into end-to-end workflows.
 
 ## Structure
 
-- `skills/<group>/<name>/SKILL.md` — Claude Code skills
-- `templates/<name>.md` — CLAUDE.md project templates
-- `prompts/<group>/<name>.md` — Standalone reusable prompts
+- `agents/<name>/AGENT.md` — Agent personas (orchestration-level workflows)
+- `skills/<group>/<name>/SKILL.md` — Skills (building-block workflows)
 - `scripts/build-catalog.sh` — Generates catalog.json from frontmatter
-- `install.sh` — Interactive installer
+- `install.sh` — Interactive installer with dependency resolution
 - `web/` — Next.js webapp for browsing the catalog
 
 ## Adding Assets
 
-1. Create a `.md` file in the appropriate category/group directory
+1. Create a directory with an `AGENT.md` or `SKILL.md` file
 2. Add YAML frontmatter with `name`, `description`, and `tags`
-3. Run `bash scripts/build-catalog.sh` to regenerate the catalog
-4. For skills, create a directory with a `SKILL.md` file inside
+3. For agents, add `requires` (skills/agents) and `features` fields
+4. Run `bash scripts/build-catalog.sh` to regenerate the catalog
 
 ## Frontmatter Format
 
-All assets use YAML frontmatter:
-
+### Skills
 ```yaml
 ---
-name: Human-readable Name
+name: skill-name
 description: One-line description
 tags: [tag1, tag2]
+---
+```
+
+### Agents
+```yaml
+---
+name: Agent Name
+description: One-line description
+tags: [tag1, tag2]
+requires:
+  skills: [skill-slug-1, skill-slug-2]
+  agents: [agent-slug]
+features: [worktrees, subagents]
 ---
 ```

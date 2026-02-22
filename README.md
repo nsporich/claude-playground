@@ -1,6 +1,6 @@
 # Claude Playground
 
-A curated collection of reusable Claude Code skills, templates, and prompts.
+Assemble your team. Opinionated agent personas for Claude Code that orchestrate skills into powerful end-to-end workflows.
 
 ## Quick Install
 
@@ -8,60 +8,36 @@ A curated collection of reusable Claude Code skills, templates, and prompts.
 curl -fsSL claude.sporich.dev/install.sh | bash
 ```
 
-The installer fetches the catalog, presents an interactive picker, and copies selected assets into your project.
+The installer resolves dependencies automatically — installing an agent pulls in all required skills.
 
-## What's Included
+## Agents
 
-### Skills (4)
+| Agent | Description | Requires |
+|-------|-------------|----------|
+| **Ironclad** | The engineer — builds features from blueprint to production | planning, tdd, feature-implementation, code-review + aegis |
+| **Deadeye** | The sharpshooter — hunts bugs with hypothesis-driven precision | bug-diagnosis, tdd, code-review |
+| **Aegis** | The shield — multi-layered code review on all fronts | code-review |
+| **Oracle** | The all-seeing — maps codebases and reveals architecture | — |
+| **Lorekeeper** | The chronicler — documents APIs, architecture, and tribal knowledge | documentation |
+| **Titan** | The powerhouse — optimizes performance and eliminates bottlenecks | optimization, code-review |
 
-| Skill | Description |
-|-------|-------------|
-| `code-review` | Structured code review with severity ratings |
-| `pr-description` | Generate well-structured PR descriptions from diff context |
-| `angular-upgrade` | Guided Angular version migration |
-| `angular-material-styleguide` | Guided creation of a shareable style guide on Angular Material |
+## Skills
 
-### Templates (3)
-
-| Template | Description |
-|----------|-------------|
-| `general` | Minimal CLAUDE.md starting point for any project |
-| `angular` | CLAUDE.md for Angular projects |
-| `npm-package` | CLAUDE.md for npm package development |
-
-### Prompts (3)
-
-| Prompt | Description |
-|--------|-------------|
-| `explain-codebase` | Structured codebase tour prompt |
-| `storybook-setup` | Get Storybook running in an existing project |
-| `browser-testing-setup` | Set up automated browser testing |
+| Skill | Description | Used By |
+|-------|-------------|---------|
+| `planning` | Requirements gathering and design | Ironclad |
+| `tdd` | Test-driven development (red-green-refactor) | Ironclad, Deadeye |
+| `feature-implementation` | Phased feature build with TDD | Ironclad |
+| `bug-diagnosis` | Hypothesis-driven debugging | Deadeye |
+| `code-review` | Structured review with severity ratings | Ironclad, Deadeye, Aegis, Titan |
+| `documentation` | Structured documentation generation | Lorekeeper |
+| `optimization` | Performance profiling and benchmarking | Titan |
 
 ## How It Works
 
-1. Each asset is a Markdown file with **YAML frontmatter** (`name`, `description`, `tags`).
-2. `build-catalog.sh` scans all asset directories and generates `catalog.json`.
-3. `install.sh` fetches the catalog from GitHub, presents an interactive picker using `gum` (or a numbered menu fallback), and copies selected files into your project's `.claude/` directory.
-
-## Adding New Assets
-
-1. Create a `.md` file in the appropriate directory:
-   - **Skills** -- `skills/<category>/<skill-name>/SKILL.md`
-   - **Templates** -- `templates/<name>.md`
-   - **Prompts** -- `prompts/<category>/<name>.md`
-2. Add YAML frontmatter with `name`, `description`, and `tags`.
-3. Run `./build-catalog.sh` to regenerate `catalog.json`.
-
-## Running the Web App Locally
-
-```bash
-cd web
-npm install
-npm run build  # generates catalog.json via prebuild
-npm start
-```
-
-The app will be available at `http://localhost:3000`.
+1. Each asset is a Markdown file with **YAML frontmatter** (`name`, `description`, `tags`, and `requires` for agents).
+2. `build-catalog.sh` scans all asset directories and generates `catalog.json` with computed `used_by` mappings.
+3. `install.sh` presents an interactive picker, resolves agent dependencies, and symlinks assets into `~/.claude/skills/`.
 
 ## License
 
