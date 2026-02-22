@@ -1,7 +1,12 @@
 @import "tailwindcss";
 
+/* Force light mode — no dark theme variant */
+@custom-variant dark (&:is(.dark *));
+
 /* ── Comic Book Design Tokens ─────────────────────────────────────── */
 :root {
+  color-scheme: light;
+
   /* Paper & Backgrounds */
   --paper: #FFF9ED;
   --paper-alt: #FFF3D6;
