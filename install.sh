@@ -1,41 +1,30 @@
 #!/usr/bin/env bash
 #
-# install.sh -- Interactive installer for claude-playground assets
+# install.sh -- Agents Assemble: pick your team, deploy your agents
 #
 # Usage:
 #   curl -fsSL claude.sporich.dev/install.sh | bash
-#
-# Or clone the repo and run directly:
-#   ./install.sh
 #
 set -euo pipefail
 
 # ── Configuration ────────────────────────────────────────────────────────────
 REPO_URL="https://github.com/nsporich/claude-playground"
 CACHE_DIR="$HOME/.claude-playground"
-CLAUDE_DIR="$HOME/.claude"
-SKILLS_DIR="$CLAUDE_DIR/skills"
+SKILLS_DIR="$HOME/.claude/skills"
 
-# ── Colors & gum detection ───────────────────────────────────────────────────
-# Amber-warm palette matching the site theme
+# ── Colors ───────────────────────────────────────────────────────────────────
 if [ -t 1 ]; then
   BOLD='\033[1m'
   DIM='\033[2m'
   RESET='\033[0m'
-  AMBER='\033[38;5;214m'
+  RED='\033[38;5;196m'
   WHITE='\033[97m'
   GRAY='\033[38;5;245m'
   GREEN='\033[32m'
-  RED='\033[31m'
   YELLOW='\033[33m'
+  CYAN='\033[36m'
 else
-  BOLD='' DIM='' RESET='' AMBER='' WHITE='' GRAY='' GREEN='' RED='' YELLOW=''
-fi
-
-# Detect gum for rich interactive experience
-HAS_GUM=0
-if command -v gum >/dev/null 2>&1; then
-  HAS_GUM=1
+  BOLD='' DIM='' RESET='' RED='' WHITE='' GRAY='' GREEN='' YELLOW='' CYAN=''
 fi
 
 # TTY input handling for piped installs (curl ... | bash)
@@ -49,7 +38,7 @@ else
 fi
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
-info()  { printf "${AMBER}  ▸${RESET} %s\n" "$*"; }
+info()  { printf "${RED}  ▸${RESET} %s\n" "$*"; }
 ok()    { printf "${GREEN}  ✓${RESET} %s\n" "$*"; }
 warn()  { printf "${YELLOW}  !${RESET} %s\n" "$*"; }
 err()   { printf "${RED}  ✗${RESET} %s\n" "$*" >&2; }
@@ -58,29 +47,14 @@ die()   { err "$@"; exit 1; }
 # ── Banner ───────────────────────────────────────────────────────────────────
 show_banner() {
   echo ""
-  if [ "$HAS_GUM" -eq 1 ]; then
-    gum style \
-      --border rounded \
-      --border-foreground 214 \
-      --foreground 214 \
-      --align center \
-      --width 42 \
-      --padding "1 2" \
-      "Claude Playground" \
-      "" \
-      "Assemble Your Team" \
-      "" \
-      "Agents · Skills"
-  else
-    printf "${AMBER}  ╭──────────────────────────────────────╮${RESET}\n"
-    printf "${AMBER}  │${RESET}                                      ${AMBER}│${RESET}\n"
-    printf "${AMBER}  │${RESET}    ${BOLD}${WHITE}Claude Playground${RESET}                ${AMBER}│${RESET}\n"
-    printf "${AMBER}  │${RESET}    ${GRAY}─────────────────${RESET}                ${AMBER}│${RESET}\n"
-    printf "${AMBER}  │${RESET}    ${GRAY}Assemble Your Team${RESET}               ${AMBER}│${RESET}\n"
-    printf "${AMBER}  │${RESET}    ${GRAY}Agents · Skills${RESET}                  ${AMBER}│${RESET}\n"
-    printf "${AMBER}  │${RESET}                                      ${AMBER}│${RESET}\n"
-    printf "${AMBER}  ╰──────────────────────────────────────╯${RESET}\n"
-  fi
+  printf "${RED}  ╭──────────────────────────────────────╮${RESET}\n"
+  printf "${RED}  │${RESET}                                      ${RED}│${RESET}\n"
+  printf "${RED}  │${RESET}    ${BOLD}${WHITE}AGENTS ASSEMBLE${RESET}                  ${RED}│${RESET}\n"
+  printf "${RED}  │${RESET}    ${GRAY}──────────────────${RESET}                ${RED}│${RESET}\n"
+  printf "${RED}  │${RESET}    ${GRAY}Pick your team. We handle${RESET}          ${RED}│${RESET}\n"
+  printf "${RED}  │${RESET}    ${GRAY}the rest.${RESET}                          ${RED}│${RESET}\n"
+  printf "${RED}  │${RESET}                                      ${RED}│${RESET}\n"
+  printf "${RED}  ╰──────────────────────────────────────╯${RESET}\n"
   echo ""
 }
 
@@ -88,36 +62,31 @@ show_banner() {
 run_with_spinner() {
   local msg="$1"
   shift
-  if [ "$HAS_GUM" -eq 1 ]; then
-    gum spin --spinner dot --title "$msg" -- "$@"
-    ok "$msg"
-  else
-    local frames=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
-    local i=0
-    printf "  ${AMBER}%s${RESET} %s" "${frames[0]}" "$msg"
-    "$@" &
-    local pid=$!
-    while kill -0 "$pid" 2>/dev/null; do
-      printf "\r  ${AMBER}%s${RESET} %s" "${frames[$i]}" "$msg"
-      i=$(( (i + 1) % ${#frames[@]} ))
-      sleep 0.08
-    done
-    wait "$pid"
-    local exit_code=$?
-    printf "\r  ${GREEN}✓${RESET} %s\n" "$msg"
-    return $exit_code
-  fi
+  local frames=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
+  local i=0
+  printf "  ${RED}%s${RESET} %s" "${frames[0]}" "$msg"
+  "$@" &
+  local pid=$!
+  while kill -0 "$pid" 2>/dev/null; do
+    printf "\r  ${RED}%s${RESET} %s" "${frames[$i]}" "$msg"
+    i=$(( (i + 1) % ${#frames[@]} ))
+    sleep 0.08
+  done
+  wait "$pid"
+  local exit_code=$?
+  printf "\r  ${GREEN}✓${RESET} %s\n" "$msg"
+  return $exit_code
 }
 
 # ── Step 1: Check for git ────────────────────────────────────────────────────
-command -v git >/dev/null 2>&1 || die "git is required but not found. Please install git first."
+command -v git >/dev/null 2>&1 || die "git is required but not found."
 
 # ── Step 2: Clone or pull the repo ───────────────────────────────────────────
 if [ -d "$CACHE_DIR/.git" ]; then
-  run_with_spinner "Updating assets..." git -C "$CACHE_DIR" pull --ff-only --quiet 2>/dev/null || warn "Could not pull latest; using cached version."
+  run_with_spinner "Updating roster..." git -C "$CACHE_DIR" pull --ff-only --quiet 2>/dev/null || warn "Could not pull latest; using cached version."
 else
   rm -rf "$CACHE_DIR"
-  run_with_spinner "Fetching assets..." git clone --quiet "$REPO_URL" "$CACHE_DIR" || die "Failed to clone $REPO_URL"
+  run_with_spinner "Fetching roster..." git clone --quiet "$REPO_URL" "$CACHE_DIR" || die "Failed to clone $REPO_URL"
 fi
 
 # ── Step 3: Build catalog if needed ──────────────────────────────────────────
@@ -128,7 +97,6 @@ needs_rebuild=0
 if [ ! -f "$CATALOG" ]; then
   needs_rebuild=1
 else
-  # Check if any .md file is newer than catalog.json
   while IFS= read -r -d '' mdfile; do
     if [ "$mdfile" -nt "$CATALOG" ]; then
       needs_rebuild=1
@@ -138,34 +106,29 @@ else
 fi
 
 if [ "$needs_rebuild" -eq 1 ]; then
-  if [ -x "$BUILD_SCRIPT" ] || [ -f "$BUILD_SCRIPT" ]; then
+  if [ -f "$BUILD_SCRIPT" ]; then
     run_with_spinner "Building catalog..." bash "$BUILD_SCRIPT"
   else
-    die "catalog.json is missing and build-catalog.sh not found."
+    die "catalog.json missing and build-catalog.sh not found."
   fi
 fi
 
-[ -f "$CATALOG" ] || die "catalog.json not found after build attempt."
+[ -f "$CATALOG" ] || die "catalog.json not found."
 
-# ── Step 4: Parse catalog.json ───────────────────────────────────────────────
-# We parse the simple predictable JSON with grep/sed/awk -- no jq needed.
-# Each entry is on a single line like:
-#   {"name": "...", "slug": "...", "description": "...", ... "group": "...", "path": "..."}
+# ── Step 4: Parse catalog ────────────────────────────────────────────────────
+declare -a AGENT_NAME=()
+declare -a AGENT_SLUG=()
+declare -a AGENT_DESC=()
+declare -a AGENT_PATH=()
+declare -a AGENT_REQ_SKILLS=()
+declare -a AGENT_REQ_AGENTS=()
 
-# Arrays to hold parsed data (parallel arrays indexed by menu number)
-declare -a ITEM_CATEGORY=()   # skills | agents
-declare -a ITEM_NAME=()
-declare -a ITEM_SLUG=()
-declare -a ITEM_DESC=()
-declare -a ITEM_GROUP=()
-declare -a ITEM_PATH=()
-declare -a ITEM_REQ_SKILLS=()  # comma-separated list of required skill slugs (agents only)
-declare -a ITEM_REQ_AGENTS=()  # comma-separated list of required agent slugs (agents only)
+declare -a SKILL_SLUG=()
+declare -a SKILL_PATH=()
 
 current_category=""
 
 while IFS= read -r line; do
-  # Detect category sections
   if echo "$line" | grep -q '"skills"'; then
     current_category="skills"
     continue
@@ -174,119 +137,132 @@ while IFS= read -r line; do
     continue
   fi
 
-  # Skip lines that don't look like entries
   echo "$line" | grep -q '"slug"' || continue
 
-  # Extract fields
   local_name="$(echo "$line" | sed 's/.*"name":[[:space:]]*"\([^"]*\)".*/\1/')"
   local_slug="$(echo "$line" | sed 's/.*"slug":[[:space:]]*"\([^"]*\)".*/\1/')"
   local_desc="$(echo "$line" | sed 's/.*"description":[[:space:]]*"\([^"]*\)".*/\1/')"
-  local_group="$(echo "$line" | sed 's/.*"group":[[:space:]]*"\([^"]*\)".*/\1/')"
   local_path="$(echo "$line" | sed 's/.*"path":[[:space:]]*"\([^"]*\)".*/\1/')"
 
-  # Parse requires for agents
-  local_req_skills=""
-  local_req_agents=""
   if [ "$current_category" = "agents" ]; then
-    # Extract skills array from requires
     local_req_skills="$(echo "$line" | sed -n 's/.*"skills":[[:space:]]*\[\([^]]*\)\].*/\1/p' | sed 's/"//g' | sed 's/[[:space:]]//g')"
-    # Extract agents array from requires
     local_req_agents="$(echo "$line" | sed -n 's/.*"agents":[[:space:]]*\[\([^]]*\)\].*/\1/p' | sed 's/"//g' | sed 's/[[:space:]]//g')"
-  fi
 
-  ITEM_CATEGORY+=("$current_category")
-  ITEM_NAME+=("$local_name")
-  ITEM_SLUG+=("$local_slug")
-  ITEM_DESC+=("$local_desc")
-  ITEM_GROUP+=("$local_group")
-  ITEM_PATH+=("$local_path")
-  ITEM_REQ_SKILLS+=("$local_req_skills")
-  ITEM_REQ_AGENTS+=("$local_req_agents")
+    AGENT_NAME+=("$local_name")
+    AGENT_SLUG+=("$local_slug")
+    AGENT_DESC+=("$local_desc")
+    AGENT_PATH+=("$local_path")
+    AGENT_REQ_SKILLS+=("$local_req_skills")
+    AGENT_REQ_AGENTS+=("$local_req_agents")
+  elif [ "$current_category" = "skills" ]; then
+    SKILL_SLUG+=("$local_slug")
+    SKILL_PATH+=("$local_path")
+  fi
 done < "$CATALOG"
 
-total=${#ITEM_SLUG[@]}
-if [ "$total" -eq 0 ]; then
-  die "No items found in catalog.json."
+agent_count=${#AGENT_SLUG[@]}
+[ "$agent_count" -eq 0 ] && die "No agents found in catalog."
+
+# ── Step 5: Show the roster ──────────────────────────────────────────────────
+show_banner
+
+# Check what's already installed
+installed_agents=()
+for i in $(seq 0 $((agent_count - 1))); do
+  if [ -L "$SKILLS_DIR/${AGENT_SLUG[$i]}" ] || [ -d "$SKILLS_DIR/${AGENT_SLUG[$i]}" ]; then
+    installed_agents+=("${AGENT_SLUG[$i]}")
+  fi
+done
+
+printf "  ${BOLD}${WHITE}THE ROSTER${RESET}\n"
+printf "  ${GRAY}──────────────────────────────────────────────${RESET}\n"
+
+for i in $(seq 0 $((agent_count - 1))); do
+  num=$((i + 1))
+  status_mark="  "
+  for inst in "${installed_agents[@]+"${installed_agents[@]}"}"; do
+    [ "$inst" = "${AGENT_SLUG[$i]}" ] && status_mark=" ${GREEN}✓${RESET}" && break
+  done
+  printf "  ${WHITE}%2d)${RESET}%b  ${BOLD}%-14s${RESET}  ${GRAY}%s${RESET}\n" "$num" "$status_mark" "${AGENT_NAME[$i]}" "${AGENT_DESC[$i]}"
+done
+
+echo ""
+if [ ${#installed_agents[@]} -gt 0 ]; then
+  printf "  ${GRAY}✓ = already deployed (select to update)${RESET}\n"
+fi
+printf "\n  ${RED}▸${RESET} Select agents (space-separated), ${BOLD}'all'${RESET}, or ${BOLD}'q'${RESET} to quit: "
+read -r selection < "$TTY_INPUT"
+
+if [ -z "$selection" ] || [ "$selection" = "q" ] || [ "$selection" = "Q" ]; then
+  echo "  Nothing to deploy. Bye!"
+  exit 0
 fi
 
-# ── Step 5: Detect installed assets ──────────────────────────────────────────
-# Check which assets are already installed
-declare -a ITEM_STATUS=()   # "installed" | "not_installed"
+# ── Step 6: Parse selection ──────────────────────────────────────────────────
+declare -a selected_agents=()
 
-for i in $(seq 0 $((total - 1))); do
-  cat="${ITEM_CATEGORY[$i]}"
-  slug="${ITEM_SLUG[$i]}"
+if [ "$selection" = "all" ] || [ "$selection" = "ALL" ]; then
+  for i in $(seq 0 $((agent_count - 1))); do
+    selected_agents+=("$i")
+  done
+else
+  for token in $selection; do
+    if ! echo "$token" | grep -qE '^[0-9]+$'; then
+      warn "Skipping invalid input: $token"
+      continue
+    fi
+    idx=$((token - 1))
+    if [ "$idx" -lt 0 ] || [ "$idx" -ge "$agent_count" ]; then
+      warn "Skipping out-of-range: $token"
+      continue
+    fi
+    selected_agents+=("$idx")
+  done
+fi
 
-  case "$cat" in
-    skills|agents)
-      if [ -L "$SKILLS_DIR/$slug" ] || [ -d "$SKILLS_DIR/$slug" ]; then
-        ITEM_STATUS+=("installed")
-      else
-        ITEM_STATUS+=("not_installed")
-      fi
-      ;;
-    *)
-      ITEM_STATUS+=("not_installed")
-      ;;
-  esac
-done
+if [ ${#selected_agents[@]} -eq 0 ]; then
+  echo "  Nothing selected. Bye!"
+  exit 0
+fi
 
-# Count installed
-installed_count=0
-for s in "${ITEM_STATUS[@]}"; do
-  [ "$s" = "installed" ] && installed_count=$((installed_count + 1))
-done
+# ── Step 7: Resolve dependencies ─────────────────────────────────────────────
+# Collect all required skill slugs and agent slugs
+declare -A needed_skills=()
+declare -A needed_agents=()
+declare -a visited=()
 
-# ── Dependency Resolution ──────────────────────────────────────────────────
-# Given an agent index, resolve all required skills and agents recursively
-# Populates dep_indices array with indices of all dependencies
-declare -a dep_indices=()
-declare -a visited_deps=()
-
-resolve_deps() {
+resolve_agent() {
   local idx="$1"
-  local slug="${ITEM_SLUG[$idx]}"
+  local slug="${AGENT_SLUG[$idx]}"
 
-  # Circular dependency guard
-  local v
-  for v in "${visited_deps[@]}"; do
+  # Guard against circular deps
+  for v in "${visited[@]+"${visited[@]}"}"; do
     [ "$v" = "$slug" ] && return
   done
-  visited_deps+=("$slug")
+  visited+=("$slug")
 
-  # Resolve required skills
-  if [ -n "${ITEM_REQ_SKILLS[$idx]}" ]; then
-    local req_skills_arr
-    IFS=',' read -ra req_skills_arr <<< "${ITEM_REQ_SKILLS[$idx]}"
-    local req
-    for req in "${req_skills_arr[@]}"; do
-      req="$(echo "$req" | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//')"
-      [ -z "$req" ] && continue
-      # Find the skill index
-      local j
-      for j in $(seq 0 $((total - 1))); do
-        if [ "${ITEM_SLUG[$j]}" = "$req" ] && [ "${ITEM_CATEGORY[$j]}" = "skills" ]; then
-          dep_indices+=("$j")
-          break
-        fi
-      done
+  needed_agents["$slug"]="$idx"
+
+  # Required skills
+  if [ -n "${AGENT_REQ_SKILLS[$idx]}" ]; then
+    IFS=',' read -ra skills <<< "${AGENT_REQ_SKILLS[$idx]}"
+    for s in "${skills[@]}"; do
+      s="$(echo "$s" | tr -d ' ')"
+      [ -z "$s" ] && continue
+      needed_skills["$s"]=1
     done
   fi
 
-  # Resolve required agents (recursive)
-  if [ -n "${ITEM_REQ_AGENTS[$idx]}" ]; then
-    local req_agents_arr
-    IFS=',' read -ra req_agents_arr <<< "${ITEM_REQ_AGENTS[$idx]}"
-    local req
-    for req in "${req_agents_arr[@]}"; do
-      req="$(echo "$req" | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//')"
-      [ -z "$req" ] && continue
-      # Find the agent index and recurse
-      local j
-      for j in $(seq 0 $((total - 1))); do
-        if [ "${ITEM_SLUG[$j]}" = "$req" ] && [ "${ITEM_CATEGORY[$j]}" = "agents" ]; then
-          dep_indices+=("$j")
-          resolve_deps "$j"
+  # Required agents (recursive)
+  if [ -n "${AGENT_REQ_AGENTS[$idx]}" ]; then
+    IFS=',' read -ra agents <<< "${AGENT_REQ_AGENTS[$idx]}"
+    for a in "${agents[@]}"; do
+      a="$(echo "$a" | tr -d ' ')"
+      [ -z "$a" ] && continue
+      # Find the agent index
+      for j in $(seq 0 $((agent_count - 1))); do
+        if [ "${AGENT_SLUG[$j]}" = "$a" ]; then
+          resolve_agent "$j"
           break
         fi
       done
@@ -294,381 +270,113 @@ resolve_deps() {
   fi
 }
 
-# ── Step 6: Select assets ────────────────────────────────────────────────────
-show_banner
+for idx in "${selected_agents[@]}"; do
+  resolve_agent "$idx"
+done
 
-# Show installed status if any assets are already present
-if [ "$installed_count" -gt 0 ]; then
-  if [ "$HAS_GUM" -eq 1 ]; then
-    gum style \
-      --foreground 214 \
-      --bold \
-      "  $installed_count asset(s) already installed"
+# ── Step 8: Show deployment plan ─────────────────────────────────────────────
+echo ""
+printf "  ${BOLD}${WHITE}DEPLOYMENT PLAN${RESET}\n"
+printf "  ${GRAY}──────────────────────────────────────────────${RESET}\n"
+
+# Agents
+for slug in "${!needed_agents[@]}"; do
+  printf "  ${RED}●${RESET}  ${BOLD}%-14s${RESET}  ${GRAY}agent${RESET}\n" "$slug"
+done
+
+# Skills
+for slug in "${!needed_skills[@]}"; do
+  already_installed=0
+  if [ -L "$SKILLS_DIR/$slug" ] || [ -d "$SKILLS_DIR/$slug" ]; then
+    already_installed=1
+  fi
+  if [ "$already_installed" -eq 1 ]; then
+    printf "  ${CYAN}●${RESET}  ${DIM}%-14s${RESET}  ${GRAY}skill (installed)${RESET}\n" "$slug"
   else
-    printf "  ${AMBER}${BOLD}%d asset(s) already installed${RESET}\n" "$installed_count"
-  fi
-
-  # List installed assets
-  for i in $(seq 0 $((total - 1))); do
-    if [ "${ITEM_STATUS[$i]}" = "installed" ]; then
-      printf "  ${GREEN}  ✓${RESET} ${DIM}%s${RESET}  %s\n" "[${ITEM_CATEGORY[$i]}]" "${ITEM_SLUG[$i]}"
-    fi
-  done
-  echo ""
-
-  # Ask what the user wants to do
-  action=""
-  if [ "$HAS_GUM" -eq 1 ]; then
-    action="$(gum choose \
-        "Install / update assets" \
-        "Remove installed assets" \
-        --header "What would you like to do?" \
-        --header.foreground 214 \
-        --cursor "▸ " \
-        --cursor.foreground 214 \
-        < "$TTY_INPUT")" || action=""
-  else
-    printf "  ${AMBER}▸${RESET} What would you like to do?\n"
-    printf "    ${WHITE}1)${RESET}  Install / update assets\n"
-    printf "    ${WHITE}2)${RESET}  Remove installed assets\n"
-    echo ""
-    printf "    Choice [1]: "
-    read -r action_choice < "$TTY_INPUT"
-    case "$action_choice" in
-      2) action="Remove installed assets" ;;
-      *) action="Install / update assets" ;;
-    esac
-  fi
-
-  if [ -z "$action" ]; then
-    echo "  Nothing to do. Bye!"
-    exit 0
-  fi
-else
-  action="Install / update assets"
-fi
-
-declare -a install_indices=()
-declare -a remove_indices=()
-
-if [ "$action" = "Remove installed assets" ]; then
-  # ── Remove mode: select from installed assets ──
-  if [ "$installed_count" -eq 0 ]; then
-    echo "  No installed assets to remove."
-    exit 0
-  fi
-
-  if [ "$HAS_GUM" -eq 1 ]; then
-    # Build lines for installed assets only
-    tmpfile="$(mktemp)"
-    for i in $(seq 0 $((total - 1))); do
-      [ "${ITEM_STATUS[$i]}" != "installed" ] && continue
-      printf "%d|[%s]  %-28s  %s\n" "$i" "${ITEM_CATEGORY[$i]}" "${ITEM_SLUG[$i]}" "${ITEM_DESC[$i]}" >> "$tmpfile"
-    done
-
-    printf "  ${GRAY}Space to select · Enter to confirm${RESET}\n\n"
-    selected="$(gum filter \
-      --no-limit \
-      --height 15 \
-      --header "Select assets to remove" \
-      --header.foreground 214 \
-      --indicator "▸" \
-      --indicator.foreground 214 \
-      --selected-prefix "✓ " \
-      --selected-indicator.foreground 214 \
-      --unselected-prefix "  " \
-      --match.foreground 214 < "$tmpfile")" || selected=""
-    rm -f "$tmpfile"
-
-    if [ -z "$selected" ]; then
-      echo "  Nothing selected. Bye!"
-      exit 0
-    fi
-
-    while IFS= read -r sel_line; do
-      idx="${sel_line%%|*}"
-      remove_indices+=("$idx")
-    done <<< "$selected"
-  else
-    # Bash remove menu
-    num=0
-    declare -a remove_map=()
-    for i in $(seq 0 $((total - 1))); do
-      [ "${ITEM_STATUS[$i]}" != "installed" ] && continue
-      num=$((num + 1))
-      remove_map+=("$i")
-      printf "  ${WHITE}%2d)${RESET}  ${BOLD}%-28s${RESET}  ${GRAY}%s${RESET}\n" "$num" "${ITEM_SLUG[$i]}" "${ITEM_DESC[$i]}"
-    done
-
-    echo ""
-    printf "  ${AMBER}▸${RESET} Enter numbers (space-separated), ${BOLD}'all'${RESET}, or ${BOLD}'q'${RESET} to quit: "
-    read -r selection < "$TTY_INPUT"
-
-    if [ -z "$selection" ] || [ "$selection" = "q" ] || [ "$selection" = "Q" ]; then
-      echo "  Nothing to remove. Bye!"
-      exit 0
-    fi
-
-    if [ "$selection" = "all" ] || [ "$selection" = "ALL" ]; then
-      remove_indices=("${remove_map[@]}")
-    else
-      for token in $selection; do
-        if ! echo "$token" | grep -qE '^[0-9]+$'; then
-          warn "Skipping invalid input: $token"
-          continue
-        fi
-        map_idx=$((token - 1))
-        if [ "$map_idx" -lt 0 ] || [ "$map_idx" -ge "${#remove_map[@]}" ]; then
-          warn "Skipping out-of-range: $token"
-          continue
-        fi
-        remove_indices+=("${remove_map[$map_idx]}")
-      done
-    fi
-  fi
-
-else
-  # ── Install / update mode ──
-  if [ "$HAS_GUM" -eq 1 ]; then
-    # Build lines with install status markers and write to temp file
-    tmpfile="$(mktemp)"
-    for i in $(seq 0 $((total - 1))); do
-      cat_label=""
-      case "${ITEM_CATEGORY[$i]}" in
-        skills)    cat_label="skill " ;;
-        agents)    cat_label="agent " ;;
-        *)         cat_label="${ITEM_CATEGORY[$i]}" ;;
-      esac
-      status_mark=""
-      if [ "${ITEM_STATUS[$i]}" = "installed" ]; then
-        status_mark="↻ "
-      else
-        status_mark="  "
-      fi
-      printf "%d|%s[%s]  %-28s  %s\n" "$i" "$status_mark" "$cat_label" "${ITEM_SLUG[$i]}" "${ITEM_DESC[$i]}" >> "$tmpfile"
-    done
-
-    printf "  ${GRAY}Arrow keys to navigate · Space to select · Enter to confirm${RESET}\n"
-    printf "  ${GRAY}↻ = already installed (select to update)${RESET}\n\n"
-
-    selected="$(gum filter \
-      --no-limit \
-      --height 15 \
-      --header "Select assets to install / update" \
-      --header.foreground 214 \
-      --indicator "▸" \
-      --indicator.foreground 214 \
-      --selected-prefix "✓ " \
-      --selected-indicator.foreground 214 \
-      --unselected-prefix "  " \
-      --match.foreground 214 < "$tmpfile")" || selected=""
-    rm -f "$tmpfile"
-
-    if [ -z "$selected" ]; then
-      echo "  Nothing selected. Bye!"
-      exit 0
-    fi
-
-    # Map selected lines back to indices (extract the index prefix)
-    while IFS= read -r sel_line; do
-      idx="${sel_line%%|*}"
-      install_indices+=("$idx")
-    done <<< "$selected"
-
-  else
-    # ── Bash: improved numbered menu ──
-    prev_cat=""
-    for i in $(seq 0 $((total - 1))); do
-      cat_raw="${ITEM_CATEGORY[$i]}"
-      grp="${ITEM_GROUP[$i]}"
-      if [ "$cat_raw" = "agents" ]; then
-        header="Agents"
-      else
-        grp_label="$(echo "$grp" | awk '{print toupper(substr($0,1,1)) substr($0,2)}')"
-        header="Skills › ${grp_label}"
-      fi
-
-      if [ "$header" != "$prev_cat" ]; then
-        [ -n "$prev_cat" ] && echo ""
-        printf "  ${AMBER}${BOLD}%s${RESET}\n" "$header"
-        printf "  ${GRAY}────────────────────────────────────────${RESET}\n"
-        prev_cat="$header"
-      fi
-
-      num=$((i + 1))
-      status_mark=""
-      if [ "${ITEM_STATUS[$i]}" = "installed" ]; then
-        status_mark=" ${GREEN}✓${RESET}"
-      fi
-      printf "  ${WHITE}%2d)${RESET}%b  ${BOLD}%-28s${RESET}  ${GRAY}%s${RESET}\n" "$num" "$status_mark" "${ITEM_SLUG[$i]}" "${ITEM_DESC[$i]}"
-    done
-
-    echo ""
-    if [ "$installed_count" -gt 0 ]; then
-      printf "  ${GRAY}✓ = already installed (select to update)${RESET}\n"
-    fi
-    printf "  ${AMBER}▸${RESET} Enter numbers (space-separated), ${BOLD}'all'${RESET}, or ${BOLD}'q'${RESET} to quit: "
-    read -r selection < "$TTY_INPUT"
-
-    if [ -z "$selection" ] || [ "$selection" = "q" ] || [ "$selection" = "Q" ]; then
-      echo "  Nothing to install. Bye!"
-      exit 0
-    fi
-
-    if [ "$selection" = "all" ] || [ "$selection" = "ALL" ]; then
-      for i in $(seq 0 $((total - 1))); do
-        install_indices+=("$i")
-      done
-    else
-      for token in $selection; do
-        if ! echo "$token" | grep -qE '^[0-9]+$'; then
-          warn "Skipping invalid input: $token"
-          continue
-        fi
-        idx=$((token - 1))
-        if [ "$idx" -lt 0 ] || [ "$idx" -ge "$total" ]; then
-          warn "Skipping out-of-range: $token"
-          continue
-        fi
-        install_indices+=("$idx")
-      done
-    fi
-  fi
-fi
-
-if [ ${#install_indices[@]} -eq 0 ] && [ ${#remove_indices[@]} -eq 0 ]; then
-  echo "  Nothing selected. Bye!"
-  exit 0
-fi
-
-# ── Resolve dependencies for selected agents ────────────────────────────────
-final_indices=()
-for idx in "${install_indices[@]}"; do
-  final_indices+=("$idx")
-  if [ "${ITEM_CATEGORY[$idx]}" = "agents" ]; then
-    dep_indices=()
-    visited_deps=()
-    resolve_deps "$idx"
-    for dep_idx in "${dep_indices[@]}"; do
-      # Add if not already selected and not already installed
-      already=0
-      for existing in "${final_indices[@]}"; do
-        [ "$existing" = "$dep_idx" ] && already=1 && break
-      done
-      if [ "$already" -eq 0 ] && [ "${ITEM_STATUS[$dep_idx]}" != "installed" ]; then
-        final_indices+=("$dep_idx")
-      fi
-    done
+    printf "  ${CYAN}●${RESET}  %-14s  ${GRAY}skill (auto)${RESET}\n" "$slug"
   fi
 done
 
-# Show dependency summary if any deps were added
-dep_count=$(( ${#final_indices[@]} - ${#install_indices[@]} ))
-if [ "$dep_count" -gt 0 ]; then
-  echo ""
-  info "Resolving dependencies: $dep_count additional item(s) will be installed"
-  for idx in "${final_indices[@]}"; do
-    # Check if this was an auto-resolved dependency
-    is_dep=1
-    for orig in "${install_indices[@]}"; do
-      [ "$orig" = "$idx" ] && is_dep=0 && break
-    done
-    if [ "$is_dep" -eq 1 ]; then
-      printf "    ${GRAY}+ [%s] %s${RESET}\n" "${ITEM_CATEGORY[$idx]}" "${ITEM_SLUG[$idx]}"
-    fi
-  done
-  echo ""
-fi
-install_indices=("${final_indices[@]}")
-
-# ── Step 7: Remove selected items ────────────────────────────────────────────
 echo ""
+
+# ── Step 9: Install everything ───────────────────────────────────────────────
+mkdir -p "$SKILLS_DIR"
+
 declare -a summary=()
 
-for idx in "${remove_indices[@]}"; do
-  cat="${ITEM_CATEGORY[$idx]}"
-  slug="${ITEM_SLUG[$idx]}"
+# Install skills first
+for slug in "${!needed_skills[@]}"; do
+  # Find skill path
+  skill_path=""
+  for j in $(seq 0 $((${#SKILL_SLUG[@]} - 1))); do
+    if [ "${SKILL_SLUG[$j]}" = "$slug" ]; then
+      skill_path="${SKILL_PATH[$j]}"
+      break
+    fi
+  done
 
-  case "$cat" in
-    skills|agents)
-      target_link="$SKILLS_DIR/$slug"
-      if [ -L "$target_link" ]; then
-        rm "$target_link"
-        summary+=("$(printf "${RED}✗${RESET}  %-12s  %-28s  removed" "[$cat]" "$slug")")
-      elif [ -d "$target_link" ]; then
-        warn "$slug is a directory (not a symlink) -- skipping removal"
-        summary+=("$(printf "${YELLOW}–${RESET}  %-12s  %-28s  skipped (not a symlink)" "[$cat]" "$slug")")
-      else
-        summary+=("$(printf "${YELLOW}–${RESET}  %-12s  %-28s  not found" "[$cat]" "$slug")")
-      fi
-      ;;
-    *)
-      warn "Removal is only supported for skills and agents"
-      ;;
-  esac
-done
+  if [ -z "$skill_path" ]; then
+    warn "Skill '$slug' not found in catalog -- skipping"
+    continue
+  fi
 
-# ── Step 8: Install selected items ───────────────────────────────────────────
-for idx in "${install_indices[@]}"; do
-  cat="${ITEM_CATEGORY[$idx]}"
-  slug="${ITEM_SLUG[$idx]}"
-  desc="${ITEM_DESC[$idx]}"
-  group="${ITEM_GROUP[$idx]}"
-  item_path="${ITEM_PATH[$idx]}"
-  src="$CACHE_DIR/$item_path"
+  src="$CACHE_DIR/$skill_path"
+  src_dir="$(dirname "$src")"
+  target="$SKILLS_DIR/$slug"
 
   if [ ! -f "$src" ]; then
-    warn "Source not found: $src -- skipping $slug"
+    warn "Source not found: $src -- skipping"
     continue
   fi
 
   is_update="no"
-  [ "${ITEM_STATUS[$idx]}" = "installed" ] && is_update="yes"
+  if [ -L "$target" ]; then
+    rm "$target"
+    is_update="yes"
+  fi
 
-  case "$cat" in
-    skills|agents)
-      skill_src_dir="$(dirname "$src")"
-      target_link="$SKILLS_DIR/$slug"
-      mkdir -p "$SKILLS_DIR"
-
-      if [ -L "$target_link" ]; then
-        rm "$target_link"
-      elif [ -d "$target_link" ]; then
-        summary+=("$(printf "${YELLOW}–${RESET}  %-12s  %-28s  skipped (dir exists)" "[$cat]" "$slug")")
-        continue
-      fi
-
-      ln -s "$skill_src_dir" "$target_link"
-      if [ "$is_update" = "yes" ]; then
-        summary+=("$(printf "${GREEN}↻${RESET}  %-12s  %-28s  updated → %s" "[$cat]" "$slug" "$target_link")")
-      else
-        summary+=("$(printf "${GREEN}✓${RESET}  %-12s  %-28s  → %s" "[$cat]" "$slug" "$target_link")")
-      fi
-      ;;
-  esac
+  ln -s "$src_dir" "$target"
+  if [ "$is_update" = "yes" ]; then
+    summary+=("$(printf "${GREEN}↻${RESET}  ${CYAN}skill${RESET}   %-14s  updated" "$slug")")
+  else
+    summary+=("$(printf "${GREEN}✓${RESET}  ${CYAN}skill${RESET}   %-14s  deployed" "$slug")")
+  fi
 done
 
-# ── Step 9: Print summary ────────────────────────────────────────────────────
-echo ""
-if [ ${#summary[@]} -eq 0 ]; then
-  printf "  Nothing was installed.\n"
-else
-  if [ "$HAS_GUM" -eq 1 ]; then
-    summary_text=""
-    for line in "${summary[@]}"; do
-      summary_text+="$(printf '%b' "$line")"$'\n'
-    done
-    printf '%s' "$summary_text" | gum style \
-      --border rounded \
-      --border-foreground 214 \
-      --padding "1 2"
-  else
-    printf "  ${AMBER}${BOLD}Installation Summary${RESET}\n"
-    printf "  ${GRAY}────────────────────────────────────────────────────────────${RESET}\n"
-    for line in "${summary[@]}"; do
-      printf "  %b\n" "$line"
-    done
-    printf "  ${GRAY}────────────────────────────────────────────────────────────${RESET}\n"
+# Install agents
+for slug in "${!needed_agents[@]}"; do
+  idx="${needed_agents[$slug]}"
+  src="$CACHE_DIR/${AGENT_PATH[$idx]}"
+  src_dir="$(dirname "$src")"
+  target="$SKILLS_DIR/$slug"
+
+  if [ ! -f "$src" ]; then
+    warn "Source not found: $src -- skipping"
+    continue
   fi
-fi
+
+  is_update="no"
+  if [ -L "$target" ]; then
+    rm "$target"
+    is_update="yes"
+  fi
+
+  ln -s "$src_dir" "$target"
+  if [ "$is_update" = "yes" ]; then
+    summary+=("$(printf "${GREEN}↻${RESET}  ${RED}agent${RESET}   %-14s  updated" "$slug")")
+  else
+    summary+=("$(printf "${GREEN}✓${RESET}  ${RED}agent${RESET}   %-14s  deployed" "$slug")")
+  fi
+done
+
+# ── Step 10: Summary ─────────────────────────────────────────────────────────
+echo ""
+printf "  ${BOLD}${WHITE}DEPLOYMENT COMPLETE${RESET}\n"
+printf "  ${GRAY}──────────────────────────────────────────────${RESET}\n"
+for line in "${summary[@]}"; do
+  printf "  %b\n" "$line"
+done
+printf "  ${GRAY}──────────────────────────────────────────────${RESET}\n"
+echo ""
+printf "  ${GRAY}Open Claude Code in any project to use your agents.${RESET}\n"
 echo ""

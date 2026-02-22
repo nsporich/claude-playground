@@ -2,15 +2,26 @@ import Link from "next/link";
 
 export default function Header() {
   return (
-    <header className="border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]/80 backdrop-blur-xl sticky top-0 z-50">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--accent)] text-sm font-bold text-black">
-            CP
+    <header className="border-b-2 border-[var(--accent-dim)]/30 bg-[var(--bg-surface)]/90 backdrop-blur-xl sticky top-0 z-50">
+      {/* Thin accent line at very top */}
+      <div className="h-[2px] bg-gradient-to-r from-transparent via-[var(--accent)] to-transparent" />
+
+      <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5">
+        <Link href="/" className="flex items-center gap-3 group">
+          {/* Logo mark */}
+          <span className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--accent)] text-black overflow-hidden">
+            <svg className="h-5 w-5 relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+            </svg>
           </span>
-          <span className="font-display text-lg text-[var(--text-primary)] tracking-wide">
-            Claude Playground
-          </span>
+          <div className="flex flex-col">
+            <span className="font-[family-name:var(--font-display)] text-xl tracking-[0.12em] text-[var(--text-primary)] leading-none">
+              AGENTS ASSEMBLE
+            </span>
+            <span className="text-[9px] tracking-[0.25em] uppercase text-[var(--text-muted)] leading-none mt-0.5">
+              Command Center
+            </span>
+          </div>
         </Link>
 
         <div className="flex items-center gap-1">
@@ -18,13 +29,13 @@ export default function Header() {
             href="/browse"
             className="rounded-lg px-3.5 py-2 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]"
           >
-            Browse
+            Roster
           </Link>
           <Link
             href="/getting-started"
             className="rounded-lg px-3.5 py-2 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]"
           >
-            Getting Started
+            Briefing
           </Link>
           <div className="ml-2 h-4 w-px bg-[var(--border-default)]" />
           <a

@@ -2,13 +2,17 @@ import type { Metadata } from "next";
 import InstallCommand from "@/components/InstallCommand";
 
 export const metadata: Metadata = {
-  title: "Getting Started | Claude Playground",
+  title: "Mission Briefing | Agents Assemble",
 };
 
-function SectionHeading({ children }: { children: React.ReactNode }) {
+function SectionHeading({ children, color = "var(--accent-text)" }: { children: React.ReactNode; color?: string }) {
   return (
-    <div className="flex items-center gap-4 mb-4">
-      <h2 className="font-display text-2xl text-[var(--text-primary)]">
+    <div className="flex items-center gap-3 mb-5">
+      <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[var(--border-subtle)]" />
+      <h2
+        className="font-[family-name:var(--font-display)] text-2xl tracking-[0.12em]"
+        style={{ color }}
+      >
         {children}
       </h2>
       <div className="flex-1 h-px bg-[var(--border-subtle)]" />
@@ -18,7 +22,7 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
 
 function CodeTag({ children }: { children: React.ReactNode }) {
   return (
-    <code className="rounded-md bg-[var(--bg-elevated)] border border-[var(--border-subtle)] px-1.5 py-0.5 text-sm font-mono text-[var(--accent-text)]">
+    <code className="rounded-md bg-[var(--bg-elevated)] border border-[var(--border-subtle)] px-1.5 py-0.5 text-sm font-mono text-[var(--cyan-text)]">
       {children}
     </code>
   );
@@ -26,7 +30,7 @@ function CodeTag({ children }: { children: React.ReactNode }) {
 
 function StepNumber({ n }: { n: number }) {
   return (
-    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--accent)]/10 text-[11px] font-bold text-[var(--accent)]">
+    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--accent)]/30 text-[11px] font-bold text-[var(--accent)] font-[family-name:var(--font-display)] tracking-wider">
       {n}
     </span>
   );
@@ -34,22 +38,22 @@ function StepNumber({ n }: { n: number }) {
 
 function InfoCard({
   icon,
-  iconBg,
+  iconColor,
   title,
   children,
 }: {
   icon: React.ReactNode;
-  iconBg: string;
+  iconColor: string;
   title: string;
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6">
-      <div className={`mb-4 flex h-10 w-10 items-center justify-center rounded-lg ${iconBg}`}>
+    <div className="rounded-xl border-2 border-[var(--border-default)] bg-[var(--bg-surface)] p-6">
+      <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg" style={{ background: `${iconColor}15` }}>
         {icon}
       </div>
-      <h3 className="text-base font-semibold text-[var(--text-primary)] mb-2">
-        {title}
+      <h3 className="font-[family-name:var(--font-display)] text-xl tracking-[0.08em] text-[var(--text-primary)] mb-2">
+        {title.toUpperCase()}
       </h3>
       <div className="text-sm text-[var(--text-secondary)] leading-relaxed space-y-3">
         {children}
@@ -63,27 +67,29 @@ export default function GettingStartedPage() {
     <div className="mx-auto max-w-3xl space-y-16 py-8">
       {/* Header */}
       <header>
-        <p className="text-xs font-medium tracking-[0.2em] uppercase text-[var(--accent)] mb-3">
-          Documentation
-        </p>
-        <h1 className="font-display text-4xl sm:text-5xl text-[var(--text-primary)] tracking-tight">
-          Getting Started
+        <div className="inline-flex items-center gap-2 rounded-full border border-[var(--accent)]/30 bg-[var(--accent)]/5 px-4 py-1.5 mb-5">
+          <span className="text-[10px] tracking-[0.2em] uppercase text-[var(--accent-text)] font-medium">
+            Mission Briefing
+          </span>
+        </div>
+        <h1 className="font-[family-name:var(--font-display)] text-5xl sm:text-6xl text-[var(--text-primary)] tracking-[0.06em]">
+          GETTING STARTED
         </h1>
         <p className="mt-4 text-lg text-[var(--text-secondary)] leading-relaxed">
-          A complete guide to installing and using Claude Playground assets in your workflow.
+          Everything you need to deploy the team and start running operations.
         </p>
       </header>
 
       {/* Prerequisites */}
       <section className="space-y-4">
-        <SectionHeading>Prerequisites</SectionHeading>
+        <SectionHeading>PREREQUISITES</SectionHeading>
         <p className="text-[var(--text-secondary)] leading-relaxed">
-          Before using Claude Playground, you need{" "}
+          Before deploying agents, you need{" "}
           <strong className="text-[var(--text-primary)]">Claude Code</strong>{" "}
           installed on your machine.
         </p>
 
-        <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 space-y-4">
+        <div className="rounded-xl border-2 border-[var(--border-default)] bg-[var(--bg-surface)] p-6 space-y-4">
           <div className="flex items-start gap-3">
             <StepNumber n={1} />
             <div>
@@ -96,7 +102,7 @@ export default function GettingStartedPage() {
                   href="https://docs.anthropic.com/en/docs/claude-code/overview"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[var(--accent-text)] border-b border-[var(--accent-text)]/30 hover:border-[var(--accent-text)] transition-colors"
+                  className="text-[var(--cyan-text)] border-b border-[var(--cyan)]/30 hover:border-[var(--cyan)] transition-colors"
                 >
                   official installation guide
                 </a>{" "}
@@ -113,7 +119,6 @@ export default function GettingStartedPage() {
               </p>
               <p className="text-sm text-[var(--text-muted)] mt-1">
                 Open your terminal and run <CodeTag>claude --version</CodeTag>.
-                You should see the version number printed.
               </p>
             </div>
           </div>
@@ -135,36 +140,76 @@ export default function GettingStartedPage() {
 
       {/* What is Claude Playground */}
       <section className="space-y-4">
-        <SectionHeading>What is Claude Playground</SectionHeading>
+        <SectionHeading>WHAT IS AGENTS ASSEMBLE</SectionHeading>
         <p className="text-[var(--text-secondary)] leading-relaxed">
           Claude Code is Anthropic&apos;s CLI for working with Claude in your
           terminal and IDE. It reads files, runs commands, and follows
-          project-specific instructions&mdash;but it&apos;s only as useful as
+          project-specific instructions&mdash;but it&apos;s only as good as
           the context you give it.
         </p>
         <p className="text-[var(--text-secondary)] leading-relaxed">
-          <strong className="text-[var(--text-primary)]">Claude Playground</strong>{" "}
-          is a curated library of pre-built assets that give Claude Code instant
-          context: coding workflows, project conventions, and task-specific
-          instructions. Instead of writing everything from scratch, install what
-          you need and start working.
+          <strong className="text-[var(--text-primary)]">Agents Assemble</strong>{" "}
+          gives Claude Code a team of specialized agents. Each agent is an opinionated
+          persona that orchestrates skills into end-to-end workflows&mdash;code review,
+          debugging, feature development&mdash;delivering structured, repeatable
+          results instead of ad-hoc prompting.
         </p>
       </section>
 
-      {/* The Three Asset Types */}
+      {/* Two Asset Types */}
       <section className="space-y-6">
-        <SectionHeading>The three asset types</SectionHeading>
+        <SectionHeading>ASSET TYPES</SectionHeading>
         <p className="text-[var(--text-secondary)] leading-relaxed">
-          Every asset in Claude Playground is one of three types. Each serves a
-          different purpose and installs to a different location.
+          Two types. Agents are the operators. Skills are their equipment.
         </p>
 
         <div className="space-y-5">
+          {/* Agents */}
+          <InfoCard
+            iconColor="var(--accent)"
+            icon={
+              <svg className="h-5 w-5" style={{ color: "var(--accent)" }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+              </svg>
+            }
+            title="Agents"
+          >
+            <p>
+              Agents are <CodeTag>AGENT.md</CodeTag> files that define
+              opinionated personas. Each agent has a specialty&mdash;Aegis for
+              code review, Deadeye for debugging, Ironclad for feature
+              development&mdash;and knows exactly which skills to deploy.
+            </p>
+            <p>
+              When you install an agent, the installer{" "}
+              <strong className="text-[var(--text-primary)]">
+                automatically resolves and installs all required skills
+              </strong>.
+              Agents can leverage worktrees for isolation and subagents for
+              parallel work.
+            </p>
+            <div className="rounded-lg bg-[var(--bg-base)] border border-[var(--border-subtle)] p-4 font-mono text-xs text-[var(--text-muted)]">
+              <div className="text-[var(--text-muted)]/60">~/.claude/skills/</div>
+              <div className="ml-4">
+                <span className="text-[var(--accent-text)]">ironclad/</span>
+                <span className="text-[var(--text-muted)]/40"> AGENT.md</span>
+              </div>
+              <div className="ml-4">
+                <span className="text-[var(--accent-text)]">aegis/</span>
+                <span className="text-[var(--text-muted)]/40"> AGENT.md</span>
+              </div>
+              <div className="ml-4">
+                <span className="text-[var(--accent-text)]">deadeye/</span>
+                <span className="text-[var(--text-muted)]/40"> AGENT.md</span>
+              </div>
+            </div>
+          </InfoCard>
+
           {/* Skills */}
           <InfoCard
-            iconBg="bg-amber-500/10"
+            iconColor="var(--cyan)"
             icon={
-              <svg className="h-5 w-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <svg className="h-5 w-5" style={{ color: "var(--cyan)" }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z" />
               </svg>
             }
@@ -175,126 +220,57 @@ export default function GettingStartedPage() {
               specific workflows. They live in{" "}
               <CodeTag>~/.claude/skills/</CodeTag> and are{" "}
               <strong className="text-[var(--text-primary)]">
-                automatically available in every Claude Code session
-              </strong>,
-              regardless of which project you&apos;re in.
+                available in every Claude Code session
+              </strong>.
             </p>
             <p>
-              When you invoke a skill (e.g., type <CodeTag>/review</CodeTag> in
-              Claude Code), Claude reads the SKILL.md file and follows its
-              instructions. Skills can define structured processes like
-              severity-rated code reviews, PR description templates, or
-              step-by-step framework migrations.
+              Skills define structured processes like severity-rated code
+              reviews, TDD workflows, or planning sessions. Agents compose
+              these skills into larger operations.
             </p>
             <div className="rounded-lg bg-[var(--bg-base)] border border-[var(--border-subtle)] p-4 font-mono text-xs text-[var(--text-muted)]">
               <div className="text-[var(--text-muted)]/60">~/.claude/skills/</div>
               <div className="ml-4">
-                <span className="text-amber-400">code-review/</span>
+                <span className="text-[var(--cyan-text)]">code-review/</span>
                 <span className="text-[var(--text-muted)]/40"> SKILL.md</span>
               </div>
               <div className="ml-4">
-                <span className="text-amber-400">pr-description/</span>
+                <span className="text-[var(--cyan-text)]">tdd/</span>
                 <span className="text-[var(--text-muted)]/40"> SKILL.md</span>
               </div>
               <div className="ml-4">
-                <span className="text-amber-400">angular-upgrade/</span>
+                <span className="text-[var(--cyan-text)]">planning/</span>
                 <span className="text-[var(--text-muted)]/40"> SKILL.md</span>
               </div>
             </div>
-          </InfoCard>
-
-          {/* Templates */}
-          <InfoCard
-            iconBg="bg-emerald-500/10"
-            icon={
-              <svg className="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-              </svg>
-            }
-            title="Templates"
-          >
-            <p>
-              Templates are <CodeTag>CLAUDE.md</CodeTag> files you drop into a
-              project root. When Claude Code starts a session, it reads
-              CLAUDE.md and treats it as project-level context&mdash;your
-              conventions, directory structure, testing patterns, and preferred
-              approaches.
-            </p>
-            <p>
-              Think of templates as{" "}
-              <strong className="text-[var(--text-primary)]">
-                onboarding docs for your AI pair programmer
-              </strong>.
-              A good CLAUDE.md means Claude immediately knows how your project
-              is organized, which frameworks you use, and how you prefer things
-              done. Use a template as a starting point and customize it for your project.
-            </p>
-            <div className="rounded-lg bg-[var(--bg-base)] border border-[var(--border-subtle)] p-4 font-mono text-xs text-[var(--text-muted)]">
-              <div className="text-[var(--text-muted)]/60">your-project/</div>
-              <div className="ml-4">
-                <span className="text-emerald-400">CLAUDE.md</span>
-                <span className="text-[var(--text-muted)]/40"> &larr; installed here</span>
-              </div>
-              <div className="ml-4 text-[var(--text-muted)]/40">src/</div>
-              <div className="ml-4 text-[var(--text-muted)]/40">package.json</div>
-            </div>
-          </InfoCard>
-
-          {/* Prompts */}
-          <InfoCard
-            iconBg="bg-violet-500/10"
-            icon={
-              <svg className="h-5 w-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
-              </svg>
-            }
-            title="Prompts"
-          >
-            <p>
-              Prompts are standalone instructions you paste directly into a
-              Claude conversation. Unlike skills (which are persistent and
-              automatic), prompts are{" "}
-              <strong className="text-[var(--text-primary)]">
-                one-shot and on-demand
-              </strong>.
-              Use them when you want consistent results for a specific task
-              without installing anything permanently.
-            </p>
-            <p>
-              Prompts are great for tasks you do occasionally: setting up
-              Storybook in a new project, configuring browser testing, or
-              getting a structured codebase tour. Copy the prompt, paste it
-              into Claude Code, and it handles the rest.
-            </p>
           </InfoCard>
         </div>
       </section>
 
       {/* Installing */}
       <section className="space-y-6">
-        <SectionHeading>Installing assets</SectionHeading>
+        <SectionHeading>DEPLOYMENT</SectionHeading>
         <p className="text-[var(--text-secondary)] leading-relaxed">
-          The interactive installer handles everything. Run one command and pick
-          what you want.
+          One command. Pick your agents. The installer handles dependency resolution.
         </p>
 
         <InstallCommand command="curl -fsSL claude.sporich.dev/install.sh | bash" />
 
-        <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 space-y-5">
-          <h3 className="text-xs font-semibold tracking-[0.15em] uppercase text-[var(--text-muted)]">
-            What happens when you run it
+        <div className="rounded-xl border-2 border-[var(--border-default)] bg-[var(--bg-surface)] p-6 space-y-5">
+          <h3 className="text-[10px] font-bold tracking-[0.2em] uppercase text-[var(--text-muted)]">
+            Deployment Sequence
           </h3>
 
           <div className="flex items-start gap-3">
             <StepNumber n={1} />
             <div>
               <p className="text-sm font-medium text-[var(--text-primary)]">
-                Clones the repository
+                Cache the repository
               </p>
               <p className="text-sm text-[var(--text-muted)] mt-1">
-                The installer fetches the latest assets from GitHub into a cache
-                at <CodeTag>~/.claude-playground</CodeTag>. Subsequent runs
-                pull updates automatically.
+                Fetches the latest assets from GitHub into{" "}
+                <CodeTag>~/.claude-playground</CodeTag>. Subsequent runs pull
+                updates automatically.
               </p>
             </div>
           </div>
@@ -303,12 +279,12 @@ export default function GettingStartedPage() {
             <StepNumber n={2} />
             <div>
               <p className="text-sm font-medium text-[var(--text-primary)]">
-                Presents a menu
+                Select your team
               </p>
               <p className="text-sm text-[var(--text-muted)] mt-1">
-                You&apos;ll see a numbered list of all available assets grouped by
-                category. Enter the numbers of the ones you want, or type{" "}
-                <CodeTag>all</CodeTag> to install everything.
+                You&apos;ll see a numbered list of all agents and skills.
+                Enter the numbers of the ones you want, or type{" "}
+                <CodeTag>all</CodeTag> to deploy everything.
               </p>
             </div>
           </div>
@@ -317,13 +293,11 @@ export default function GettingStartedPage() {
             <StepNumber n={3} />
             <div>
               <p className="text-sm font-medium text-[var(--text-primary)]">
-                Installs to the right locations
+                Resolve dependencies and install
               </p>
               <p className="text-sm text-[var(--text-muted)] mt-1">
-                Skills are symlinked to <CodeTag>~/.claude/skills/</CodeTag>.
-                Templates are copied as <CodeTag>CLAUDE.md</CodeTag> in your
-                current directory. Prompts are printed to the terminal or saved
-                to a file.
+                Assets are symlinked to <CodeTag>~/.claude/skills/</CodeTag>.
+                Agent dependencies are automatically resolved and installed.
               </p>
             </div>
           </div>
@@ -332,11 +306,10 @@ export default function GettingStartedPage() {
             <StepNumber n={4} />
             <div>
               <p className="text-sm font-medium text-[var(--text-primary)]">
-                Shows a summary
+                Deployment summary
               </p>
               <p className="text-sm text-[var(--text-muted)] mt-1">
-                After installation, you&apos;ll see exactly what was installed
-                and where it went.
+                See exactly what was installed and where it went.
               </p>
             </div>
           </div>
@@ -345,19 +318,23 @@ export default function GettingStartedPage() {
 
       {/* Try it out */}
       <section className="space-y-4">
-        <SectionHeading>Try it out</SectionHeading>
+        <SectionHeading>FIRST MISSION</SectionHeading>
         <p className="text-[var(--text-secondary)] leading-relaxed">
-          Here&apos;s a quick way to see Claude Playground in action: install
-          the <strong className="text-[var(--text-primary)]">code-review</strong>{" "}
-          skill and use it immediately.
+          Deploy{" "}
+          <strong className="text-[var(--text-primary)]">Aegis</strong>{" "}
+          and run your first code review operation.
         </p>
 
-        <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 space-y-5">
+        <div className="rounded-xl border-2 border-[var(--border-default)] bg-[var(--bg-surface)] p-6 space-y-5">
           <div className="flex items-start gap-3">
             <StepNumber n={1} />
             <div>
               <p className="text-sm font-medium text-[var(--text-primary)]">
-                Run the installer and select the code-review skill
+                Deploy the Aegis agent
+              </p>
+              <p className="text-sm text-[var(--text-muted)] mt-1">
+                The installer automatically pulls in the code-review skill
+                that Aegis requires.
               </p>
               <div className="mt-2 rounded-lg bg-[var(--bg-base)] border border-[var(--border-subtle)] p-3 font-mono text-xs text-[var(--text-muted)]">
                 <span className="text-[var(--accent)]">$</span> curl -fsSL claude.sporich.dev/install.sh | bash
@@ -381,12 +358,11 @@ export default function GettingStartedPage() {
             <StepNumber n={3} />
             <div>
               <p className="text-sm font-medium text-[var(--text-primary)]">
-                Ask Claude to review your code
+                Initiate review
               </p>
               <p className="text-sm text-[var(--text-muted)] mt-1">
-                Claude will automatically use the code-review skill to give you
-                a structured review with severity ratings, specific file
-                references, and actionable suggestions.
+                Aegis will run a multi-layered code review with severity
+                ratings, file references, and actionable suggestions.
               </p>
             </div>
           </div>
@@ -395,47 +371,40 @@ export default function GettingStartedPage() {
 
       {/* Where things go */}
       <section className="space-y-4">
-        <SectionHeading>Where things go</SectionHeading>
+        <SectionHeading>FILE LOCATIONS</SectionHeading>
         <p className="text-[var(--text-secondary)] leading-relaxed mb-2">
-          A quick reference for where each asset type lives on your system.
+          Where each asset type deploys on your system.
         </p>
 
-        <div className="overflow-hidden rounded-xl border border-[var(--border-subtle)]">
+        <div className="overflow-hidden rounded-xl border-2 border-[var(--border-default)]">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-[var(--bg-surface)]">
-                <th className="px-5 py-3 text-left text-[10px] font-semibold tracking-[0.15em] uppercase text-[var(--text-muted)]">
+              <tr className="bg-[var(--bg-elevated)]">
+                <th className="px-5 py-3 text-left text-[10px] font-bold tracking-[0.2em] uppercase text-[var(--text-muted)]">
                   Type
                 </th>
-                <th className="px-5 py-3 text-left text-[10px] font-semibold tracking-[0.15em] uppercase text-[var(--text-muted)]">
+                <th className="px-5 py-3 text-left text-[10px] font-bold tracking-[0.2em] uppercase text-[var(--text-muted)]">
                   Location
                 </th>
-                <th className="px-5 py-3 text-left text-[10px] font-semibold tracking-[0.15em] uppercase text-[var(--text-muted)]">
+                <th className="px-5 py-3 text-left text-[10px] font-bold tracking-[0.2em] uppercase text-[var(--text-muted)]">
                   Scope
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border-subtle)]">
-              <tr className="bg-[var(--bg-base)]">
-                <td className="px-5 py-3 font-medium text-amber-400">Skills</td>
-                <td className="px-5 py-3 font-mono text-xs text-[var(--accent-text)]">
-                  ~/.claude/skills/&lt;name&gt;/SKILL.md
+              <tr className="bg-[var(--bg-surface)]">
+                <td className="px-5 py-3 font-[family-name:var(--font-display)] tracking-[0.08em] text-[var(--accent-text)]">AGENTS</td>
+                <td className="px-5 py-3 font-mono text-xs text-[var(--cyan-text)]">
+                  ~/.claude/skills/&lt;name&gt;/AGENT.md
                 </td>
                 <td className="px-5 py-3 text-[var(--text-muted)]">Global &mdash; all sessions</td>
               </tr>
-              <tr className="bg-[var(--bg-base)]">
-                <td className="px-5 py-3 font-medium text-emerald-400">Templates</td>
-                <td className="px-5 py-3 font-mono text-xs text-[var(--accent-text)]">
-                  ./CLAUDE.md
+              <tr className="bg-[var(--bg-surface)]">
+                <td className="px-5 py-3 font-[family-name:var(--font-display)] tracking-[0.08em] text-[var(--cyan-text)]">SKILLS</td>
+                <td className="px-5 py-3 font-mono text-xs text-[var(--cyan-text)]">
+                  ~/.claude/skills/&lt;name&gt;/SKILL.md
                 </td>
-                <td className="px-5 py-3 text-[var(--text-muted)]">Project-level</td>
-              </tr>
-              <tr className="bg-[var(--bg-base)]">
-                <td className="px-5 py-3 font-medium text-violet-400">Prompts</td>
-                <td className="px-5 py-3 font-mono text-xs text-[var(--accent-text)]">
-                  copy &amp; paste
-                </td>
-                <td className="px-5 py-3 text-[var(--text-muted)]">One-shot</td>
+                <td className="px-5 py-3 text-[var(--text-muted)]">Global &mdash; all sessions</td>
               </tr>
             </tbody>
           </table>
@@ -444,25 +413,26 @@ export default function GettingStartedPage() {
 
       {/* Contributing */}
       <section className="space-y-4">
-        <SectionHeading>Contributing</SectionHeading>
+        <SectionHeading>CONTRIBUTING</SectionHeading>
         <p className="text-[var(--text-secondary)] leading-relaxed">
-          Want to add your own asset? The process is simple:
+          Want to add your own agent or skill? Here&apos;s the process:
         </p>
         <ol className="space-y-3 text-[var(--text-secondary)] list-none">
           {[
             <>
               Create a <CodeTag>.md</CodeTag> file in the right directory (
-              <CodeTag>skills/&lt;category&gt;/&lt;name&gt;/SKILL.md</CodeTag>,{" "}
-              <CodeTag>templates/&lt;name&gt;.md</CodeTag>, or{" "}
-              <CodeTag>prompts/&lt;category&gt;/&lt;name&gt;.md</CodeTag>).
+              <CodeTag>agents/&lt;name&gt;/AGENT.md</CodeTag> or{" "}
+              <CodeTag>skills/&lt;group&gt;/&lt;name&gt;/SKILL.md</CodeTag>).
             </>,
             <>
               Add YAML frontmatter with <CodeTag>name</CodeTag>,{" "}
               <CodeTag>description</CodeTag>, and <CodeTag>tags</CodeTag>.
+              Agents also need <CodeTag>requires</CodeTag> and{" "}
+              <CodeTag>features</CodeTag>.
             </>,
             <>
               Run <CodeTag>bash scripts/build-catalog.sh</CodeTag> to
-              regenerate the catalog and verify your asset appears.
+              regenerate the catalog.
             </>,
             <>
               Submit a PR to the{" "}
@@ -470,7 +440,7 @@ export default function GettingStartedPage() {
                 href="https://github.com/nsporich/claude-playground"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[var(--accent-text)] border-b border-[var(--accent-text)]/30 hover:border-[var(--accent-text)] transition-colors"
+                className="text-[var(--cyan-text)] border-b border-[var(--cyan)]/30 hover:border-[var(--cyan)] transition-colors"
               >
                 GitHub repo
               </a>.

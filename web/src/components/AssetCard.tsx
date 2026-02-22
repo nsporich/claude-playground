@@ -1,52 +1,62 @@
 import Link from "next/link";
 import type { CatalogAsset } from "@/lib/types";
 
-const categoryStyles: Record<string, { bg: string; text: string }> = {
-  skills: { bg: "bg-amber-500/10", text: "text-amber-400" },
-  templates: { bg: "bg-emerald-500/10", text: "text-emerald-400" },
-  prompts: { bg: "bg-violet-500/10", text: "text-violet-400" },
-};
-
-const categoryLabels: Record<string, string> = {
-  skills: "Skill",
-  templates: "Template",
-  prompts: "Prompt",
+const categoryStyles: Record<string, { border: string; text: string; bg: string; label: string }> = {
+  agents: {
+    border: "border-[var(--accent)]/30",
+    text: "text-[var(--accent-text)]",
+    bg: "bg-[var(--accent)]/10",
+    label: "AGENT",
+  },
+  skills: {
+    border: "border-[var(--cyan)]/30",
+    text: "text-[var(--cyan-text)]",
+    bg: "bg-[var(--cyan)]/10",
+    label: "SKILL",
+  },
 };
 
 export default function AssetCard({ asset }: { asset: CatalogAsset }) {
   const style = categoryStyles[asset.category] ?? {
-    bg: "bg-white/5",
+    border: "border-white/10",
     text: "text-white/60",
+    bg: "bg-white/5",
+    label: asset.category.toUpperCase(),
   };
+
+  const requiresCount = asset.requires
+    ? asset.requires.skills.length + asset.requires.agents.length
+    : 0;
 
   return (
     <Link
       href={`/${asset.category}/${asset.slug}`}
-      className="group relative block rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 transition-all duration-300 hover:border-[var(--border-accent)] hover:bg-[var(--bg-elevated)]"
+      className={`glow-border group relative block rounded-xl border-2 ${style.border} bg-[var(--bg-surface)] p-5 transition-all duration-300 hover:bg-[var(--bg-elevated)] hover:-translate-y-0.5`}
     >
-      {/* Hover glow */}
-      <div className="pointer-events-none absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-[radial-gradient(ellipse_at_top,var(--accent-glow),transparent_70%)]" />
-
       <div className="relative">
+        {/* Category + group badges */}
         <div className="mb-3 flex items-center gap-2">
-          <span
-            className={`rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${style.bg} ${style.text}`}
-          >
-            {categoryLabels[asset.category] ?? asset.category}
+          <span className={`rounded-md px-2 py-0.5 text-[10px] font-bold tracking-[0.15em] ${style.bg} ${style.text}`}>
+            {style.label}
           </span>
-          <span className="rounded-md bg-white/5 px-2 py-0.5 text-[10px] font-medium text-[var(--text-muted)]">
-            {asset.group}
-          </span>
+          {asset.group && (
+            <span className="rounded-md bg-white/5 px-2 py-0.5 text-[10px] font-medium text-[var(--text-muted)]">
+              {asset.group}
+            </span>
+          )}
         </div>
 
-        <h3 className="mb-1.5 text-base font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-text)] transition-colors">
-          {asset.name}
+        {/* Name */}
+        <h3 className={`mb-1.5 font-[family-name:var(--font-display)] text-xl tracking-[0.06em] text-[var(--text-primary)] group-hover:${style.text} transition-colors`}>
+          {asset.name.toUpperCase()}
         </h3>
 
+        {/* Description */}
         <p className="mb-4 text-sm leading-relaxed text-[var(--text-muted)]">
           {asset.description}
         </p>
 
+        {/* Tags */}
         {asset.tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {asset.tags.map((tag) => (
@@ -57,6 +67,16 @@ export default function AssetCard({ asset }: { asset: CatalogAsset }) {
                 {tag}
               </span>
             ))}
+          </div>
+        )}
+
+        {/* Requires count for agents */}
+        {requiresCount > 0 && (
+          <div className="mt-3 flex items-center gap-1.5 text-[11px] text-[var(--text-muted)]">
+            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+            </svg>
+            {requiresCount} {requiresCount === 1 ? "dependency" : "dependencies"}
           </div>
         )}
       </div>

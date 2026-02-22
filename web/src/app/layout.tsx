@@ -1,20 +1,19 @@
 import type { Metadata } from "next";
-import { DM_Sans, Instrument_Serif, JetBrains_Mono } from "next/font/google";
+import { Bebas_Neue, Barlow, JetBrains_Mono } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import "./globals.css";
 
-const dmSans = DM_Sans({
-  variable: "--font-body",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
-const instrumentSerif = Instrument_Serif({
+const bebasNeue = Bebas_Neue({
   variable: "--font-display",
   subsets: ["latin"],
   weight: "400",
-  style: ["normal", "italic"],
+});
+
+const barlow = Barlow({
+  variable: "--font-body",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -24,9 +23,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Claude Playground",
+  title: "Agents Assemble",
   description:
-    "A collection of reusable Claude Code skills, templates, and prompts",
+    "Opinionated agent personas and skills for Claude Code. Assemble your team.",
 };
 
 export default function RootLayout({
@@ -37,8 +36,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${dmSans.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable} antialiased flex min-h-screen flex-col bg-[var(--bg-base)] text-[var(--text-primary)] font-[family-name:var(--font-body)]`}
+        className={`${bebasNeue.variable} ${barlow.variable} ${jetbrainsMono.variable} antialiased flex min-h-screen flex-col bg-[var(--bg-base)] text-[var(--text-primary)] font-[family-name:var(--font-body)]`}
       >
+        <div className="noise-overlay" />
         <Header />
         <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-10">
           {children}

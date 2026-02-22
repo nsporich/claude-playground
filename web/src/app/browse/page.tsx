@@ -3,7 +3,7 @@ import { getAllAssets, getAllTags } from "@/lib/catalog";
 import BrowseClient from "./BrowseClient";
 
 export const metadata: Metadata = {
-  title: "Browse | Claude Playground",
+  title: "Roster | Agents Assemble",
 };
 
 export default function BrowsePage() {

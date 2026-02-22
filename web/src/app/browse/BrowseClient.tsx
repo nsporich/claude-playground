@@ -5,12 +5,11 @@ import type { AssetCategory, CatalogAsset } from "@/lib/types";
 import TagFilter from "@/components/TagFilter";
 import AssetCard from "@/components/AssetCard";
 
-const categoryOrder: AssetCategory[] = ["skills", "templates", "prompts"];
+const categoryOrder: AssetCategory[] = ["agents", "skills"];
 
-const categoryLabels: Record<AssetCategory, string> = {
-  skills: "Skills",
-  templates: "Templates",
-  prompts: "Prompts",
+const categoryConfig: Record<AssetCategory, { label: string; colorClass: string }> = {
+  agents: { label: "AGENTS", colorClass: "text-[var(--accent-text)]" },
+  skills: { label: "SKILLS", colorClass: "text-[var(--cyan-text)]" },
 };
 
 export default function BrowseClient({
@@ -41,25 +40,28 @@ export default function BrowseClient({
       grouped.set(asset.category, new Map());
     }
     const categoryMap = grouped.get(asset.category)!;
-    if (!categoryMap.has(asset.group)) {
-      categoryMap.set(asset.group, []);
+    const group = asset.group || "";
+    if (!categoryMap.has(group)) {
+      categoryMap.set(group, []);
     }
-    categoryMap.get(asset.group)!.push(asset);
+    categoryMap.get(group)!.push(asset);
   }
 
   return (
     <div className="space-y-10">
+      {/* Page header */}
       <div>
-        <h1 className="font-display text-4xl text-[var(--text-primary)] mb-2">
-          Browse
+        <h1 className="font-[family-name:var(--font-display)] text-5xl tracking-[0.08em] text-[var(--text-primary)] mb-2">
+          THE ROSTER
         </h1>
         <p className="text-[var(--text-muted)]">
           Filter by tag or explore by category.
         </p>
       </div>
 
-      <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4">
-        <div className="mb-2 text-[10px] font-medium tracking-[0.15em] uppercase text-[var(--text-muted)]">
+      {/* Tag filter */}
+      <div className="rounded-xl border-2 border-[var(--border-default)] bg-[var(--bg-surface)] p-4">
+        <div className="mb-2 text-[10px] font-bold tracking-[0.2em] uppercase text-[var(--text-muted)]">
           Filter by tag
         </div>
         <TagFilter
@@ -69,39 +71,51 @@ export default function BrowseClient({
         />
       </div>
 
+      {/* Categories */}
       {categoryOrder.map((category) => {
         const groupMap = grouped.get(category);
         if (!groupMap || groupMap.size === 0) return null;
 
         const sortedGroups = [...groupMap.keys()].sort();
+        const allAssets = [...groupMap.values()].flat();
+        const config = categoryConfig[category];
+        const hasMultipleGroups = sortedGroups.length > 1 || (sortedGroups.length === 1 && sortedGroups[0] !== "");
 
         return (
           <section key={category}>
             <div className="mb-6 flex items-center gap-4">
-              <h2 className="font-display text-2xl text-[var(--text-primary)]">
-                {categoryLabels[category]}
+              <h2 className={`font-[family-name:var(--font-display)] text-2xl tracking-[0.12em] ${config.colorClass}`}>
+                {config.label}
               </h2>
               <div className="flex-1 h-px bg-[var(--border-subtle)]" />
               <span className="text-xs font-mono text-[var(--text-muted)]">
-                {[...groupMap.values()].reduce((sum, g) => sum + g.length, 0)}
+                {allAssets.length}
               </span>
             </div>
 
-            {sortedGroups.map((group) => {
-              const groupAssets = groupMap.get(group)!;
-              return (
-                <div key={group} className="mb-8">
-                  <h3 className="mb-4 text-xs font-semibold tracking-[0.15em] uppercase text-[var(--text-muted)]">
-                    {group}
-                  </h3>
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {groupAssets.map((asset) => (
-                      <AssetCard key={asset.slug} asset={asset} />
-                    ))}
+            {hasMultipleGroups ? (
+              sortedGroups.map((group) => {
+                const groupAssets = groupMap.get(group)!;
+                return (
+                  <div key={group} className="mb-8">
+                    <h3 className="mb-4 text-[10px] font-bold tracking-[0.2em] uppercase text-[var(--text-muted)]">
+                      {group}
+                    </h3>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      {groupAssets.map((asset) => (
+                        <AssetCard key={asset.slug} asset={asset} />
+                      ))}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+            ) : (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {allAssets.map((asset) => (
+                  <AssetCard key={asset.slug} asset={asset} />
+                ))}
+              </div>
+            )}
           </section>
         );
       })}

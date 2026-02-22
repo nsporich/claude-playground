@@ -15,8 +15,8 @@ export function getCatalog(): Catalog {
   const raw = fs.readFileSync(catalogPath, "utf-8");
   const data = JSON.parse(raw) as Record<string, Omit<CatalogAsset, "category">[]>;
 
-  const categories: AssetCategory[] = ["skills", "templates", "prompts"];
-  const catalog: Catalog = { skills: [], templates: [], prompts: [] };
+  const categories: AssetCategory[] = ["agents", "skills"];
+  const catalog: Catalog = { agents: [], skills: [] };
 
   for (const category of categories) {
     catalog[category] = (data[category] ?? []).map((asset) => ({
@@ -33,7 +33,7 @@ export function getCatalog(): Catalog {
  */
 export function getAllAssets(): CatalogAsset[] {
   const catalog = getCatalog();
-  return [...catalog.skills, ...catalog.templates, ...catalog.prompts];
+  return [...catalog.agents, ...catalog.skills];
 }
 
 /**
@@ -63,7 +63,11 @@ export function getAssetContent(asset: CatalogAsset): string {
  */
 export function getAllGroups(category: AssetCategory): string[] {
   const catalog = getCatalog();
-  const groups = new Set(catalog[category].map((asset) => asset.group));
+  const groups = new Set(
+    catalog[category]
+      .map((asset) => asset.group)
+      .filter((g): g is string => !!g),
+  );
   return [...groups].sort();
 }
 
