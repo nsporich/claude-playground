@@ -131,3 +131,4 @@ Verification means proving the bug is gone, not just observing that it seems to 
 
 - If the bug was discovered during feature work, return to the **feature-implementation** skill after the fix is verified.
 - Use the **code-review** skill to review fixes that touch security-sensitive or critical code paths.
+- Write regression tests using the **tdd** skill's discipline — failing test first, then fix.

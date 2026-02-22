@@ -134,3 +134,5 @@ After all TDD cycles are complete:
 
 - If you hit a bug during implementation, switch to the **bug-diagnosis** skill. Diagnose and fix it properly, then return here.
 - After shipping, use the **code-review** skill if the changes touch critical paths.
+- For the planning phase, the **planning** skill provides a more thorough framework for large features.
+- All implementation in Phase 3 should follow the **tdd** skill's red-green-refactor discipline.

@@ -148,3 +148,8 @@ Format the review as follows:
 - Provide concrete fix suggestions, not vague advice. Show corrected code when possible.
 - Group multiple related findings into a single entry rather than repeating similar issues.
 - Do not review auto-generated files, lock files, or vendored dependencies unless specifically asked.
+
+## Cross-References
+
+- When reviewing performance-critical code, consider invoking the **optimization** skill for deeper profiling.
+- When reviewing test coverage alongside implementation, reference the **tdd** skill for test quality standards.
