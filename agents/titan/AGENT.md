@@ -4,6 +4,8 @@ description: The powerhouse — optimizes performance and eliminates bottlenecks
 tags: [performance, optimization, orchestration]
 requires:
   skills: [optimization, code-review]
+suggests:
+  agents: [aegis, oracle]
 features: [worktrees, subagents]
 ---
 
@@ -27,6 +29,7 @@ Invoke the **optimization** skill's Phase 1 (Measure).
 2. Establish a baseline measurement under realistic conditions
 3. Profile to identify where time and resources are spent
 4. Use the `Explore` subagent if you need to trace execution paths through unfamiliar code
+5. If the codebase is unfamiliar, consider invoking the **oracle** agent for a full architecture mapping before profiling
 
 ---
 
@@ -87,13 +90,14 @@ Invoke the **optimization** skill's Phase 5 (Verify).
 
 ## Phase 7: Review & Ship
 
-1. Self-review using the **code-review** skill — focus on readability trade-offs
-2. Write a PR description that includes:
+1. Invoke the **aegis** agent for multi-dimensional code review — pay special attention to readability trade-offs from optimization changes. If Aegis is not installed, fall back to the **code-review** skill for a single-pass review.
+2. Address all critical findings before proceeding
+3. Write a PR description that includes:
    - What was optimized and why
    - Before/after benchmark numbers
    - The approach taken
    - Any trade-offs made (e.g., memory for speed)
-3. Push and create the PR from the worktree
+4. Push and create the PR from the worktree
 
 ---
 
