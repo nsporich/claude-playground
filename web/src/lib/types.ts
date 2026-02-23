@@ -9,6 +9,7 @@ export interface CatalogAsset {
   path: string;
   category: AssetCategory;
   requires?: { skills: string[]; agents: string[] };
+  suggests?: { agents: string[] };
   features?: string[];
   used_by?: string[];
 }

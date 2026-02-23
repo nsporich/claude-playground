@@ -214,6 +214,43 @@ export default async function AssetDetailPage({ params }: PageProps) {
           </div>
         )}
 
+      {/* Agent-specific: Team Synergies */}
+      {asset.suggests &&
+        asset.suggests.agents.length > 0 && (
+          <div
+            className="mb-5 bg-[var(--panel-bg)] p-5"
+            style={{
+              border: "3px solid var(--ink)",
+              boxShadow: "var(--shadow-comic)",
+            }}
+          >
+            <p className="mb-1 font-[family-name:var(--font-display)] tracking-widest uppercase text-[var(--ink-light)] text-sm">
+              Team Synergies
+            </p>
+            <p className="mb-3 text-[11px] text-[var(--ink-light)]">
+              Calls on these teammates
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {asset.suggests.agents.map((agent) => {
+                const agentColor = getHeroColor(agent);
+                return (
+                  <Link
+                    key={agent}
+                    href={`/agents/${agent}`}
+                    className="border-2 border-[var(--ink)] px-3 py-1 text-xs font-bold transition-colors hover:text-white"
+                    style={{
+                      color: agentColor?.color ?? color,
+                      background: agentColor?.light ?? colorLight,
+                    }}
+                  >
+                    {agent}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
       {/* Agent-specific: Capabilities */}
       {asset.features && asset.features.length > 0 && (
         <div
