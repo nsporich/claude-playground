@@ -248,27 +248,32 @@ export default function HeroRoster({ agents }: { agents: CatalogAsset[] }) {
       {directorAgent && directorMeta && (
         <button
           onClick={() => handleSelect("director")}
-          className="animate-fade-up w-full mb-6 relative text-left transition-all duration-200 cursor-pointer speed-hover"
+          className="animate-fade-up w-full mb-6 relative text-left transition-all duration-200 cursor-pointer bg-[var(--panel-bg)] speed-hover"
           style={{
             border: "3px solid var(--ink)",
             boxShadow:
               selectedSlug === "director"
-                ? "6px 6px 0 #e8e8f0"
+                ? `6px 6px 0 ${directorMeta.color}`
                 : "4px 4px 0 var(--ink)",
-            background: directorMeta.color,
             transform:
               selectedSlug === "director"
                 ? "translate(-2px, -2px)"
                 : undefined,
           }}
         >
+          {/* Color bar at top */}
+          <div
+            className="absolute top-0 left-0 right-0 h-[4px]"
+            style={{ background: directorMeta.color }}
+          />
+
           {/* Halftone dot overlay */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              backgroundImage:
-                "radial-gradient(circle, rgba(232, 232, 240, 0.08) 1px, transparent 1px)",
+              backgroundImage: `radial-gradient(circle, ${directorMeta.color} 0.6px, transparent 0.6px)`,
               backgroundSize: "6px 6px",
+              opacity: 0.04,
             }}
           />
 
@@ -276,22 +281,25 @@ export default function HeroRoster({ agents }: { agents: CatalogAsset[] }) {
             {/* Icon */}
             <div
               className="flex h-14 w-14 sm:h-16 sm:w-16 shrink-0 items-center justify-center"
-              style={{ background: "rgba(232, 232, 240, 0.12)" }}
+              style={{ background: directorMeta.colorLight }}
             >
-              <HeroIcon slug="director" color="#e8e8f0" />
+              <HeroIcon slug="director" color={directorMeta.color} />
             </div>
 
             {/* Text */}
             <div className="flex-1 text-center sm:text-left">
               <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3">
-                <h3 className="font-[family-name:var(--font-display)] text-2xl sm:text-3xl tracking-wider text-[#e8e8f0]">
+                <h3
+                  className="font-[family-name:var(--font-display)] text-2xl sm:text-3xl tracking-wider"
+                  style={{ color: directorMeta.color }}
+                >
                   DIRECTOR
                 </h3>
-                <span className="text-[11px] tracking-widest uppercase text-[#e8e8f0] opacity-60 font-bold">
+                <span className="text-[11px] tracking-widest uppercase text-[var(--ink-light)] font-bold">
                   {directorMeta.title}
                 </span>
               </div>
-              <p className="mt-1 text-sm text-[#e8e8f0] opacity-70 font-bold">
+              <p className="mt-1 text-sm text-[var(--ink-medium)] font-bold">
                 {directorMeta.skillSet}
               </p>
             </div>
@@ -300,7 +308,13 @@ export default function HeroRoster({ agents }: { agents: CatalogAsset[] }) {
             <Link
               href="/agents/director"
               onClick={(e) => e.stopPropagation()}
-              className="shrink-0 inline-flex items-center gap-2 border-2 border-[#e8e8f0] px-4 py-2 font-[family-name:var(--font-display)] text-sm tracking-wider text-[#e8e8f0] transition-all duration-200 hover:bg-[#e8e8f0] hover:text-[#1a1a2e]"
+              className="shrink-0 inline-flex items-center gap-2 border-2 border-[var(--ink)] px-4 py-2 font-[family-name:var(--font-display)] text-sm tracking-wider transition-all duration-200 hover:text-white"
+              style={{
+                color: directorMeta.color,
+                background: directorMeta.colorLight,
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = directorMeta.color; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = directorMeta.colorLight; e.currentTarget.style.color = directorMeta.color; }}
             >
               View Dossier
               <svg
@@ -322,9 +336,9 @@ export default function HeroRoster({ agents }: { agents: CatalogAsset[] }) {
           {/* Selection indicator — star burst */}
           {selectedSlug === "director" && (
             <div
-              className="absolute -top-3 -right-3 flex h-7 w-7 items-center justify-center text-[#1a1a2e] text-[10px] font-bold animate-pop"
+              className="absolute -top-3 -right-3 flex h-7 w-7 items-center justify-center text-white text-[10px] font-bold animate-pop"
               style={{
-                background: "#e8e8f0",
+                background: directorMeta.color,
                 clipPath:
                   "polygon(50% 0%, 63% 28%, 98% 35%, 72% 57%, 82% 91%, 50% 72%, 18% 91%, 28% 57%, 2% 35%, 37% 28%)",
               }}
