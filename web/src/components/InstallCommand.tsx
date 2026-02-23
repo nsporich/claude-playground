@@ -13,41 +13,51 @@ export default function InstallCommand({ command }: { command: string }) {
 
   return (
     <div
-      className="relative overflow-hidden border-3 border-[var(--ink)] bg-[#1e1e2e]"
-      style={{ border: "3px solid var(--ink)", boxShadow: "var(--shadow-comic)" }}
+      className="relative overflow-hidden bg-[var(--paper)]"
+      style={{
+        border: "3px solid var(--ink)",
+        boxShadow: "6px 6px 0 var(--ink)",
+      }}
     >
-      {/* Terminal chrome */}
-      <div className="flex items-center gap-2 border-b-2 border-[var(--ink)] px-4 py-2 bg-[#2d2d44]">
-        <div className="h-3 w-3 rounded-full bg-[var(--comic-red)] border border-[var(--ink)]" />
-        <div className="h-3 w-3 rounded-full bg-[var(--comic-yellow)] border border-[var(--ink)]" />
-        <div className="h-3 w-3 rounded-full bg-[var(--comic-green)] border border-[var(--ink)]" />
-        <span className="ml-2 text-[10px] tracking-[0.2em] uppercase text-[#8888aa] font-[family-name:var(--font-mono)]">
-          mission-control
-        </span>
-      </div>
-
-      <div className="flex items-center justify-between px-4 py-3.5">
-        <div className="flex items-center gap-2 min-w-0 overflow-x-auto">
-          <span className="shrink-0 text-[var(--comic-red)] font-mono text-sm font-bold">
-            $
+      {/* Header bar */}
+      <div
+        className="flex items-center justify-between px-5 py-2.5"
+        style={{
+          background: "var(--ink)",
+        }}
+      >
+        <div className="flex items-center gap-3">
+          {/* Action dots */}
+          <div className="flex gap-1.5">
+            <div className="h-3 w-3 border-2 border-[var(--comic-red)]" style={{ background: "var(--comic-red)" }} />
+            <div className="h-3 w-3 border-2 border-[var(--comic-yellow)]" style={{ background: "var(--comic-yellow)" }} />
+            <div className="h-3 w-3 border-2 border-[var(--comic-green)]" style={{ background: "var(--comic-green)" }} />
+          </div>
+          <span className="font-[family-name:var(--font-display)] text-sm tracking-[0.25em] uppercase text-[var(--paper)] opacity-60">
+            Mission Control
           </span>
-          <code className="text-sm text-[var(--comic-cyan)] font-mono whitespace-nowrap">
-            {command}
-          </code>
         </div>
+
+        {/* Copy button in header */}
         <button
           onClick={handleCopy}
-          className="ml-4 shrink-0 border-2 border-[#555] px-3 py-1 text-xs font-bold text-[#aaa] transition-all cursor-pointer hover:border-[var(--comic-yellow)] hover:text-[var(--comic-yellow)] hover:bg-[var(--comic-yellow)]/10"
+          className="flex items-center gap-1.5 border-2 px-3 py-1 font-[family-name:var(--font-display)] text-xs tracking-widest uppercase transition-all cursor-pointer"
+          style={{
+            border: "2px solid var(--comic-yellow)",
+            color: "var(--comic-yellow)",
+            background: copied ? "var(--comic-yellow)" : "transparent",
+            ...(copied ? { color: "var(--ink)" } : {}),
+          }}
           aria-label="Copy command"
         >
           {copied ? (
-            <span className="flex items-center gap-1 text-[var(--comic-green)]">
+            <>
               <svg
-                className="h-3 w-3"
+                className="h-3.5 w-3.5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
-                strokeWidth={2}
+                strokeWidth={3}
               >
                 <path
                   strokeLinecap="round"
@@ -56,11 +66,51 @@ export default function InstallCommand({ command }: { command: string }) {
                 />
               </svg>
               Copied!
-            </span>
+            </>
           ) : (
-            "Copy"
+            <>
+              <svg
+                className="h-3.5 w-3.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                />
+              </svg>
+              Copy
+            </>
           )}
         </button>
+      </div>
+
+      {/* Command area */}
+      <div className="relative px-5 py-4">
+        {/* Halftone background dots */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: "radial-gradient(circle, var(--ink) 0.5px, transparent 0.5px)",
+            backgroundSize: "8px 8px",
+            opacity: 0.04,
+          }}
+        />
+
+        <div className="relative flex items-center gap-3">
+          <span
+            className="font-[family-name:var(--font-display)] text-lg tracking-wider"
+            style={{ color: "var(--comic-red)" }}
+          >
+            &gt;
+          </span>
+          <code className="font-[family-name:var(--font-mono)] text-sm font-bold text-[var(--ink)] whitespace-nowrap">
+            {command}
+          </code>
+        </div>
       </div>
     </div>
   );
