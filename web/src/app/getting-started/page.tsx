@@ -380,9 +380,10 @@ export default function GettingStartedPage() {
       <section className="space-y-4">
         <SectionHeading>FIRST MISSION</SectionHeading>
         <p className="text-[var(--ink-medium)] leading-relaxed font-bold">
-          Deploy{" "}
-          <strong className="text-[var(--ink)]">Aegis</strong> and run your
-          first code review operation.
+          The{" "}
+          <strong className="text-[var(--ink)]">Director</strong> agent is
+          always installed and acts as your single entry point. Just describe
+          what you need&mdash;Director figures out which agent to deploy.
         </p>
 
         <div
@@ -396,11 +397,11 @@ export default function GettingStartedPage() {
             <StepNumber n={1} />
             <div>
               <p className="text-sm font-bold text-[var(--ink)]">
-                Deploy the Aegis agent
+                Install the team
               </p>
               <p className="text-sm text-[var(--ink-light)] mt-1 font-bold">
-                The installer automatically pulls in the code-review skill that
-                Aegis requires.
+                Pick any agents you want. Director is always included
+                automatically.
               </p>
               <div
                 className="mt-2 p-3 font-mono text-xs text-[var(--ink-light)] bg-[var(--paper)]"
@@ -432,11 +433,39 @@ export default function GettingStartedPage() {
             <StepNumber n={3} />
             <div>
               <p className="text-sm font-bold text-[var(--ink)]">
-                Initiate review
+                Describe your mission
               </p>
               <p className="text-sm text-[var(--ink-light)] mt-1 font-bold">
-                Aegis will run a multi-layered code review with severity ratings,
-                file references, and actionable suggestions.
+                Tell Director what you need in plain language. No need to
+                memorize agent names.
+              </p>
+              <div
+                className="mt-2 p-3 font-mono text-xs text-[var(--ink-light)] bg-[var(--paper)] space-y-2"
+                style={{ border: "2px solid var(--ink)" }}
+              >
+                <div>
+                  <span className="text-[var(--comic-blue)] font-bold">you:</span>{" "}
+                  &ldquo;Review the auth module for security issues&rdquo;
+                </div>
+                <div>
+                  <span className="text-[var(--comic-red)] font-bold">director:</span>{" "}
+                  Deploying <strong>Aegis</strong> &mdash; code review specialist
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <StepNumber n={4} />
+            <div>
+              <p className="text-sm font-bold text-[var(--ink)]">
+                Agent runs its workflow
+              </p>
+              <p className="text-sm text-[var(--ink-light)] mt-1 font-bold">
+                The deployed agent takes full control&mdash;running its
+                end-to-end workflow with severity ratings, file references, and
+                actionable suggestions. When done, Director offers follow-up
+                recommendations.
               </p>
             </div>
           </div>
