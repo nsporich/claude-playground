@@ -107,6 +107,12 @@ process_agent() {
   local req_agents_json
   req_agents_json="$(parse_array "$req_agents_raw")"
 
+  # Parse suggests.agents from indented YAML
+  local sug_agents_raw
+  sug_agents_raw="$(echo "$frontmatter" | awk '/^suggests:/{found=1; next} found && /^  agents:/{print; next} found && /^[^ ]/{exit}' | sed 's/^  agents:[[:space:]]*//')"
+  local sug_agents_json
+  sug_agents_json="$(parse_array "$sug_agents_raw")"
+
   # Parse features
   local features_raw
   features_raw="$(parse_field "$frontmatter" "features")"
@@ -125,7 +131,7 @@ process_agent() {
   done
 
   local entry
-  entry="    {\"name\": \"$name\", \"slug\": \"$slug\", \"description\": \"$description\", \"tags\": $tags_json, \"path\": \"$relpath\", \"requires\": {\"skills\": $req_skills_json, \"agents\": $req_agents_json}, \"features\": $features_json}"
+  entry="    {\"name\": \"$name\", \"slug\": \"$slug\", \"description\": \"$description\", \"tags\": $tags_json, \"path\": \"$relpath\", \"requires\": {\"skills\": $req_skills_json, \"agents\": $req_agents_json}, \"suggests\": {\"agents\": $sug_agents_json}, \"features\": $features_json}"
 
   if [ -n "$agents_json" ]; then
     agents_json+=$',\n'
