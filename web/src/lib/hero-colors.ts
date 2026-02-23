@@ -6,6 +6,12 @@ export interface HeroColor {
 }
 
 const HERO_COLORS: Record<string, HeroColor> = {
+  director: {
+    color: "#1a1a2e",
+    text: "#1a1a2e",
+    bg: "rgba(26, 26, 46, 0.12)",
+    light: "#e8e8f0",
+  },
   ironclad: {
     color: "#E23636",
     text: "#B91C1C",
