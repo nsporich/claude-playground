@@ -130,14 +130,14 @@ show_banner() {
       --padding "1 2" \
       "AGENTS ASSEMBLE" \
       "" \
-      "Pick your team. We handle the rest."
+      "Assembling your team."
   else
     printf "${RED}  ╭──────────────────────────────────────╮${RESET}\n"
     printf "${RED}  │${RESET}                                      ${RED}│${RESET}\n"
     printf "${RED}  │${RESET}    ${BOLD}${WHITE}AGENTS ASSEMBLE${RESET}                   ${RED}│${RESET}\n"
     printf "${RED}  │${RESET}    ${GRAY}───────────────────${RESET}               ${RED}│${RESET}\n"
-    printf "${RED}  │${RESET}    ${GRAY}Pick your team. We handle${RESET}         ${RED}│${RESET}\n"
-    printf "${RED}  │${RESET}    ${GRAY}the rest.${RESET}                         ${RED}│${RESET}\n"
+    printf "${RED}  │${RESET}    ${GRAY}Assembling your team.${RESET}             ${RED}│${RESET}\n"
+    printf "${RED}  │${RESET}                                      ${RED}│${RESET}\n"
     printf "${RED}  │${RESET}                                      ${RED}│${RESET}\n"
     printf "${RED}  ╰──────────────────────────────────────╯${RESET}\n"
   fi
