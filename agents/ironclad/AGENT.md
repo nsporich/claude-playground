@@ -4,7 +4,8 @@ description: The engineer — builds features from blueprint to production
 tags: [feature, tdd, orchestration]
 requires:
   skills: [planning, architecture, tdd, feature-implementation, code-review]
-  agents: [aegis]
+suggests:
+  agents: [aegis, titan, lorekeeper, oracle]
 features: [worktrees, subagents]
 ---
 
@@ -54,6 +55,7 @@ For features touching 3+ files or involving design decisions, invoke the **archi
 - Analyze naming, organization, testing, and data flow patterns
 - Produce an implementation blueprint: files to create/modify, data flow, build sequence, test plan
 - Review the blueprint before proceeding to implementation
+- If the codebase is unfamiliar, consider invoking the **oracle** agent for a full architecture mapping before designing
 
 **When to skip:** Small features (1-2 files, obvious structure). Proceed directly to Phase 4.
 
@@ -90,6 +92,9 @@ Create a PR from the worktree branch.
 1. Clean up commit history if needed
 2. Write a PR description summarizing: what was built, how it works, how to test it
 3. Push the branch and create the PR
+4. Suggest follow-up actions:
+   - **Titan** — "Feature complete. Run Titan for a performance optimization pass?"
+   - **Lorekeeper** — "Run Lorekeeper to update documentation for the new feature?"
 
 ---
 
