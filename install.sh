@@ -7,6 +7,14 @@
 #
 set -euo pipefail
 
+# ── Flags ─────────────────────────────────────────────────────────────────────
+UNINSTALL=0
+for arg in "$@"; do
+  case "$arg" in
+    --uninstall) UNINSTALL=1 ;;
+  esac
+done
+
 # ── Configuration ────────────────────────────────────────────────────────────
 REPO_URL="https://github.com/nsporich/agents-assemble"
 CACHE_DIR="$HOME/.agents-assemble"
@@ -46,6 +54,68 @@ ok()    { printf "${GREEN}  ✓${RESET} %s\n" "$*"; }
 warn()  { printf "${YELLOW}  !${RESET} %s\n" "$*"; }
 err()   { printf "${RED}  ✗${RESET} %s\n" "$*" >&2; }
 die()   { err "$@"; exit 1; }
+
+# ── Uninstall mode ────────────────────────────────────────────────────────────
+if [ "$UNINSTALL" -eq 1 ]; then
+  CACHE_DIR="$HOME/.agents-assemble"
+  SKILLS_DIR="$HOME/.claude/skills"
+
+  echo ""
+  printf "  ${BOLD}${WHITE}DISBAND THE TEAM${RESET}\n"
+  printf "  ${GRAY}──────────────────────────────────────────────${RESET}\n"
+
+  # Find installed agents-assemble symlinks
+  removed=0
+  if [ -d "$SKILLS_DIR" ]; then
+    for link in "$SKILLS_DIR"/*/; do
+      link="${link%/}"
+      [ -L "$link" ] || continue
+      target="$(readlink "$link")"
+      case "$target" in
+        */.agents-assemble/*)
+          slug="$(basename "$link")"
+          printf "  ${RED}✗${RESET}  %s\n" "$slug"
+          removed=$((removed + 1))
+          ;;
+      esac
+    done
+  fi
+
+  if [ "$removed" -eq 0 ]; then
+    echo ""
+    info "No agents-assemble assets found. Nothing to remove."
+    echo ""
+    exit 0
+  fi
+
+  echo ""
+  printf "  ${YELLOW}This will remove ${BOLD}$removed${RESET}${YELLOW} assets and the local cache.${RESET}\n"
+  printf "\n  ${RED}▸${RESET} Disband the entire team? [y/${BOLD}N${RESET}]: "
+  read -r confirm < "$TTY_INPUT"
+
+  case "$confirm" in
+    y|Y|yes|YES)
+      for link in "$SKILLS_DIR"/*/; do
+        link="${link%/}"
+        [ -L "$link" ] || continue
+        target="$(readlink "$link")"
+        case "$target" in
+          */.agents-assemble/*) rm "$link" ;;
+        esac
+      done
+      rm -rf "$CACHE_DIR"
+      echo ""
+      ok "Team disbanded. All agents and skills removed."
+      echo ""
+      ;;
+    *)
+      echo ""
+      info "Aborted. Your team is still deployed."
+      echo ""
+      ;;
+  esac
+  exit 0
+fi
 
 # ── Banner ───────────────────────────────────────────────────────────────────
 show_banner() {
