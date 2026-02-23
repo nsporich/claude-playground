@@ -433,11 +433,11 @@ export default function GettingStartedPage() {
             <StepNumber n={3} />
             <div>
               <p className="text-sm font-bold text-[var(--ink)]">
-                Describe your mission
+                Invoke Director
               </p>
               <p className="text-sm text-[var(--ink-light)] mt-1 font-bold">
-                Tell Director what you need in plain language. No need to
-                memorize agent names.
+                Type <CodeTag>/director</CodeTag> followed by what you need in
+                plain language. No need to memorize agent names.
               </p>
               <div
                 className="mt-2 p-3 font-mono text-xs text-[var(--ink-light)] bg-[var(--paper)] space-y-2"
@@ -445,7 +445,7 @@ export default function GettingStartedPage() {
               >
                 <div>
                   <span className="text-[var(--comic-blue)] font-bold">you:</span>{" "}
-                  &ldquo;Review the auth module for security issues&rdquo;
+                  /director review the auth module for security issues
                 </div>
                 <div>
                   <span className="text-[var(--comic-red)] font-bold">director:</span>{" "}
