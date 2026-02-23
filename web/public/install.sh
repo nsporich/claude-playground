@@ -7,6 +7,14 @@
 #
 set -euo pipefail
 
+# ── Flags ─────────────────────────────────────────────────────────────────────
+UNINSTALL=0
+for arg in "$@"; do
+  case "$arg" in
+    --uninstall) UNINSTALL=1 ;;
+  esac
+done
+
 # ── Configuration ────────────────────────────────────────────────────────────
 REPO_URL="https://github.com/nsporich/agents-assemble"
 CACHE_DIR="$HOME/.agents-assemble"
@@ -47,6 +55,68 @@ warn()  { printf "${YELLOW}  !${RESET} %s\n" "$*"; }
 err()   { printf "${RED}  ✗${RESET} %s\n" "$*" >&2; }
 die()   { err "$@"; exit 1; }
 
+# ── Uninstall mode ────────────────────────────────────────────────────────────
+if [ "$UNINSTALL" -eq 1 ]; then
+  CACHE_DIR="$HOME/.agents-assemble"
+  SKILLS_DIR="$HOME/.claude/skills"
+
+  echo ""
+  printf "  ${BOLD}${WHITE}DISBAND THE TEAM${RESET}\n"
+  printf "  ${GRAY}──────────────────────────────────────────────${RESET}\n"
+
+  # Find installed agents-assemble symlinks
+  removed=0
+  if [ -d "$SKILLS_DIR" ]; then
+    for link in "$SKILLS_DIR"/*/; do
+      link="${link%/}"
+      [ -L "$link" ] || continue
+      target="$(readlink "$link")"
+      case "$target" in
+        */.agents-assemble/*)
+          slug="$(basename "$link")"
+          printf "  ${RED}✗${RESET}  %s\n" "$slug"
+          removed=$((removed + 1))
+          ;;
+      esac
+    done
+  fi
+
+  if [ "$removed" -eq 0 ]; then
+    echo ""
+    info "No agents-assemble assets found. Nothing to remove."
+    echo ""
+    exit 0
+  fi
+
+  echo ""
+  printf "  ${YELLOW}This will remove ${BOLD}$removed${RESET}${YELLOW} assets and the local cache.${RESET}\n"
+  printf "\n  ${RED}▸${RESET} Disband the entire team? [y/${BOLD}N${RESET}]: "
+  read -r confirm < "$TTY_INPUT"
+
+  case "$confirm" in
+    y|Y|yes|YES)
+      for link in "$SKILLS_DIR"/*/; do
+        link="${link%/}"
+        [ -L "$link" ] || continue
+        target="$(readlink "$link")"
+        case "$target" in
+          */.agents-assemble/*) rm "$link" ;;
+        esac
+      done
+      rm -rf "$CACHE_DIR"
+      echo ""
+      ok "Team disbanded. All agents and skills removed."
+      echo ""
+      ;;
+    *)
+      echo ""
+      info "Aborted. Your team is still deployed."
+      echo ""
+      ;;
+  esac
+  exit 0
+fi
+
 # ── Banner ───────────────────────────────────────────────────────────────────
 show_banner() {
   echo ""
@@ -60,14 +130,14 @@ show_banner() {
       --padding "1 2" \
       "AGENTS ASSEMBLE" \
       "" \
-      "Pick your team. We handle the rest."
+      "Assembling your team."
   else
     printf "${RED}  ╭──────────────────────────────────────╮${RESET}\n"
     printf "${RED}  │${RESET}                                      ${RED}│${RESET}\n"
     printf "${RED}  │${RESET}    ${BOLD}${WHITE}AGENTS ASSEMBLE${RESET}                   ${RED}│${RESET}\n"
     printf "${RED}  │${RESET}    ${GRAY}───────────────────${RESET}               ${RED}│${RESET}\n"
-    printf "${RED}  │${RESET}    ${GRAY}Pick your team. We handle${RESET}         ${RED}│${RESET}\n"
-    printf "${RED}  │${RESET}    ${GRAY}the rest.${RESET}                         ${RED}│${RESET}\n"
+    printf "${RED}  │${RESET}    ${GRAY}Assembling your team.${RESET}             ${RED}│${RESET}\n"
+    printf "${RED}  │${RESET}                                      ${RED}│${RESET}\n"
     printf "${RED}  │${RESET}                                      ${RED}│${RESET}\n"
     printf "${RED}  ╰──────────────────────────────────────╯${RESET}\n"
   fi
@@ -183,115 +253,8 @@ done < "$CATALOG"
 agent_count=${#AGENT_SLUG[@]}
 [ "$agent_count" -eq 0 ] && die "No agents found in catalog."
 
-# ── Step 5: Show the roster ──────────────────────────────────────────────────
-show_banner
-
-# Check what's already installed
-installed_agents=()
-for i in $(seq 0 $((agent_count - 1))); do
-  if [ -L "$SKILLS_DIR/${AGENT_SLUG[$i]}" ] || [ -d "$SKILLS_DIR/${AGENT_SLUG[$i]}" ]; then
-    installed_agents+=("${AGENT_SLUG[$i]}")
-  fi
-done
-
-declare -a selected_agents=()
-
-if [ "$HAS_GUM" -eq 1 ]; then
-  # ── Gum multi-select ─────────────────────────────────────────────────────
-  declare -a choices=()
-  declare -a preselected_args=()
-  for i in $(seq 0 $((agent_count - 1))); do
-    label="${AGENT_NAME[$i]} — ${AGENT_DESC[$i]}"
-    choices+=("$label")
-    # Pre-select already-installed agents
-    for inst in "${installed_agents[@]+"${installed_agents[@]}"}"; do
-      if [ "$inst" = "${AGENT_SLUG[$i]}" ]; then
-        preselected_args+=(--selected "$label")
-        break
-      fi
-    done
-  done
-
-  selection="$(printf '%s\n' "${choices[@]}" | gum choose \
-    --no-limit \
-    --header "Select agents to deploy (space to toggle, enter to confirm)" \
-    --header.foreground 196 \
-    --cursor-prefix "[ ] " \
-    --selected-prefix "[✓] " \
-    --unselected-prefix "[ ] " \
-    "${preselected_args[@]+"${preselected_args[@]}"}" \
-    < "$TTY_INPUT")" || true
-
-  if [ -z "$selection" ]; then
-    echo "  Nothing to deploy. Bye!"
-    exit 0
-  fi
-
-  # Map selected lines back to indices
-  while IFS= read -r sel_line; do
-    [ -z "$sel_line" ] && continue
-    for i in $(seq 0 $((agent_count - 1))); do
-      if [ "$sel_line" = "${AGENT_NAME[$i]} — ${AGENT_DESC[$i]}" ]; then
-        selected_agents+=("$i")
-        break
-      fi
-    done
-  done <<< "$selection"
-else
-  # ── Bash numbered list ───────────────────────────────────────────────────
-  printf "  ${BOLD}${WHITE}THE ROSTER${RESET}\n"
-  printf "  ${GRAY}──────────────────────────────────────────────${RESET}\n"
-
-  for i in $(seq 0 $((agent_count - 1))); do
-    num=$((i + 1))
-    status_mark="  "
-    for inst in "${installed_agents[@]+"${installed_agents[@]}"}"; do
-      [ "$inst" = "${AGENT_SLUG[$i]}" ] && status_mark=" ${GREEN}✓${RESET}" && break
-    done
-    printf "  ${WHITE}%2d)${RESET}%b  ${BOLD}%-14s${RESET}  ${GRAY}%s${RESET}\n" "$num" "$status_mark" "${AGENT_NAME[$i]}" "${AGENT_DESC[$i]}"
-  done
-
-  echo ""
-  if [ ${#installed_agents[@]} -gt 0 ]; then
-    printf "  ${GRAY}✓ = already deployed (select to update)${RESET}\n"
-  fi
-  printf "\n  ${RED}▸${RESET} Select agents (space-separated), ${BOLD}'all'${RESET}, or ${BOLD}'q'${RESET} to quit: "
-  read -r selection < "$TTY_INPUT"
-
-  if [ -z "$selection" ] || [ "$selection" = "q" ] || [ "$selection" = "Q" ]; then
-    echo "  Nothing to deploy. Bye!"
-    exit 0
-  fi
-
-  # ── Parse selection ──────────────────────────────────────────────────────
-  if [ "$selection" = "all" ] || [ "$selection" = "ALL" ]; then
-    for i in $(seq 0 $((agent_count - 1))); do
-      selected_agents+=("$i")
-    done
-  else
-    for token in $selection; do
-      if ! echo "$token" | grep -qE '^[0-9]+$'; then
-        warn "Skipping invalid input: $token"
-        continue
-      fi
-      idx=$((token - 1))
-      if [ "$idx" -lt 0 ] || [ "$idx" -ge "$agent_count" ]; then
-        warn "Skipping out-of-range: $token"
-        continue
-      fi
-      selected_agents+=("$idx")
-    done
-  fi
-fi
-
-if [ ${#selected_agents[@]} -eq 0 ]; then
-  echo "  Nothing selected. Bye!"
-  exit 0
-fi
-
-# ── Step 7: Resolve dependencies ─────────────────────────────────────────────
-# Collect all required skill slugs and agent slugs
-# (Using indexed arrays for Bash 3.2 compatibility — no declare -A)
+# ── Step 5: Resolve all agents and skills ────────────────────────────────────
+# Install everything — no selection needed
 declare -a needed_skill_list=()
 declare -a needed_agent_slugs=()
 declare -a needed_agent_idxs=()
@@ -310,7 +273,6 @@ resolve_agent() {
   local idx="$1"
   local slug="${AGENT_SLUG[$idx]}"
 
-  # Guard against circular deps
   list_contains "$slug" "${visited[@]+"${visited[@]}"}" && return
   visited+=("$slug")
 
@@ -319,7 +281,6 @@ resolve_agent() {
     needed_agent_idxs+=("$idx")
   fi
 
-  # Required skills
   if [ -n "${AGENT_REQ_SKILLS[$idx]}" ]; then
     IFS=',' read -ra skills <<< "${AGENT_REQ_SKILLS[$idx]}"
     for s in "${skills[@]}"; do
@@ -331,13 +292,11 @@ resolve_agent() {
     done
   fi
 
-  # Required agents (recursive)
   if [ -n "${AGENT_REQ_AGENTS[$idx]}" ]; then
     IFS=',' read -ra agents <<< "${AGENT_REQ_AGENTS[$idx]}"
     for a in "${agents[@]}"; do
       a="$(echo "$a" | tr -d ' ')"
       [ -z "$a" ] && continue
-      # Find the agent index
       for j in $(seq 0 $((agent_count - 1))); do
         if [ "${AGENT_SLUG[$j]}" = "$a" ]; then
           resolve_agent "$j"
@@ -348,57 +307,115 @@ resolve_agent() {
   fi
 }
 
-for idx in "${selected_agents[@]}"; do
-  resolve_agent "$idx"
+for i in $(seq 0 $((agent_count - 1))); do
+  resolve_agent "$i"
 done
 
-# ── Step 8: Show deployment plan ─────────────────────────────────────────────
+# ── Step 6: Scan installed state ─────────────────────────────────────────────
+declare -a agent_status=()  # "current", "update", or "deploy"
+update_count=0
+deploy_count=0
+
+for i in $(seq 0 $((${#needed_agent_slugs[@]} - 1))); do
+  slug="${needed_agent_slugs[$i]}"
+  idx="${needed_agent_idxs[$i]}"
+  target="$SKILLS_DIR/$slug"
+  src="$CACHE_DIR/${AGENT_PATH[$idx]}"
+  src_dir="$(dirname "$src")"
+
+  if [ -L "$target" ]; then
+    existing="$(readlink "$target")"
+    if [ "$existing" = "$src_dir" ]; then
+      agent_status+=("current")
+    else
+      agent_status+=("update")
+      update_count=$((update_count + 1))
+    fi
+  elif [ -d "$target" ]; then
+    agent_status+=("update")
+    update_count=$((update_count + 1))
+  else
+    agent_status+=("deploy")
+    deploy_count=$((deploy_count + 1))
+  fi
+done
+
+declare -a skill_status=()
+for slug in "${needed_skill_list[@]+"${needed_skill_list[@]}"}"; do
+  target="$SKILLS_DIR/$slug"
+  if [ -L "$target" ] || [ -d "$target" ]; then
+    skill_status+=("current")
+  else
+    skill_status+=("deploy")
+    deploy_count=$((deploy_count + 1))
+  fi
+done
+
+# ── Step 7: Show roster ──────────────────────────────────────────────────────
+show_banner
+
+printf "  ${BOLD}${WHITE}ASSEMBLING YOUR TEAM${RESET}\n"
+printf "  ${GRAY}──────────────────────────────────────────────${RESET}\n"
+
+for i in $(seq 0 $((${#needed_agent_slugs[@]} - 1))); do
+  slug="${needed_agent_slugs[$i]}"
+  idx="${needed_agent_idxs[$i]}"
+  name="${AGENT_NAME[$idx]}"
+  desc="${AGENT_DESC[$idx]}"
+  status="${agent_status[$i]}"
+
+  # Icon: ★ for Director, ✓ for installed, + for new
+  if [ "$slug" = "director" ]; then
+    icon="${YELLOW}★${RESET}"
+  elif [ "$status" = "deploy" ]; then
+    icon="${GREEN}+${RESET}"
+  else
+    icon="${GREEN}✓${RESET}"
+  fi
+
+  # Status label
+  case "$status" in
+    current) status_label="${GREEN}✓ current${RESET}" ;;
+    update)  status_label="${CYAN}↑ update${RESET}" ;;
+    deploy)  status_label="${GREEN}+ deploy${RESET}" ;;
+  esac
+
+  # Extract title from description (text after the em dash)
+  title="$(echo "$desc" | sed 's/.*— //')"
+
+  printf "  %b  ${BOLD}%-14s${RESET}${GRAY}%-22s${RESET} %b\n" "$icon" "$name" "$title" "$status_label"
+done
+
+printf "  ${GRAY}──────────────────────────────────────────────${RESET}\n"
+
+# Summary line
+if [ "$update_count" -eq 0 ] && [ "$deploy_count" -eq 0 ]; then
+  echo ""
+  ok "All agents current — nothing to do."
+  echo ""
+  exit 0
+fi
+
+parts=()
+[ "$update_count" -gt 0 ] && parts+=("$update_count update$([ "$update_count" -ne 1 ] && echo 's')")
+[ "$deploy_count" -gt 0 ] && parts+=("$deploy_count new deployment$([ "$deploy_count" -ne 1 ] && echo 's')")
+summary_line="$(IFS=' • '; echo "${parts[*]}")"
+printf "  ${GRAY}%s${RESET}\n" "$summary_line"
+
 echo ""
 
-if [ "$HAS_GUM" -eq 1 ]; then
-  # Build deployment plan text for gum style
-  plan_text="DEPLOYMENT PLAN\n"
-  plan_text+="──────────────────────────────────────────────\n"
-  for slug in "${needed_agent_slugs[@]+"${needed_agent_slugs[@]}"}"; do
-    plan_text+="●  $(printf '%-14s' "$slug")  agent\n"
-  done
-  for slug in "${needed_skill_list[@]+"${needed_skill_list[@]}"}"; do
-    already_installed=0
-    if [ -L "$SKILLS_DIR/$slug" ] || [ -d "$SKILLS_DIR/$slug" ]; then
-      already_installed=1
-    fi
-    if [ "$already_installed" -eq 1 ]; then
-      plan_text+="●  $(printf '%-14s' "$slug")  skill (installed)\n"
-    else
-      plan_text+="●  $(printf '%-14s' "$slug")  skill (auto)\n"
-    fi
-  done
-  printf '%b' "$plan_text" | gum style \
-    --border rounded \
-    --border-foreground 196 \
-    --padding "0 2"
-else
-  printf "  ${BOLD}${WHITE}DEPLOYMENT PLAN${RESET}\n"
-  printf "  ${GRAY}──────────────────────────────────────────────${RESET}\n"
+# ── Step 8: Confirm ──────────────────────────────────────────────────────────
+printf "  ${RED}▸${RESET} Assemble the team? [${BOLD}Y${RESET}/n]: "
+read -r confirm < "$TTY_INPUT"
 
-  # Agents
-  for slug in "${needed_agent_slugs[@]+"${needed_agent_slugs[@]}"}"; do
-    printf "  ${RED}●${RESET}  ${BOLD}%-14s${RESET}  ${GRAY}agent${RESET}\n" "$slug"
-  done
-
-  # Skills
-  for slug in "${needed_skill_list[@]+"${needed_skill_list[@]}"}"; do
-    already_installed=0
-    if [ -L "$SKILLS_DIR/$slug" ] || [ -d "$SKILLS_DIR/$slug" ]; then
-      already_installed=1
-    fi
-    if [ "$already_installed" -eq 1 ]; then
-      printf "  ${CYAN}●${RESET}  ${DIM}%-14s${RESET}  ${GRAY}skill (installed)${RESET}\n" "$slug"
-    else
-      printf "  ${CYAN}●${RESET}  %-14s  ${GRAY}skill (auto)${RESET}\n" "$slug"
-    fi
-  done
-fi
+case "$confirm" in
+  n|N|no|NO)
+    echo ""
+    info "Aborted. Run again when you're ready, commander."
+    echo ""
+    exit 0
+    ;;
+esac
 
 echo ""
 
@@ -408,7 +425,10 @@ mkdir -p "$SKILLS_DIR"
 declare -a summary=()
 
 # Install skills first
-for slug in "${needed_skill_list[@]+"${needed_skill_list[@]}"}"; do
+for i in $(seq 0 $((${#needed_skill_list[@]} - 1))); do
+  slug="${needed_skill_list[$i]}"
+  status="${skill_status[$i]}"
+
   # Find skill path
   skill_path=""
   for j in $(seq 0 $((${#SKILL_SLUG[@]} - 1))); do
@@ -432,30 +452,7 @@ for slug in "${needed_skill_list[@]+"${needed_skill_list[@]}"}"; do
     continue
   fi
 
-  is_update="no"
-  if [ -L "$target" ]; then
-    rm "$target"
-    is_update="yes"
-  fi
-
-  ln -s "$src_dir" "$target"
-  if [ "$is_update" = "yes" ]; then
-    summary+=("$(printf "${GREEN}↻${RESET}  ${CYAN}skill${RESET}   %-14s  updated" "$slug")")
-  else
-    summary+=("$(printf "${GREEN}✓${RESET}  ${CYAN}skill${RESET}   %-14s  deployed" "$slug")")
-  fi
-done
-
-# Install agents
-for i in $(seq 0 $((${#needed_agent_slugs[@]} - 1))); do
-  slug="${needed_agent_slugs[$i]}"
-  idx="${needed_agent_idxs[$i]}"
-  src="$CACHE_DIR/${AGENT_PATH[$idx]}"
-  src_dir="$(dirname "$src")"
-  target="$SKILLS_DIR/$slug"
-
-  if [ ! -f "$src" ]; then
-    warn "Source not found: $src -- skipping"
+  if [ "$status" = "current" ]; then
     continue
   fi
 
@@ -467,35 +464,52 @@ for i in $(seq 0 $((${#needed_agent_slugs[@]} - 1))); do
 
   ln -s "$src_dir" "$target"
   if [ "$is_update" = "yes" ]; then
-    summary+=("$(printf "${GREEN}↻${RESET}  ${RED}agent${RESET}   %-14s  updated" "$slug")")
+    summary+=("$(printf "${CYAN}↻${RESET}  %-14s  ${GRAY}skill updated${RESET}" "$slug")")
   else
-    summary+=("$(printf "${GREEN}✓${RESET}  ${RED}agent${RESET}   %-14s  deployed" "$slug")")
+    summary+=("$(printf "${GREEN}✓${RESET}  %-14s  ${GRAY}skill deployed${RESET}" "$slug")")
+  fi
+done
+
+# Install agents
+for i in $(seq 0 $((${#needed_agent_slugs[@]} - 1))); do
+  slug="${needed_agent_slugs[$i]}"
+  idx="${needed_agent_idxs[$i]}"
+  status="${agent_status[$i]}"
+  src="$CACHE_DIR/${AGENT_PATH[$idx]}"
+  src_dir="$(dirname "$src")"
+  target="$SKILLS_DIR/$slug"
+
+  if [ ! -f "$src" ]; then
+    warn "Source not found: $src -- skipping"
+    continue
+  fi
+
+  if [ "$status" = "current" ]; then
+    continue
+  fi
+
+  is_update="no"
+  if [ -L "$target" ]; then
+    rm "$target"
+    is_update="yes"
+  fi
+
+  ln -s "$src_dir" "$target"
+  if [ "$is_update" = "yes" ]; then
+    summary+=("$(printf "${CYAN}↻${RESET}  %-14s  ${GRAY}agent updated${RESET}" "$slug")")
+  else
+    summary+=("$(printf "${GREEN}✓${RESET}  %-14s  ${GRAY}agent deployed${RESET}" "$slug")")
   fi
 done
 
 # ── Step 10: Summary ─────────────────────────────────────────────────────────
+printf "  ${BOLD}${WHITE}DEPLOYMENT COMPLETE${RESET}\n"
+printf "  ${GRAY}──────────────────────────────────────────────${RESET}\n"
+for line in "${summary[@]}"; do
+  printf "  %b\n" "$line"
+done
+printf "  ${GRAY}──────────────────────────────────────────────${RESET}\n"
 echo ""
-
-if [ "$HAS_GUM" -eq 1 ]; then
-  summary_text="DEPLOYMENT COMPLETE\n"
-  summary_text+="──────────────────────────────────────────────\n"
-  for line in "${summary[@]}"; do
-    summary_text+="$(printf '%b' "$line")\n"
-  done
-  summary_text+="\nOpen Claude Code in any project to use your agents."
-  printf '%b' "$summary_text" | gum style \
-    --border rounded \
-    --border-foreground 34 \
-    --padding "0 2"
-else
-  printf "  ${BOLD}${WHITE}DEPLOYMENT COMPLETE${RESET}\n"
-  printf "  ${GRAY}──────────────────────────────────────────────${RESET}\n"
-  for line in "${summary[@]}"; do
-    printf "  %b\n" "$line"
-  done
-  printf "  ${GRAY}──────────────────────────────────────────────${RESET}\n"
-  echo ""
-  printf "  ${GRAY}Open Claude Code in any project to use your agents.${RESET}\n"
-fi
-
+printf "  ${BOLD}${WHITE}Your team is assembled.${RESET}\n"
+printf "  ${GRAY}Open Claude Code and type ${WHITE}/director${GRAY} to start.${RESET}\n"
 echo ""
