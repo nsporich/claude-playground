@@ -37,6 +37,11 @@ tags: [tag1, tag2]
 requires:
   skills: [skill-slug-1, skill-slug-2]
   agents: [agent-slug]
+suggests:
+  agents: [agent-slug-1, agent-slug-2]
 features: [worktrees, subagents]
 ---
 ```
+
+- `requires` — hard dependencies pulled in by the installer
+- `suggests` — soft dependencies; the agent offers handoffs but works without them
