@@ -3,3 +3,4 @@ node_modules/
 catalog.json
 .DS_Store
 *.log
+.worktrees/
