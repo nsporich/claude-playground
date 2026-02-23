@@ -527,50 +527,6 @@ export default function GettingStartedPage() {
           </table>
         </div>
       </section>
-
-      {/* Contributing */}
-      <section className="space-y-4">
-        <SectionHeading>CONTRIBUTING</SectionHeading>
-        <p className="text-[var(--ink-medium)] leading-relaxed font-bold">
-          Want to add your own agent or skill? Here&apos;s the process:
-        </p>
-        <ol className="space-y-3 text-[var(--ink-medium)] list-none">
-          {[
-            <>
-              Create a <CodeTag>.md</CodeTag> file in the right directory (
-              <CodeTag>agents/&lt;name&gt;/AGENT.md</CodeTag> or{" "}
-              <CodeTag>skills/&lt;group&gt;/&lt;name&gt;/SKILL.md</CodeTag>).
-            </>,
-            <>
-              Add YAML frontmatter with <CodeTag>name</CodeTag>,{" "}
-              <CodeTag>description</CodeTag>, and <CodeTag>tags</CodeTag>.
-              Agents also need <CodeTag>requires</CodeTag> and{" "}
-              <CodeTag>features</CodeTag>.
-            </>,
-            <>
-              Run <CodeTag>bash scripts/build-catalog.sh</CodeTag> to regenerate
-              the catalog.
-            </>,
-            <>
-              Submit a PR to the{" "}
-              <a
-                href="https://github.com/nsporich/agents-assemble"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[var(--comic-blue)] border-b-2 border-[var(--comic-blue)] font-bold hover:text-[var(--comic-red)] hover:border-[var(--comic-red)] transition-colors"
-              >
-                GitHub repo
-              </a>
-              .
-            </>,
-          ].map((content, i) => (
-            <li key={i} className="flex items-start gap-3">
-              <StepNumber n={i + 1} />
-              <span className="text-sm font-bold">{content}</span>
-            </li>
-          ))}
-        </ol>
-      </section>
     </div>
   );
 }
