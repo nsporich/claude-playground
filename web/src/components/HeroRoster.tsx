@@ -313,13 +313,15 @@ export default function HeroRoster({ agents }: { agents: CatalogAsset[] }) {
               borderBottom: "3px solid var(--ink)",
             }}
           >
-            {/* Halftone texture */}
+            {/* Halftone dot pattern — dense at edges, fading to center */}
             <div
               className="absolute inset-0 pointer-events-none"
               style={{
-                backgroundImage: `radial-gradient(circle, ${selectedMeta.color} 0.7px, transparent 0.7px)`,
-                backgroundSize: "5px 5px",
-                opacity: 0.08,
+                backgroundImage: `radial-gradient(circle, ${selectedMeta.color} 1.2px, transparent 1.2px)`,
+                backgroundSize: "6px 6px",
+                opacity: 0.35,
+                maskImage: "linear-gradient(to right, black, transparent 35%, transparent 65%, black)",
+                WebkitMaskImage: "linear-gradient(to right, black, transparent 35%, transparent 65%, black)",
               }}
             />
 
