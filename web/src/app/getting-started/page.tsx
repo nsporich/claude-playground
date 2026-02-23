@@ -339,12 +339,12 @@ export default function GettingStartedPage() {
             <StepNumber n={2} />
             <div>
               <p className="text-sm font-bold text-[var(--ink)]">
-                Select your team
+                Review the roster
               </p>
               <p className="text-sm text-[var(--ink-light)] mt-1 font-bold">
-                You&apos;ll see a numbered list of all agents and skills. Enter
-                the numbers of the ones you want, or type{" "}
-                <CodeTag>all</CodeTag> to deploy everything.
+                The installer shows every agent and skill with their current
+                status&mdash;new, update available, or already current. Confirm
+                once to deploy them all.
               </p>
             </div>
           </div>
