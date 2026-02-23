@@ -289,6 +289,21 @@ if [ ${#selected_agents[@]} -eq 0 ]; then
   exit 0
 fi
 
+# ── Step 6: Always include Director ──────────────────────────────────────────
+for i in $(seq 0 $((agent_count - 1))); do
+  if [ "${AGENT_SLUG[$i]}" = "director" ]; then
+    already_selected=0
+    for sel in "${selected_agents[@]+"${selected_agents[@]}"}"; do
+      [ "$sel" = "$i" ] && already_selected=1 && break
+    done
+    if [ "$already_selected" -eq 0 ]; then
+      selected_agents=("$i" "${selected_agents[@]}")
+      info "Director auto-included (orchestrates your team)"
+    fi
+    break
+  fi
+done
+
 # ── Step 7: Resolve dependencies ─────────────────────────────────────────────
 # Collect all required skill slugs and agent slugs
 # (Using indexed arrays for Bash 3.2 compatibility — no declare -A)
