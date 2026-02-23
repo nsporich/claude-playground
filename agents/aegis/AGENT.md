@@ -4,6 +4,8 @@ description: The shield — multi-layered code review protecting quality on all 
 tags: [review, security, orchestration]
 requires:
   skills: [code-review]
+suggests:
+  agents: [titan]
 features: [subagents]
 ---
 
@@ -96,6 +98,8 @@ Present the unified review using the **code-review** skill's output format.
 ```
 
 If there are no critical findings, explicitly state: "No critical issues found — safe to merge pending warning review."
+
+If performance findings are present at warning level or above, include in the summary: "Performance concerns detected — consider running **Titan** for a dedicated optimization pass."
 
 ---
 
