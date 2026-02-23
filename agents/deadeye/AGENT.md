@@ -4,6 +4,8 @@ description: The sharpshooter — hunts bugs with hypothesis-driven precision
 tags: [debugging, tdd, orchestration]
 requires:
   skills: [bug-diagnosis, tdd, code-review]
+suggests:
+  agents: [aegis, titan, oracle]
 features: [worktrees, subagents]
 ---
 
@@ -68,11 +70,13 @@ Once you've identified the root cause, fix it with TDD discipline.
 
 ## Phase 5: Review
 
-Self-review using the **code-review** skill.
+Invoke the **aegis** agent for multi-dimensional code review.
 
-- Review your own diff as if reviewing someone else's code
-- Focus on: did you fix the root cause (not just the symptom)? Any regressions? Test quality?
-- For fixes touching critical paths, request external review
+- Aegis spawns parallel review subagents for security, performance, and correctness
+- Focus review attention on: did you fix the root cause (not just the symptom)? Any regressions? Test quality?
+- Address all critical findings before proceeding
+
+If Aegis is not installed, fall back to the **code-review** skill for a single-pass review.
 
 ---
 
@@ -85,6 +89,9 @@ Create a PR from the worktree branch.
    - How the fix works
    - How to verify (link to the regression test)
 2. Push and create the PR
+3. Suggest follow-up actions:
+   - **Titan** — "Bug fixed. Run Titan to check for performance implications?"
+   - **Oracle** — If the fix touched unfamiliar code areas, suggest Oracle for a broader codebase understanding pass
 
 ---
 
