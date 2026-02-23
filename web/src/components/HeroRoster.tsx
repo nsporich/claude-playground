@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { CatalogAsset } from "@/lib/types";
+import { getHeroColor } from "@/lib/hero-colors";
+
 interface HeroStats {
   power: number;
   precision: number;
@@ -15,7 +17,6 @@ interface HeroMeta {
   title: string;
   role: string;
   skillSet: string;
-  synergy?: string;
   flavorText: string;
   color: string;
   colorLight: string;
@@ -27,7 +28,6 @@ const HERO_META: Record<string, HeroMeta> = {
     title: "The Heavy Hitter",
     role: "Feature Development",
     skillSet: "Master of Planning, TDD, and Feature-Implementation.",
-    synergy: "Automatically calls in Aegis for final code verification.",
     flavorText:
       "If you can dream the blueprint, Ironclad can forge the fortress. He doesn\u2019t just write code; he constructs reality.",
     color: "#E23636",
@@ -382,17 +382,36 @@ export default function HeroRoster({ agents }: { agents: CatalogAsset[] }) {
                   </p>
                 </div>
 
-                {/* Synergy */}
-                {selectedMeta.synergy && (
-                  <div>
-                    <p className="text-[10px] font-[family-name:var(--font-display)] tracking-widest uppercase text-[var(--ink-light)] mb-1.5 text-sm">
-                      Synergy
-                    </p>
-                    <p className="text-sm text-[var(--ink-medium)] leading-relaxed font-bold">
-                      {selectedMeta.synergy}
-                    </p>
-                  </div>
-                )}
+                {/* Team Synergies */}
+                {selectedAgent.suggests &&
+                  selectedAgent.suggests.agents.length > 0 && (
+                    <div>
+                      <p className="text-[10px] font-[family-name:var(--font-display)] tracking-widest uppercase text-[var(--ink-light)] mb-1 text-sm">
+                        Team Synergies
+                      </p>
+                      <p className="text-[11px] text-[var(--ink-light)] mb-2">
+                        Calls on these teammates
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedAgent.suggests.agents.map((agent) => {
+                          const agentColor = getHeroColor(agent);
+                          return (
+                            <Link
+                              key={agent}
+                              href={`/agents/${agent}`}
+                              className="border-2 border-[var(--ink)] px-3 py-1 text-xs font-bold transition-colors hover:text-white"
+                              style={{
+                                color: agentColor?.color ?? selectedMeta.color,
+                                background: agentColor?.light ?? selectedMeta.colorLight,
+                              }}
+                            >
+                              {agent}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
 
                 {/* Required Skills */}
                 {selectedAgent.requires &&
