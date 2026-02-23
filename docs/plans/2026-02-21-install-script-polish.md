@@ -101,13 +101,13 @@ show_banner() {
       --align center \
       --width 42 \
       --padding "1 2" \
-      "Claude Playground" \
+      "Agents Assemble" \
       "" \
       "Skills · Templates · Prompts"
   else
     printf "${AMBER}  ╭──────────────────────────────────────╮${RESET}\n"
     printf "${AMBER}  │${RESET}                                      ${AMBER}│${RESET}\n"
-    printf "${AMBER}  │${RESET}    ${BOLD}${WHITE}Claude Playground${RESET}                ${AMBER}│${RESET}\n"
+    printf "${AMBER}  │${RESET}    ${BOLD}${WHITE}Agents Assemble${RESET}                ${AMBER}│${RESET}\n"
     printf "${AMBER}  │${RESET}    ${GRAY}─────────────────${RESET}                ${AMBER}│${RESET}\n"
     printf "${AMBER}  │${RESET}    ${GRAY}Skills · Templates · Prompts${RESET}     ${AMBER}│${RESET}\n"
     printf "${AMBER}  │${RESET}                                      ${AMBER}│${RESET}\n"
@@ -122,7 +122,7 @@ show_banner() {
 Find and replace:
 ```bash
 echo ""
-printf "${BOLD}${CYAN}Claude Playground Installer${RESET}\n"
+printf "${BOLD}${CYAN}Agents Assemble Installer${RESET}\n"
 echo ""
 ```
 
@@ -210,7 +210,7 @@ Also remove the old `info "Cloning repo..."`, `info "Updating cached repo..."`, 
 
 **Step 4: Test**
 
-Run: `rm -rf ~/.claude-playground && bash install.sh` — should show spinner during clone and build, then the menu. Ctrl-C.
+Run: `rm -rf ~/.agents-assemble && bash install.sh` — should show spinner during clone and build, then the menu. Ctrl-C.
 
 **Step 5: Commit**
 
@@ -530,7 +530,7 @@ cp install.sh web/public/install.sh
 **Step 2: Full end-to-end test (bash fallback)**
 
 ```bash
-rm -rf ~/.claude-playground
+rm -rf ~/.agents-assemble
 bash install.sh
 ```
 
@@ -539,7 +539,7 @@ Verify: banner → spinners → menu → selection → install → summary all d
 **Step 3: Full end-to-end test (gum path, if available)**
 
 ```bash
-rm -rf ~/.claude-playground
+rm -rf ~/.agents-assemble
 bash install.sh
 ```
 

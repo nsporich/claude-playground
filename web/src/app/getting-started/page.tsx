@@ -329,7 +329,7 @@ export default function GettingStartedPage() {
               </p>
               <p className="text-sm text-[var(--ink-light)] mt-1 font-bold">
                 Fetches the latest assets from GitHub into{" "}
-                <CodeTag>~/.claude-playground</CodeTag>. Subsequent runs pull
+                <CodeTag>~/.agents-assemble</CodeTag>. Subsequent runs pull
                 updates automatically.
               </p>
             </div>
@@ -525,7 +525,7 @@ export default function GettingStartedPage() {
             <>
               Submit a PR to the{" "}
               <a
-                href="https://github.com/nsporich/claude-playground"
+                href="https://github.com/nsporich/agents-assemble"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[var(--comic-blue)] border-b-2 border-[var(--comic-blue)] font-bold hover:text-[var(--comic-red)] hover:border-[var(--comic-red)] transition-colors"

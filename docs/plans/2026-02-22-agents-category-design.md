@@ -2,7 +2,7 @@
 
 ## Overview
 
-Add a new top-level asset category — **Agents** — to claude-playground. Agents are orchestration-level personas that compose skills and Claude Code features (worktrees, subagents) into opinionated end-to-end workflows.
+Add a new top-level asset category — **Agents** — to agents-assemble. Agents are orchestration-level personas that compose skills and Claude Code features (worktrees, subagents) into opinionated end-to-end workflows.
 
 **Tagline:** "Assemble your team."
 
@@ -82,7 +82,7 @@ Body: markdown orchestration instructions — phases, delegation patterns, when 
 **Flow:**
 1. Gather requirements using `planning` skill
 2. Create worktree for isolation
-3. Design architecture using `feature-dev:code-architect` subagent
+3. Design architecture using `architecture skill` subagent
 4. Implement using `feature-implementation` skill with `tdd` discipline
 5. Invoke `aegis` agent for review
 6. Create PR from worktree branch
@@ -99,7 +99,7 @@ Body: markdown orchestration instructions — phases, delegation patterns, when 
 1. Reproduce the bug in current branch
 2. Create worktree for the fix
 3. Investigate using `bug-diagnosis` skill (hypothesis-driven)
-4. Use `feature-dev:code-explorer` subagent to trace execution paths if needed
+4. Use `Explore` subagent to trace execution paths if needed
 5. Write regression test first using `tdd` skill
 6. Implement fix
 7. Self-review using `code-review` skill
@@ -116,7 +116,7 @@ Body: markdown orchestration instructions — phases, delegation patterns, when 
 **Flow:**
 1. Identify changes to review (git diff, PR, or specified files)
 2. Spawn parallel subagents for independent review dimensions:
-   - `feature-dev:code-reviewer` for bugs and logic errors
+   - `general-purpose` for bugs and logic errors
    - Security analysis pass
    - Performance analysis pass
 3. Synthesize findings into structured report with severity ratings
@@ -237,7 +237,7 @@ Skill entries gain a computed `used_by` array derived from agent `requires` fiel
   3. Show summary: "Installing Ironclad + 4 skills + 1 agent"
   4. Install dependencies first, then the selected agent
 - Circular dependency guard (visited set during recursive resolution)
-- Same symlink approach: `~/.claude/skills/<slug>` -> `~/.claude-playground/agents/<slug>/` (or skills path)
+- Same symlink approach: `~/.claude/skills/<slug>` -> `~/.agents-assemble/agents/<slug>/` (or skills path)
 - Remove templates and prompts installation logic
 
 ## Design Decisions

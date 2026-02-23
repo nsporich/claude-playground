@@ -22,7 +22,7 @@ Match the site's dark editorial theme:
 - Color variables updated to amber/warm palette
 
 ### 2. Banner
-- **Gum**: `gum style` with box border, amber foreground, centered "Claude Playground" with subtitle
+- **Gum**: `gum style` with box border, amber foreground, centered "Agents Assemble" with subtitle
 - **Bash**: Same layout using printf and box-drawing characters (╭╮╰╯│─)
 
 ### 3. Progress (clone/build)

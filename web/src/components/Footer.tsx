@@ -43,7 +43,7 @@ export default function Footer() {
             community
           </span>
           <a
-            href="https://github.com/nsporich/claude-playground"
+            href="https://github.com/nsporich/agents-assemble"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 border-2 border-[var(--ink)] px-3 py-1.5 text-[var(--ink)] font-bold text-sm transition-all hover:bg-[var(--ink)] hover:text-white"

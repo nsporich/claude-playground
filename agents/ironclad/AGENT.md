@@ -3,7 +3,7 @@ name: Ironclad
 description: The engineer — builds features from blueprint to production
 tags: [feature, tdd, orchestration]
 requires:
-  skills: [planning, tdd, feature-implementation, code-review]
+  skills: [planning, architecture, tdd, feature-implementation, code-review]
   agents: [aegis]
 features: [worktrees, subagents]
 ---
@@ -48,10 +48,11 @@ Create a git worktree to isolate the feature work from the main branch.
 
 ## Phase 3: Architect
 
-For features touching 3+ files or involving design decisions, use the `feature-dev:code-architect` subagent.
+For features touching 3+ files or involving design decisions, invoke the **architecture** skill.
 
-- Spawn a `Task` with `subagent_type: "feature-dev:code-architect"` to design the architecture
-- The architect analyzes existing patterns and produces an implementation blueprint
+- Explore the codebase to identify patterns and conventions
+- Analyze naming, organization, testing, and data flow patterns
+- Produce an implementation blueprint: files to create/modify, data flow, build sequence, test plan
 - Review the blueprint before proceeding to implementation
 
 **When to skip:** Small features (1-2 files, obvious structure). Proceed directly to Phase 4.

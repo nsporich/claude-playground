@@ -38,9 +38,9 @@ Spawn multiple review subagents in parallel using the `Task` tool. Each reviewer
 
 ### Reviewer 1: Bug & Logic Review
 
-Spawn a `Task` with `subagent_type: "feature-dev:code-reviewer"`:
-- Focus: bugs, logic errors, correctness issues, security vulnerabilities
-- Instructions: review the diff for high-confidence issues only
+Spawn a `Task` with `subagent_type: "general-purpose"`:
+- Focus: bugs, logic errors, correctness issues following the **code-review** skill's correctness dimension
+- Instructions: review the diff for high-confidence issues only — real bugs, not style preferences
 
 ### Reviewer 2: Security-Focused Review
 

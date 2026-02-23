@@ -12,7 +12,7 @@ REPO_URL="https://github.com/nsporich/agents-assemble"
 CACHE_DIR="$HOME/.agents-assemble"
 SKILLS_DIR="$HOME/.claude/skills"
 
-# ── Colors ───────────────────────────────────────────────────────────────────
+# ── Colors & gum detection ──────────────────────────────────────────────────
 if [ -t 1 ]; then
   BOLD='\033[1m'
   DIM='\033[2m'
@@ -26,6 +26,9 @@ if [ -t 1 ]; then
 else
   BOLD='' DIM='' RESET='' RED='' WHITE='' GRAY='' GREEN='' YELLOW='' CYAN=''
 fi
+
+HAS_GUM=0
+command -v gum >/dev/null 2>&1 && HAS_GUM=1
 
 # TTY input handling for piped installs (curl ... | bash)
 if [ -t 0 ]; then
@@ -47,14 +50,27 @@ die()   { err "$@"; exit 1; }
 # ── Banner ───────────────────────────────────────────────────────────────────
 show_banner() {
   echo ""
-  printf "${RED}  ╭──────────────────────────────────────╮${RESET}\n"
-  printf "${RED}  │${RESET}                                      ${RED}│${RESET}\n"
-  printf "${RED}  │${RESET}    ${BOLD}${WHITE}AGENTS ASSEMBLE${RESET}                  ${RED}│${RESET}\n"
-  printf "${RED}  │${RESET}    ${GRAY}──────────────────${RESET}                ${RED}│${RESET}\n"
-  printf "${RED}  │${RESET}    ${GRAY}Pick your team. We handle${RESET}          ${RED}│${RESET}\n"
-  printf "${RED}  │${RESET}    ${GRAY}the rest.${RESET}                          ${RED}│${RESET}\n"
-  printf "${RED}  │${RESET}                                      ${RED}│${RESET}\n"
-  printf "${RED}  ╰──────────────────────────────────────╯${RESET}\n"
+  if [ "$HAS_GUM" -eq 1 ]; then
+    gum style \
+      --border double \
+      --border-foreground 196 \
+      --foreground 196 \
+      --align center \
+      --width 42 \
+      --padding "1 2" \
+      "AGENTS ASSEMBLE" \
+      "" \
+      "Pick your team. We handle the rest."
+  else
+    printf "${RED}  ╭──────────────────────────────────────╮${RESET}\n"
+    printf "${RED}  │${RESET}                                      ${RED}│${RESET}\n"
+    printf "${RED}  │${RESET}    ${BOLD}${WHITE}AGENTS ASSEMBLE${RESET}                   ${RED}│${RESET}\n"
+    printf "${RED}  │${RESET}    ${GRAY}───────────────────${RESET}               ${RED}│${RESET}\n"
+    printf "${RED}  │${RESET}    ${GRAY}Pick your team. We handle${RESET}         ${RED}│${RESET}\n"
+    printf "${RED}  │${RESET}    ${GRAY}the rest.${RESET}                         ${RED}│${RESET}\n"
+    printf "${RED}  │${RESET}                                      ${RED}│${RESET}\n"
+    printf "${RED}  ╰──────────────────────────────────────╯${RESET}\n"
+  fi
   echo ""
 }
 
@@ -62,20 +78,25 @@ show_banner() {
 run_with_spinner() {
   local msg="$1"
   shift
-  local frames=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
-  local i=0
-  printf "  ${RED}%s${RESET} %s" "${frames[0]}" "$msg"
-  "$@" &
-  local pid=$!
-  while kill -0 "$pid" 2>/dev/null; do
-    printf "\r  ${RED}%s${RESET} %s" "${frames[$i]}" "$msg"
-    i=$(( (i + 1) % ${#frames[@]} ))
-    sleep 0.08
-  done
-  wait "$pid"
-  local exit_code=$?
-  printf "\r  ${GREEN}✓${RESET} %s\n" "$msg"
-  return $exit_code
+  if [ "$HAS_GUM" -eq 1 ]; then
+    gum spin --spinner dot --title "$msg" -- "$@"
+    printf "  ${GREEN}✓${RESET} %s\n" "$msg"
+  else
+    local frames=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
+    local i=0
+    printf "  ${RED}%s${RESET} %s" "${frames[0]}" "$msg"
+    "$@" &
+    local pid=$!
+    while kill -0 "$pid" 2>/dev/null; do
+      printf "\r  ${RED}%s${RESET} %s" "${frames[$i]}" "$msg"
+      i=$(( (i + 1) % ${#frames[@]} ))
+      sleep 0.08
+    done
+    wait "$pid"
+    local exit_code=$?
+    printf "\r  ${GREEN}✓${RESET} %s\n" "$msg"
+    return $exit_code
+  fi
 }
 
 # ── Step 1: Check for git ────────────────────────────────────────────────────
@@ -173,50 +194,94 @@ for i in $(seq 0 $((agent_count - 1))); do
   fi
 done
 
-printf "  ${BOLD}${WHITE}THE ROSTER${RESET}\n"
-printf "  ${GRAY}──────────────────────────────────────────────${RESET}\n"
-
-for i in $(seq 0 $((agent_count - 1))); do
-  num=$((i + 1))
-  status_mark="  "
-  for inst in "${installed_agents[@]+"${installed_agents[@]}"}"; do
-    [ "$inst" = "${AGENT_SLUG[$i]}" ] && status_mark=" ${GREEN}✓${RESET}" && break
-  done
-  printf "  ${WHITE}%2d)${RESET}%b  ${BOLD}%-14s${RESET}  ${GRAY}%s${RESET}\n" "$num" "$status_mark" "${AGENT_NAME[$i]}" "${AGENT_DESC[$i]}"
-done
-
-echo ""
-if [ ${#installed_agents[@]} -gt 0 ]; then
-  printf "  ${GRAY}✓ = already deployed (select to update)${RESET}\n"
-fi
-printf "\n  ${RED}▸${RESET} Select agents (space-separated), ${BOLD}'all'${RESET}, or ${BOLD}'q'${RESET} to quit: "
-read -r selection < "$TTY_INPUT"
-
-if [ -z "$selection" ] || [ "$selection" = "q" ] || [ "$selection" = "Q" ]; then
-  echo "  Nothing to deploy. Bye!"
-  exit 0
-fi
-
-# ── Step 6: Parse selection ──────────────────────────────────────────────────
 declare -a selected_agents=()
 
-if [ "$selection" = "all" ] || [ "$selection" = "ALL" ]; then
+if [ "$HAS_GUM" -eq 1 ]; then
+  # ── Gum multi-select ─────────────────────────────────────────────────────
+  declare -a choices=()
+  declare -a preselected_args=()
   for i in $(seq 0 $((agent_count - 1))); do
-    selected_agents+=("$i")
+    label="${AGENT_NAME[$i]} — ${AGENT_DESC[$i]}"
+    choices+=("$label")
+    # Pre-select already-installed agents
+    for inst in "${installed_agents[@]+"${installed_agents[@]}"}"; do
+      if [ "$inst" = "${AGENT_SLUG[$i]}" ]; then
+        preselected_args+=(--selected "$label")
+        break
+      fi
+    done
   done
+
+  selection="$(printf '%s\n' "${choices[@]}" | gum choose \
+    --no-limit \
+    --header "Select agents to deploy (space to toggle, enter to confirm)" \
+    --header.foreground 196 \
+    --cursor-prefix "[ ] " \
+    --selected-prefix "[✓] " \
+    --unselected-prefix "[ ] " \
+    "${preselected_args[@]+"${preselected_args[@]}"}" \
+    < "$TTY_INPUT")" || true
+
+  if [ -z "$selection" ]; then
+    echo "  Nothing to deploy. Bye!"
+    exit 0
+  fi
+
+  # Map selected lines back to indices
+  while IFS= read -r sel_line; do
+    [ -z "$sel_line" ] && continue
+    for i in $(seq 0 $((agent_count - 1))); do
+      if [ "$sel_line" = "${AGENT_NAME[$i]} — ${AGENT_DESC[$i]}" ]; then
+        selected_agents+=("$i")
+        break
+      fi
+    done
+  done <<< "$selection"
 else
-  for token in $selection; do
-    if ! echo "$token" | grep -qE '^[0-9]+$'; then
-      warn "Skipping invalid input: $token"
-      continue
-    fi
-    idx=$((token - 1))
-    if [ "$idx" -lt 0 ] || [ "$idx" -ge "$agent_count" ]; then
-      warn "Skipping out-of-range: $token"
-      continue
-    fi
-    selected_agents+=("$idx")
+  # ── Bash numbered list ───────────────────────────────────────────────────
+  printf "  ${BOLD}${WHITE}THE ROSTER${RESET}\n"
+  printf "  ${GRAY}──────────────────────────────────────────────${RESET}\n"
+
+  for i in $(seq 0 $((agent_count - 1))); do
+    num=$((i + 1))
+    status_mark="  "
+    for inst in "${installed_agents[@]+"${installed_agents[@]}"}"; do
+      [ "$inst" = "${AGENT_SLUG[$i]}" ] && status_mark=" ${GREEN}✓${RESET}" && break
+    done
+    printf "  ${WHITE}%2d)${RESET}%b  ${BOLD}%-14s${RESET}  ${GRAY}%s${RESET}\n" "$num" "$status_mark" "${AGENT_NAME[$i]}" "${AGENT_DESC[$i]}"
   done
+
+  echo ""
+  if [ ${#installed_agents[@]} -gt 0 ]; then
+    printf "  ${GRAY}✓ = already deployed (select to update)${RESET}\n"
+  fi
+  printf "\n  ${RED}▸${RESET} Select agents (space-separated), ${BOLD}'all'${RESET}, or ${BOLD}'q'${RESET} to quit: "
+  read -r selection < "$TTY_INPUT"
+
+  if [ -z "$selection" ] || [ "$selection" = "q" ] || [ "$selection" = "Q" ]; then
+    echo "  Nothing to deploy. Bye!"
+    exit 0
+  fi
+
+  # ── Parse selection ──────────────────────────────────────────────────────
+  if [ "$selection" = "all" ] || [ "$selection" = "ALL" ]; then
+    for i in $(seq 0 $((agent_count - 1))); do
+      selected_agents+=("$i")
+    done
+  else
+    for token in $selection; do
+      if ! echo "$token" | grep -qE '^[0-9]+$'; then
+        warn "Skipping invalid input: $token"
+        continue
+      fi
+      idx=$((token - 1))
+      if [ "$idx" -lt 0 ] || [ "$idx" -ge "$agent_count" ]; then
+        warn "Skipping out-of-range: $token"
+        continue
+      fi
+      selected_agents+=("$idx")
+    done
+  fi
 fi
 
 if [ ${#selected_agents[@]} -eq 0 ]; then
@@ -289,26 +354,51 @@ done
 
 # ── Step 8: Show deployment plan ─────────────────────────────────────────────
 echo ""
-printf "  ${BOLD}${WHITE}DEPLOYMENT PLAN${RESET}\n"
-printf "  ${GRAY}──────────────────────────────────────────────${RESET}\n"
 
-# Agents
-for slug in "${needed_agent_slugs[@]+"${needed_agent_slugs[@]}"}"; do
-  printf "  ${RED}●${RESET}  ${BOLD}%-14s${RESET}  ${GRAY}agent${RESET}\n" "$slug"
-done
+if [ "$HAS_GUM" -eq 1 ]; then
+  # Build deployment plan text for gum style
+  plan_text="DEPLOYMENT PLAN\n"
+  plan_text+="──────────────────────────────────────────────\n"
+  for slug in "${needed_agent_slugs[@]+"${needed_agent_slugs[@]}"}"; do
+    plan_text+="●  $(printf '%-14s' "$slug")  agent\n"
+  done
+  for slug in "${needed_skill_list[@]+"${needed_skill_list[@]}"}"; do
+    already_installed=0
+    if [ -L "$SKILLS_DIR/$slug" ] || [ -d "$SKILLS_DIR/$slug" ]; then
+      already_installed=1
+    fi
+    if [ "$already_installed" -eq 1 ]; then
+      plan_text+="●  $(printf '%-14s' "$slug")  skill (installed)\n"
+    else
+      plan_text+="●  $(printf '%-14s' "$slug")  skill (auto)\n"
+    fi
+  done
+  printf '%b' "$plan_text" | gum style \
+    --border rounded \
+    --border-foreground 196 \
+    --padding "0 2"
+else
+  printf "  ${BOLD}${WHITE}DEPLOYMENT PLAN${RESET}\n"
+  printf "  ${GRAY}──────────────────────────────────────────────${RESET}\n"
 
-# Skills
-for slug in "${needed_skill_list[@]+"${needed_skill_list[@]}"}"; do
-  already_installed=0
-  if [ -L "$SKILLS_DIR/$slug" ] || [ -d "$SKILLS_DIR/$slug" ]; then
-    already_installed=1
-  fi
-  if [ "$already_installed" -eq 1 ]; then
-    printf "  ${CYAN}●${RESET}  ${DIM}%-14s${RESET}  ${GRAY}skill (installed)${RESET}\n" "$slug"
-  else
-    printf "  ${CYAN}●${RESET}  %-14s  ${GRAY}skill (auto)${RESET}\n" "$slug"
-  fi
-done
+  # Agents
+  for slug in "${needed_agent_slugs[@]+"${needed_agent_slugs[@]}"}"; do
+    printf "  ${RED}●${RESET}  ${BOLD}%-14s${RESET}  ${GRAY}agent${RESET}\n" "$slug"
+  done
+
+  # Skills
+  for slug in "${needed_skill_list[@]+"${needed_skill_list[@]}"}"; do
+    already_installed=0
+    if [ -L "$SKILLS_DIR/$slug" ] || [ -d "$SKILLS_DIR/$slug" ]; then
+      already_installed=1
+    fi
+    if [ "$already_installed" -eq 1 ]; then
+      printf "  ${CYAN}●${RESET}  ${DIM}%-14s${RESET}  ${GRAY}skill (installed)${RESET}\n" "$slug"
+    else
+      printf "  ${CYAN}●${RESET}  %-14s  ${GRAY}skill (auto)${RESET}\n" "$slug"
+    fi
+  done
+fi
 
 echo ""
 
@@ -385,12 +475,27 @@ done
 
 # ── Step 10: Summary ─────────────────────────────────────────────────────────
 echo ""
-printf "  ${BOLD}${WHITE}DEPLOYMENT COMPLETE${RESET}\n"
-printf "  ${GRAY}──────────────────────────────────────────────${RESET}\n"
-for line in "${summary[@]}"; do
-  printf "  %b\n" "$line"
-done
-printf "  ${GRAY}──────────────────────────────────────────────${RESET}\n"
-echo ""
-printf "  ${GRAY}Open Claude Code in any project to use your agents.${RESET}\n"
+
+if [ "$HAS_GUM" -eq 1 ]; then
+  summary_text="DEPLOYMENT COMPLETE\n"
+  summary_text+="──────────────────────────────────────────────\n"
+  for line in "${summary[@]}"; do
+    summary_text+="$(printf '%b' "$line")\n"
+  done
+  summary_text+="\nOpen Claude Code in any project to use your agents."
+  printf '%b' "$summary_text" | gum style \
+    --border rounded \
+    --border-foreground 34 \
+    --padding "0 2"
+else
+  printf "  ${BOLD}${WHITE}DEPLOYMENT COMPLETE${RESET}\n"
+  printf "  ${GRAY}──────────────────────────────────────────────${RESET}\n"
+  for line in "${summary[@]}"; do
+    printf "  %b\n" "$line"
+  done
+  printf "  ${GRAY}──────────────────────────────────────────────${RESET}\n"
+  echo ""
+  printf "  ${GRAY}Open Claude Code in any project to use your agents.${RESET}\n"
+fi
+
 echo ""

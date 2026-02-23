@@ -26,7 +26,7 @@ Invoke the **optimization** skill's Phase 1 (Measure).
 1. Define the metric with the user — what are we optimizing? Response time? Throughput? Memory? Bundle size?
 2. Establish a baseline measurement under realistic conditions
 3. Profile to identify where time and resources are spent
-4. Use `feature-dev:code-explorer` subagent if you need to trace execution paths through unfamiliar code
+4. Use the `Explore` subagent if you need to trace execution paths through unfamiliar code
 
 ---
 

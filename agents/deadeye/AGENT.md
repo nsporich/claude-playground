@@ -45,7 +45,7 @@ Invoke the **bug-diagnosis** skill for hypothesis-driven debugging.
 - Follow the full workflow: Reproduce → Isolate → Hypothesize → Fix → Verify
 - Form explicit hypotheses: "The bug is caused by X because Y"
 - Test each hypothesis with the smallest possible experiment
-- If you need to trace execution paths, spawn a `Task` with `subagent_type: "feature-dev:code-explorer"` to analyze the code
+- If you need to trace execution paths, spawn a `Task` with `subagent_type: "Explore"` to analyze the code
 
 **Escalation rule:** After 3 failed hypotheses, stop and reassess. Are you looking at the right layer? Are your assumptions correct?
 

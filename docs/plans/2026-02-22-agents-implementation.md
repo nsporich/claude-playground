@@ -2,7 +2,7 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Add the Agents category to claude-playground — 6 agent personas orchestrating 7 skills, with dependency resolution in the installer and catalog.
+**Goal:** Add the Agents category to agents-assemble — 6 agent personas orchestrating 7 skills, with dependency resolution in the installer and catalog.
 
 **Architecture:** Agents are AGENT.md files in `agents/<slug>/` that declare skill and agent dependencies via `requires` frontmatter. The installer resolves dependencies recursively and auto-installs them. The catalog builder computes reverse `used_by` mappings. Templates, prompts, and unused skills are removed.
 
@@ -766,9 +766,9 @@ Create a git worktree to isolate the feature work from the main branch.
 
 ## Phase 3: Architect
 
-For features touching 3+ files or involving design decisions, use the `feature-dev:code-architect` subagent.
+For features touching 3+ files or involving design decisions, use the `architecture skill` subagent.
 
-- Spawn a `Task` with `subagent_type: "feature-dev:code-architect"` to design the architecture
+- Spawn a `Task` with `subagent_type: "architecture skill"` to design the architecture
 - The architect analyzes existing patterns and produces an implementation blueprint
 - Review the blueprint before proceeding to implementation
 
@@ -898,7 +898,7 @@ Invoke the **bug-diagnosis** skill for hypothesis-driven debugging.
 - Follow the full workflow: Reproduce → Isolate → Hypothesize → Fix → Verify
 - Form explicit hypotheses: "The bug is caused by X because Y"
 - Test each hypothesis with the smallest possible experiment
-- If you need to trace execution paths, spawn a `Task` with `subagent_type: "feature-dev:code-explorer"` to analyze the code
+- If you need to trace execution paths, spawn a `Task` with `subagent_type: "Explore"` to analyze the code
 
 **Escalation rule:** After 3 failed hypotheses, stop and reassess. Are you looking at the right layer? Are your assumptions correct?
 
@@ -1022,7 +1022,7 @@ Spawn multiple review subagents in parallel using the `Task` tool. Each reviewer
 
 ### Reviewer 1: Bug & Logic Review
 
-Spawn a `Task` with `subagent_type: "feature-dev:code-reviewer"`:
+Spawn a `Task` with `subagent_type: "general-purpose"`:
 - Focus: bugs, logic errors, correctness issues, security vulnerabilities
 - Instructions: review the diff for high-confidence issues only
 
@@ -1185,7 +1185,7 @@ For libraries:
 - **Public API** — the exported surface area and how it maps to internal modules
 - **Extension points** — hooks, plugins, middleware, or customization patterns
 
-Use `feature-dev:code-explorer` subagent for deep tracing when needed.
+Use `Explore` subagent for deep tracing when needed.
 
 ---
 
@@ -1435,7 +1435,7 @@ Invoke the **optimization** skill's Phase 1 (Measure).
 1. Define the metric with the user — what are we optimizing? Response time? Throughput? Memory? Bundle size?
 2. Establish a baseline measurement under realistic conditions
 3. Profile to identify where time and resources are spent
-4. Use `feature-dev:code-explorer` subagent if you need to trace execution paths through unfamiliar code
+4. Use `Explore` subagent if you need to trace execution paths through unfamiliar code
 
 ---
 
@@ -1799,7 +1799,7 @@ to:
 
 In the bash branch (~lines 78-80), change the banner content lines to:
 ```bash
-    printf "${AMBER}  │${RESET}    ${BOLD}${WHITE}Claude Playground${RESET}                ${AMBER}│${RESET}\n"
+    printf "${AMBER}  │${RESET}    ${BOLD}${WHITE}Agents Assemble${RESET}                ${AMBER}│${RESET}\n"
     printf "${AMBER}  │${RESET}    ${GRAY}─────────────────${RESET}                ${AMBER}│${RESET}\n"
     printf "${AMBER}  │${RESET}    ${GRAY}Assemble Your Team${RESET}               ${AMBER}│${RESET}\n"
     printf "${AMBER}  │${RESET}    ${GRAY}Agents · Skills${RESET}                  ${AMBER}│${RESET}\n"
@@ -2063,7 +2063,7 @@ Update banner to 'Assemble Your Team'."
 Replace the contents of `CLAUDE.md` with:
 
 ```markdown
-# Claude Playground
+# Agents Assemble
 
 Opinionated agent personas and skills for Claude Code. Agents orchestrate skills into end-to-end workflows.
 
@@ -2112,7 +2112,7 @@ features: [worktrees, subagents]
 Replace the contents of `README.md` with:
 
 ```markdown
-# Claude Playground
+# Agents Assemble
 
 Assemble your team. Opinionated agent personas for Claude Code that orchestrate skills into powerful end-to-end workflows.
 

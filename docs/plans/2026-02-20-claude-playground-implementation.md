@@ -1,4 +1,4 @@
-# Claude Playground Implementation Plan
+# Agents Assemble Implementation Plan
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
@@ -48,7 +48,7 @@ Note: `catalog.json` is gitignored because it's a generated artifact.
 **Step 3: Create root CLAUDE.md**
 
 ```markdown
-# Claude Playground
+# Agents Assemble
 
 A collection of reusable Claude Code skills, CLAUDE.md templates, and prompts.
 
@@ -294,18 +294,18 @@ git commit -m "feat: add catalog build script for frontmatter-based asset discov
 A bash script that:
 1. Defines the GitHub repo URL and raw content base URL
 2. Checks for `git` availability
-3. Clones or pulls the repo to `~/.claude-playground/`
+3. Clones or pulls the repo to `~/.agents-assemble/`
 4. Runs `build-catalog.sh` if `catalog.json` doesn't exist
 5. Reads `catalog.json` and presents a grouped interactive menu using bash `select` or numbered input
 6. For each selected item, installs based on category:
-   - **Skills**: Creates symlink from `~/.claude-playground/skills/<group>/<name>` to `~/.claude/skills/<name>`
+   - **Skills**: Creates symlink from `~/.agents-assemble/skills/<group>/<name>` to `~/.claude/skills/<name>`
    - **Templates**: Copies to current working directory as `CLAUDE.md` (prompts before overwriting if exists)
    - **Prompts**: Prints to stdout (pipeable) or copies to a user-specified path
 7. Prints summary of what was installed
 
 The menu should look like:
 ```
-Claude Playground Installer
+Agents Assemble Installer
 
 [Skills > General]
   1) code-review                    - Structured code review with severity ratings
@@ -438,7 +438,7 @@ git commit -m "feat: add catalog data layer for build-time asset loading"
 
 **Step 1: Create Header component**
 
-Simple nav bar with: site title ("Claude Playground"), links to Home, Browse, Getting Started. Use Tailwind for styling. Minimal and clean.
+Simple nav bar with: site title ("Agents Assemble"), links to Home, Browse, Getting Started. Use Tailwind for styling. Minimal and clean.
 
 **Step 2: Create Footer component**
 
@@ -477,7 +477,7 @@ git commit -m "feat: add shared components (AssetCard, InstallCommand, MarkdownP
 
 **Step 1: Update layout**
 
-Add Header and Footer to the root layout. Set metadata (title: "Claude Playground", description). Apply a max-width container with padding.
+Add Header and Footer to the root layout. Set metadata (title: "Agents Assemble", description). Apply a max-width container with padding.
 
 **Step 2: Build home page**
 

@@ -61,7 +61,7 @@ For libraries:
 - **Public API** — the exported surface area and how it maps to internal modules
 - **Extension points** — hooks, plugins, middleware, or customization patterns
 
-Use `feature-dev:code-explorer` subagent for deep tracing when needed.
+Use the `Explore` subagent for deep tracing when needed.
 
 ---
 

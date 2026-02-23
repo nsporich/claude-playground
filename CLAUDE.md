@@ -1,4 +1,4 @@
-# Claude Playground
+# Agents Assemble
 
 Opinionated agent personas and skills for Claude Code. Agents orchestrate skills into end-to-end workflows.
 

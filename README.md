@@ -1,4 +1,4 @@
-# Claude Playground
+# Agents Assemble
 
 Assemble your team. Opinionated agent personas for Claude Code that orchestrate skills into powerful end-to-end workflows.
 
@@ -14,7 +14,7 @@ The installer resolves dependencies automatically — installing an agent pulls 
 
 | Agent | Description | Requires |
 |-------|-------------|----------|
-| **Ironclad** | The engineer — builds features from blueprint to production | planning, tdd, feature-implementation, code-review + aegis |
+| **Ironclad** | The engineer — builds features from blueprint to production | planning, architecture, tdd, feature-implementation, code-review + aegis |
 | **Deadeye** | The sharpshooter — hunts bugs with hypothesis-driven precision | bug-diagnosis, tdd, code-review |
 | **Aegis** | The shield — multi-layered code review on all fronts | code-review |
 | **Oracle** | The all-seeing — maps codebases and reveals architecture | — |
@@ -26,6 +26,7 @@ The installer resolves dependencies automatically — installing an agent pulls 
 | Skill | Description | Used By |
 |-------|-------------|---------|
 | `planning` | Requirements gathering and design | Ironclad |
+| `architecture` | Codebase pattern analysis and implementation blueprints | Ironclad |
 | `tdd` | Test-driven development (red-green-refactor) | Ironclad, Deadeye |
 | `feature-implementation` | Phased feature build with TDD | Ironclad |
 | `bug-diagnosis` | Hypothesis-driven debugging | Deadeye |

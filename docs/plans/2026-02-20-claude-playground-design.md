@@ -1,4 +1,4 @@
-# Claude Playground - Design Document
+# Agents Assemble - Design Document
 
 ## Overview
 
@@ -7,7 +7,7 @@ A public GitHub repository serving as a curated collection of reusable Claude Co
 ## Directory Structure
 
 ```
-claude-playground/
+agents-assemble/
   install.sh                    # curl-able interactive installer
   catalog.json                  # generated index of all assets
   scripts/
@@ -90,11 +90,11 @@ This runs as part of `npm run build` in the webapp, and can be run standalone vi
 
 Runnable via:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/<user>/claude-playground/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/<user>/agents-assemble/main/install.sh | bash
 ```
 
 Behavior:
-1. Clones/pulls the repo to `~/.claude-playground` as a local cache
+1. Clones/pulls the repo to `~/.agents-assemble` as a local cache
 2. Reads `catalog.json` (or walks directories as fallback)
 3. Presents interactive picker grouped by category and framework:
    ```
