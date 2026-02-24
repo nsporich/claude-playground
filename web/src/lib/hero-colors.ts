@@ -7,9 +7,9 @@ export interface HeroColor {
 
 const HERO_COLORS: Record<string, HeroColor> = {
   director: {
-    color: "#1a1a2e",
-    text: "#1a1a2e",
-    bg: "rgba(26, 26, 46, 0.12)",
+    color: "#4a4a5a",
+    text: "#4a4a5a",
+    bg: "rgba(74, 74, 90, 0.12)",
     light: "#e8e8f0",
   },
   ironclad: {
@@ -47,6 +47,18 @@ const HERO_COLORS: Record<string, HeroColor> = {
     text: "#0E7490",
     bg: "rgba(8, 145, 178, 0.12)",
     light: "#CFFAFE",
+  },
+  hex: {
+    color: "#C2185B",
+    text: "#AD1457",
+    bg: "rgba(194, 24, 91, 0.12)",
+    light: "#FCE4EC",
+  },
+  marvin: {
+    color: "#546E7A",
+    text: "#37474F",
+    bg: "rgba(84, 110, 122, 0.12)",
+    light: "#ECEFF1",
   },
 };
 

@@ -5,7 +5,7 @@ tags: [feature, tdd, orchestration]
 requires:
   skills: [planning, architecture, tdd, feature-implementation, code-review]
 suggests:
-  agents: [aegis, titan, lorekeeper, oracle]
+  agents: [aegis, titan, lorekeeper, oracle, hex, marvin]
 features: [worktrees, subagents]
 ---
 

@@ -5,7 +5,7 @@ tags: [orchestration, triage, routing]
 requires:
   skills: []
 suggests:
-  agents: [ironclad, deadeye, aegis, titan, lorekeeper, oracle]
+  agents: [ironclad, deadeye, aegis, titan, lorekeeper, oracle, hex, marvin]
 features: [subagents]
 ---
 
@@ -51,6 +51,8 @@ When the user describes a task, identify the right agent to handle it.
 - Performance, optimization, speed, memory → **Titan** (tags: performance, optimization)
 - Documentation, docs, README, API docs → **Lorekeeper** (tags: documentation)
 - Codebase exploration, understanding, onboarding → **Oracle** (tags: exploration, mapping)
+- UI design, components, design systems, accessibility → **Hex** (tags: design, accessibility)
+- Test coverage, QA, test health, E2E/integration testing → **M.A.R.V.I.N.** (tags: testing, qa)
 
 This guidance is a fallback. **Always prefer dynamic discovery** — read the actual installed agents' descriptions and tags rather than relying on this static list, since the roster may change.
 

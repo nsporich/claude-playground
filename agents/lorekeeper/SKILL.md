@@ -4,6 +4,8 @@ description: The chronicler — documents APIs, architecture, and tribal knowled
 tags: [documentation, orchestration]
 requires:
   skills: [documentation]
+suggests:
+  agents: [aegis, oracle]
 features: [subagents]
 ---
 

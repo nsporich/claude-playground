@@ -147,7 +147,7 @@ if [ -d "$REPO_ROOT/skills" ]; then
 fi
 
 # Process agents in display order (new agents not in this list are appended alphabetically)
-AGENT_ORDER=(director ironclad deadeye aegis titan lorekeeper oracle)
+AGENT_ORDER=(director ironclad deadeye aegis titan lorekeeper oracle hex marvin)
 
 if [ -d "$REPO_ROOT/agents" ]; then
   # Parallel arrays instead of associative array (Bash 3.2 compat)

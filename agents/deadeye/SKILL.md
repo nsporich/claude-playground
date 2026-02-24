@@ -5,7 +5,7 @@ tags: [debugging, tdd, orchestration]
 requires:
   skills: [bug-diagnosis, tdd, code-review]
 suggests:
-  agents: [aegis, titan, oracle]
+  agents: [aegis, titan, oracle, lorekeeper, marvin]
 features: [worktrees, subagents]
 ---
 

@@ -5,6 +5,8 @@ tags: [exploration, onboarding, orchestration]
 requires:
   skills: []
   agents: []
+suggests:
+  agents: [ironclad, lorekeeper, hex]
 features: [subagents]
 ---
 

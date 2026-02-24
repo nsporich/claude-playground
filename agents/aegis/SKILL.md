@@ -5,7 +5,7 @@ tags: [review, security, orchestration]
 requires:
   skills: [code-review]
 suggests:
-  agents: [titan]
+  agents: [titan, lorekeeper, hex, marvin]
 features: [subagents]
 ---
 

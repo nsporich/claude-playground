@@ -30,7 +30,7 @@ const HERO_META: Record<string, HeroMeta> = {
     skillSet: "Deploys the right agent for any mission.",
     flavorText:
       "Assessing the situation\u2026 This is a job for Ironclad. Deploying now.",
-    color: "#1a1a2e",
+    color: "#4a4a5a",
     colorLight: "#e8e8f0",
     stats: { power: 3, precision: 3, speed: 5, range: 5, teamwork: 5 },
   },
@@ -93,6 +93,26 @@ const HERO_META: Record<string, HeroMeta> = {
     color: "#0891B2",
     colorLight: "#CFFAFE",
     stats: { power: 3, precision: 4, speed: 5, range: 5, teamwork: 4 },
+  },
+  hex: {
+    title: "The Reality Anomaly",
+    role: "UI Design & Accessibility",
+    skillSet: "Master of Frontend-Design, Accessibility, and Planning.",
+    flavorText:
+      "I can see the final form already. Let me weave this together \u2014 every element will find its place.",
+    color: "#C2185B",
+    colorLight: "#FCE4EC",
+    stats: { power: 4, precision: 5, speed: 3, range: 5, teamwork: 4 },
+  },
+  marvin: {
+    title: "The QA Intelligence",
+    role: "Testing & Quality Assurance",
+    skillSet: "Master of Test-Engineering, TDD, and Coverage Analysis.",
+    flavorText:
+      "Running a full diagnostic now, sir. I suspect we\u2019ll find the situation\u2026 illuminating.",
+    color: "#546E7A",
+    colorLight: "#ECEFF1",
+    stats: { power: 3, precision: 5, speed: 4, range: 4, teamwork: 5 },
   },
 };
 
@@ -223,6 +243,26 @@ function HeroIcon({ slug, color }: { slug: string; color: string }) {
           />
         </svg>
       );
+    case "hex":
+      return (
+        <svg {...props}>
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
+          />
+        </svg>
+      );
+    case "marvin":
+      return (
+        <svg {...props}>
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714a2.25 2.25 0 00.659 1.591L19 14.5M14.25 3.104c.251.023.501.05.75.082M19 14.5l-1.482 5.19a2.25 2.25 0 01-2.163 1.651h-6.71a2.25 2.25 0 01-2.163-1.651L5 14.5m14 0H5"
+          />
+        </svg>
+      );
     default:
       return null;
   }
@@ -348,7 +388,7 @@ export default function HeroRoster({ agents }: { agents: CatalogAsset[] }) {
       )}
 
       {/* Assembly Grid — remaining agents */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-4">
         {teamAgents.map((agent, i) => {
           const meta = HERO_META[agent.slug];
           if (!meta) return null;
