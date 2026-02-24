@@ -210,7 +210,7 @@ export default function GettingStartedPage() {
             title="Agents"
           >
             <p>
-              Agents are <CodeTag>AGENT.md</CodeTag> files that define
+              Agents are <CodeTag>SKILL.md</CodeTag> files that define
               opinionated personas. Each agent has a specialty&mdash;Aegis for
               code review, Deadeye for debugging, Ironclad for feature
               development&mdash;and knows exactly which skills to deploy.
@@ -230,15 +230,15 @@ export default function GettingStartedPage() {
               <div className="text-[var(--ink-faded)]">~/.claude/skills/</div>
               <div className="ml-4">
                 <span className="text-[var(--comic-red)]">ironclad/</span>
-                <span className="text-[var(--ink-faded)]"> AGENT.md</span>
+                <span className="text-[var(--ink-faded)]"> SKILL.md</span>
               </div>
               <div className="ml-4">
                 <span className="text-[var(--comic-red)]">aegis/</span>
-                <span className="text-[var(--ink-faded)]"> AGENT.md</span>
+                <span className="text-[var(--ink-faded)]"> SKILL.md</span>
               </div>
               <div className="ml-4">
                 <span className="text-[var(--comic-red)]">deadeye/</span>
-                <span className="text-[var(--ink-faded)]"> AGENT.md</span>
+                <span className="text-[var(--ink-faded)]"> SKILL.md</span>
               </div>
             </div>
           </InfoCard>
@@ -506,7 +506,7 @@ export default function GettingStartedPage() {
                   AGENTS
                 </td>
                 <td className="px-5 py-3 font-mono text-xs text-[var(--comic-blue)] font-bold">
-                  ~/.claude/skills/&lt;name&gt;/AGENT.md
+                  ~/.claude/skills/&lt;name&gt;/SKILL.md
                 </td>
                 <td className="px-5 py-3 text-[var(--ink-light)] font-bold">
                   Global &mdash; all sessions

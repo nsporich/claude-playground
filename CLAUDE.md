@@ -4,7 +4,7 @@ Opinionated agent personas and skills for Claude Code. Agents orchestrate skills
 
 ## Structure
 
-- `agents/<name>/AGENT.md` — Agent personas (orchestration-level workflows)
+- `agents/<name>/SKILL.md` — Agent personas (orchestration-level workflows)
 - `skills/<group>/<name>/SKILL.md` — Skills (building-block workflows)
 - `scripts/build-catalog.sh` — Generates catalog.json from frontmatter
 - `install.sh` — Interactive installer with dependency resolution
@@ -12,7 +12,7 @@ Opinionated agent personas and skills for Claude Code. Agents orchestrate skills
 
 ## Adding Assets
 
-1. Create a directory with an `AGENT.md` or `SKILL.md` file
+1. Create a directory with a `SKILL.md` file
 2. Add YAML frontmatter with `name`, `description`, and `tags`
 3. For agents, add `requires` (skills/agents) and `features` fields
 4. Run `bash scripts/build-catalog.sh` to regenerate the catalog

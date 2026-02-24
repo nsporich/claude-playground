@@ -25,8 +25,8 @@ Assess → Deploy → Debrief
 
 When the user describes a task, identify the right agent to handle it.
 
-1. Scan `~/.claude/skills/` for directories containing `AGENT.md`
-2. Read each agent's YAML frontmatter: `name`, `description`, `tags`
+1. Scan `~/.claude/skills/` for directories containing `SKILL.md`
+2. Read each SKILL.md's YAML frontmatter: `name`, `description`, `tags`
 3. Match the user's request against descriptions and tags to find the best-fit agent
 4. If the match is ambiguous (multiple agents could handle it), ask the user a clarifying question
 5. Announce the deployment: "Deploying **[Agent Name]** — [agent description]."

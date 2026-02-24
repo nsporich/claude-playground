@@ -157,7 +157,7 @@ if [ -d "$REPO_ROOT/agents" ]; then
     aslug="$(basename "$(dirname "$mdfile")")"
     agent_file_slugs+=("$aslug")
     agent_file_paths+=("$mdfile")
-  done < <(find "$REPO_ROOT/agents" -name 'AGENT.md' -print0)
+  done < <(find "$REPO_ROOT/agents" -name 'SKILL.md' -print0)
 
   declare -a processed_agents=()
 

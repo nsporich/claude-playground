@@ -53,7 +53,7 @@ Director figures out which agent to deploy. You can also invoke agents directly 
 
 ## Contributing
 
-1. Create a `.md` file in the right directory (`agents/<name>/AGENT.md` or `skills/<group>/<name>/SKILL.md`).
+1. Create a `SKILL.md` file in the right directory (`agents/<name>/` or `skills/<group>/<name>/`).
 2. Add YAML frontmatter with `name`, `description`, and `tags`. Agents also need `requires` and `features`.
 3. Run `bash scripts/build-catalog.sh` to regenerate the catalog.
 4. Submit a PR to the [GitHub repo](https://github.com/nsporich/agents-assemble).
