@@ -169,11 +169,11 @@ export default function Home() {
 
               {/* Used by agents */}
               {skill.used_by && skill.used_by.length > 0 && (
-                <div className="flex items-center gap-1.5">
+                <div className="flex flex-wrap items-center gap-1.5">
                   <span className="text-[10px] text-[var(--ink-faded)] font-bold">
                     Used by
                   </span>
-                  <div className="flex gap-1">
+                  <div className="flex flex-wrap gap-1">
                     {skill.used_by.map((agent) => {
                       const heroColor = getHeroColor(agent);
                       return (
