@@ -396,11 +396,16 @@ if [ "$update_count" -eq 0 ] && [ "$deploy_count" -eq 0 ]; then
   exit 0
 fi
 
-parts=()
-[ "$update_count" -gt 0 ] && parts+=("$update_count update$([ "$update_count" -ne 1 ] && echo 's')")
-[ "$deploy_count" -gt 0 ] && parts+=("$deploy_count new deployment$([ "$deploy_count" -ne 1 ] && echo 's')")
-summary_line="$(IFS=' • '; echo "${parts[*]}")"
-printf "  ${GRAY}%s${RESET}\n" "$summary_line"
+# Counts line: "7 agents · 8 skills • 3 new deployments"
+agent_total=${#needed_agent_slugs[@]}
+skill_total=${#needed_skill_list[@]}
+
+change_parts=()
+[ "$update_count" -gt 0 ] && change_parts+=("$update_count update$([ "$update_count" -ne 1 ] && echo 's')")
+[ "$deploy_count" -gt 0 ] && change_parts+=("$deploy_count new deployment$([ "$deploy_count" -ne 1 ] && echo 's')")
+change_summary="$(IFS=' • '; echo "${change_parts[*]}")"
+
+printf "  ${GRAY}%s agents · %s skills • %s${RESET}\n" "$agent_total" "$skill_total" "$change_summary"
 
 echo ""
 
