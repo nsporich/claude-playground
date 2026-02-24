@@ -29,67 +29,67 @@ const HERO_META: Record<string, HeroMeta> = {
     role: "Mission Orchestration",
     skillSet: "Deploys the right agent for any mission.",
     flavorText:
-      "You don\u2019t need to know every agent\u2019s name. Just tell the Director what you need, and he\u2019ll assemble the team.",
+      "Assessing the situation\u2026 This is a job for Ironclad. Deploying now.",
     color: "#1a1a2e",
     colorLight: "#e8e8f0",
     stats: { power: 3, precision: 3, speed: 5, range: 5, teamwork: 5 },
   },
   ironclad: {
-    title: "The Heavy Hitter",
+    title: "The Genius Engineer",
     role: "Feature Development",
     skillSet: "Master of Planning, TDD, and Feature-Implementation.",
     flavorText:
-      "If you can dream the blueprint, Ironclad can forge the fortress. He doesn\u2019t just write code; he constructs reality.",
+      "Already three steps ahead. I\u2019ll architect the solution \u2013 try to keep up.",
     color: "#E23636",
     colorLight: "#FEE2E2",
     stats: { power: 5, precision: 3, speed: 3, range: 4, teamwork: 4 },
   },
   deadeye: {
-    title: "The Marksman",
+    title: "The Sharpshooter",
     role: "Elite Bug Hunting",
     skillSet: "Precision Bug-Diagnosis, TDD, and Code-Review.",
     flavorText:
-      "Deadeye never misses. While others guess at the cause, he\u2019s already neutralized the target from ten thousand lines away.",
+      "Got eyes on the target. Following the trail\u2026 there it is. One shot, one fix.",
     color: "#7C3AED",
     colorLight: "#EDE9FE",
     stats: { power: 3, precision: 5, speed: 4, range: 3, teamwork: 3 },
   },
   aegis: {
-    title: "The Sentinel",
+    title: "The Shield",
     role: "Code Review Specialist",
     skillSet: "Pure, unyielding Code-Review.",
     flavorText:
-      "The final line of defense. If a single semicolon is out of place, the shield stays up. Nothing enters the master branch without Aegis\u2019s seal.",
+      "I don\u2019t stand down when quality is on the line. Let me run the review \u2013 I\u2019ll make sure this code is worthy.",
     color: "#2563EB",
     colorLight: "#DBEAFE",
     stats: { power: 3, precision: 5, speed: 2, range: 2, teamwork: 4 },
   },
   titan: {
-    title: "The Colossus",
+    title: "The Powerhouse",
     role: "Optimization Specialist",
     skillSet: "Performance Optimization and Code-Review.",
     flavorText:
-      "Built for the heavy lifting. When the system groans under the weight of technical debt, Titan pulls the load until it\u2019s lean and lethal.",
+      "Titan sees slow code. Titan fixes it. 3x faster now. You\u2019re welcome.",
     color: "#16A34A",
     colorLight: "#DCFCE7",
     stats: { power: 5, precision: 4, speed: 4, range: 3, teamwork: 3 },
   },
   lorekeeper: {
-    title: "The Archivist",
+    title: "The Mystic Archivist",
     role: "Master of Documentation",
     skillSet: "Comprehensive Documentation orchestration.",
     flavorText:
-      "The guardian of the sacred texts. Lorekeeper ensures that the \u2018how\u2019 and \u2018why\u2019 of your mission are never lost to time.",
+      "I\u2019ve peered beyond the veil of this codebase. Let me commit what I\u2019ve seen to the archives before the knowledge is lost.",
     color: "#D97706",
     colorLight: "#FEF3C7",
     stats: { power: 2, precision: 4, speed: 3, range: 5, teamwork: 5 },
   },
   oracle: {
-    title: "The All-Seeing",
+    title: "The Celestial",
     role: "Codebase Onboarding",
     skillSet: "Operates via specialized Built-in Subagents.",
     flavorText:
-      "Oracle doesn\u2019t read your code; she understands it. She maps the dark corners of legacy repos so the rest of the team can strike with certainty.",
+      "I perceive the architecture in its entirety. Three subsystems, interconnected. Allow me to illuminate what others cannot see.",
     color: "#0891B2",
     colorLight: "#CFFAFE",
     stats: { power: 3, precision: 4, speed: 5, range: 5, teamwork: 4 },
@@ -358,7 +358,7 @@ export default function HeroRoster({ agents }: { agents: CatalogAsset[] }) {
             <button
               key={agent.slug}
               onClick={() => handleSelect(agent.slug)}
-              className="animate-fade-up group relative p-4 sm:p-5 text-center transition-all duration-200 cursor-pointer bg-[var(--panel-bg)] speed-hover"
+              className="animate-fade-up group relative p-4 sm:p-5 text-center transition-all duration-200 cursor-pointer bg-[var(--panel-bg)] speed-hover flex flex-col items-center"
               style={{
                 border: `3px solid var(--ink)`,
                 boxShadow: isSelected
@@ -402,7 +402,7 @@ export default function HeroRoster({ agents }: { agents: CatalogAsset[] }) {
               </h3>
 
               {/* Title */}
-              <p className="mt-0.5 text-[10px] sm:text-[11px] tracking-wider uppercase text-[var(--ink-light)] font-bold">
+              <p className="mt-auto pt-0.5 text-[10px] sm:text-[11px] tracking-wider uppercase text-[var(--ink-light)] font-bold">
                 {meta.title}
               </p>
 
