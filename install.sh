@@ -427,8 +427,6 @@ echo ""
 # ── Step 9: Install everything ───────────────────────────────────────────────
 mkdir -p "$SKILLS_DIR"
 
-declare -a summary=()
-
 # Install skills first
 for i in $(seq 0 $((${#needed_skill_list[@]} - 1))); do
   slug="${needed_skill_list[$i]}"
@@ -468,11 +466,6 @@ for i in $(seq 0 $((${#needed_skill_list[@]} - 1))); do
   fi
 
   ln -s "$src_dir" "$target"
-  if [ "$is_update" = "yes" ]; then
-    summary+=("$(printf "${CYAN}↻${RESET}  %-14s  ${GRAY}skill updated${RESET}" "$slug")")
-  else
-    summary+=("$(printf "${GREEN}✓${RESET}  %-14s  ${GRAY}skill deployed${RESET}" "$slug")")
-  fi
 done
 
 # Install agents
@@ -500,19 +493,56 @@ for i in $(seq 0 $((${#needed_agent_slugs[@]} - 1))); do
   fi
 
   ln -s "$src_dir" "$target"
-  if [ "$is_update" = "yes" ]; then
-    summary+=("$(printf "${CYAN}↻${RESET}  %-14s  ${GRAY}agent updated${RESET}" "$slug")")
-  else
-    summary+=("$(printf "${GREEN}✓${RESET}  %-14s  ${GRAY}agent deployed${RESET}" "$slug")")
-  fi
 done
 
 # ── Step 10: Summary ─────────────────────────────────────────────────────────
 printf "  ${BOLD}${WHITE}DEPLOYMENT COMPLETE${RESET}\n"
 printf "  ${GRAY}──────────────────────────────────────────────${RESET}\n"
-for line in "${summary[@]}"; do
-  printf "  %b\n" "$line"
+printf "  ${BOLD}${WHITE}%-26s${RESET}${BOLD}${WHITE}%s${RESET}\n" "AGENTS" "SKILLS"
+
+# Two-column display: agents on left, skills on right
+max_rows=$(( ${#needed_agent_slugs[@]} > ${#needed_skill_list[@]} ? ${#needed_agent_slugs[@]} : ${#needed_skill_list[@]} ))
+
+for r in $(seq 0 $((max_rows - 1))); do
+  left=""
+  left_plain=""
+
+  if [ "$r" -lt "${#needed_agent_slugs[@]}" ]; then
+    a_name="${AGENT_NAME[${needed_agent_idxs[$r]}]}"
+    a_status="${agent_status[$r]}"
+    if [ "$a_status" = "update" ]; then
+      left="$(printf "${CYAN}↻${RESET} %s" "$a_name")"
+    else
+      left="$(printf "${GREEN}✓${RESET} %s" "$a_name")"
+    fi
+    left_plain="$a_name"
+  fi
+
+  right=""
+  if [ "$r" -lt "${#needed_skill_list[@]}" ]; then
+    s_slug="${needed_skill_list[$r]}"
+    s_status="${skill_status[$r]}"
+    if [ "$s_status" = "update" ]; then
+      right="$(printf "${CYAN}↻${RESET} %s" "$s_slug")"
+    else
+      right="$(printf "${GREEN}✓${RESET} %s" "$s_slug")"
+    fi
+  fi
+
+  # Print with fixed column width
+  if [ -n "$left" ]; then
+    pad=$(( 24 - ${#left_plain} ))
+    printf "  %b%*s" "$left" "$pad" ""
+  else
+    printf "  %26s" ""
+  fi
+
+  if [ -n "$right" ]; then
+    printf "%b" "$right"
+  fi
+  printf "\n"
 done
+
 printf "  ${GRAY}──────────────────────────────────────────────${RESET}\n"
 echo ""
 printf "  ${BOLD}${WHITE}Your team is assembled.${RESET}\n"
