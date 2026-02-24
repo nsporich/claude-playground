@@ -46,9 +46,9 @@ export default function Home() {
 
           {/* Title — Big, bold, comic style */}
           <h1 className="animate-fade-up animate-delay-1 font-[family-name:var(--font-display)] text-7xl sm:text-8xl lg:text-[10rem] tracking-wider text-[var(--ink)] leading-none comic-text-3d">
-            ASSEMBLE
+            AGENTS,
             <br />
-            <span className="text-[var(--comic-red)]">YOUR TEAM</span>
+            <span className="text-[var(--comic-red)]">ASSEMBLE!</span>
           </h1>
 
           {/* Subtitle */}
