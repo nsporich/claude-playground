@@ -380,8 +380,8 @@ for i in $(seq 0 $((${#needed_agent_slugs[@]} - 1))); do
     deploy)  status_label="${GREEN}+ deploy${RESET}" ;;
   esac
 
-  # Extract title from description (text after the em dash)
-  title="$(echo "$desc" | sed 's/.*— //')"
+  # Extract codename from description (text before the em dash)
+  title="$(echo "$desc" | sed 's/ — .*//')"
 
   printf "  %b  ${BOLD}%-14s${RESET}${GRAY}%-22s${RESET} %b\n" "$icon" "$name" "$title" "$status_label"
 done
